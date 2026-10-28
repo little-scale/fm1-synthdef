@@ -21,7 +21,7 @@ static float decay_tick(float *hi,float *lo,float x,float grow){
  float low=(*hi-(sum-back))+(d-back)+*lo+dl;
  *hi=sum+low;*lo=low-(*hi-sum);return *hi;
 }
-static void extensions(const fm_graph *g,fm_voice *v,fm_scratch *b,const fm_node *n,fm_state *s,unsigned count,float sr,int initializing) {
+static __attribute__((noinline)) void extensions(const fm_graph *g,fm_voice *v,fm_scratch *b,const fm_node *n,fm_state *s,unsigned count,float sr,int initializing) {
  unsigned j;float *out=b->signal[n->output],x=input(g,b,n,0,0);
  float param=n->inputs>1?input(g,b,n,1,0):0,third=n->inputs>2?input(g,b,n,2,0):0;
  float old=s->b1,target=old,old2=s->b2,target2=old2,previous_inc,block_trigger=s->last;

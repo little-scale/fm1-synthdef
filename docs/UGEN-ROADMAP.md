@@ -17,11 +17,11 @@ Updated 28 October 2026. The development source now implements **77 UGen types**
 | `FreeVerb`, `FreeVerb2`, `MiVerb` | Audio | Exact-size caller-owned state, constructor behavior, stereo routing, freeze, parameter clamps, pinned upstream oracles |
 | `.cpsmidi`, `.midiratio`, `.ratiomidi`, `.dbamp`, `.ampdb` | Initial/control/audio operators | Domain checks and host/device-math comparison |
 
-The implementation reuses existing per-node state. Static RAM remains **78,384 bytes** and pool use **325,992 of 344,064 bytes**. The development application is **226,972 bytes**, 19,068 bytes larger than the preview. Those separate memory regions do not establish a CPU budget.
+The implementation reuses existing per-node state. The current battery-display build uses **78,432 bytes** of static RAM and pool use **325,992 of 344,064 bytes**. The development application is **226,104 bytes**, 18,200 bytes larger than the preview. Those separate memory regions do not establish a CPU budget.
 
 See the [engine profile](../synthdef-engine/README.md#supported-profile) for rate/domain restrictions. In particular: Impulse phase is initial-rate only; filter coefficients, Dust density and decay times are initial/control rate; audio triggered-random outputs require an audio trigger. TExpRand audio behavior follows a version-specific SuperCollider 3.14.1 quirk documented there.
 
-Reverb memory is charged to the existing arena: FreeVerb 50,492 bytes, FreeVerb2 102,088 bytes, MiVerb 65,536 bytes per instance. Their implementation required dedicated memory admission and reference tests; physical CPU verification remains pending.
+Reverb memory is charged to the existing arena: FreeVerb 50,492 bytes, FreeVerb2 102,088 bytes, MiVerb 65,536 bytes per instance. Their implementation required dedicated memory admission and reference tests; physical CPU results and graph-specific limits are recorded in [VERIFICATION.md](VERIFICATION.md).
 
 The [verification record](VERIFICATION.md) covers reference comparisons, API checks, sanitizer mutations, two-voice instrument emulation and firmware compilation. The [Dust chimes example](../fm1-synth/examples/dust-chimes.scd) demonstrates the requested random-trigger/decay combination.
 

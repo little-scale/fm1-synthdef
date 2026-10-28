@@ -2,19 +2,21 @@
  * C adaptation of MiVerb (Volker Bohm, GPL-3.0-or-later) and Emilie Gillet's
  * MIT-licensed reverb, fx_engine and cosine oscillator. Original notices and
  * pinned source are retained under reference/mi-ugens/.
- * 32768 packed signed-16 samples, accessed via memcpy to respect float-arena
+ * 32768 packed signed-16 samples, accessed via unsigned bytes to respect float-arena
  * aliasing. All filters/LFOs reuse this node's existing fm_state fields.
  */
 typedef struct { float acc,previous;uint32_t pos;unsigned char *mem;fm_voice *voice; } mi_context;
 static float mi_read(mi_context *c,unsigned offset) {
- int16_t sample;memcpy(&sample,c->mem+2*((c->pos+offset)&32767u),2);
+ unsigned at=2*((c->pos+offset)&32767u);
+ unsigned bits=c->mem[at]|((unsigned)c->mem[at+1]<<8);
+ int32_t sample=bits>=32768u?(int32_t)bits-65536:(int32_t)bits;
  return (float)sample*(1.0f/32768.0f);
 }
 static void mi_write(mi_context *c,unsigned offset,float scale) {
- float x=c->acc;int16_t sample;
+ float x=c->acc;uint16_t sample;unsigned at=2*((c->pos+offset)&32767u);
  if(!isfinite(x)){c->voice->fault=1;x=0;}
- x=fminf(32767.0f/32768.0f,fmaxf(-1.0f,x));sample=(int16_t)(int32_t)(x*32768.0f);
- memcpy(c->mem+2*((c->pos+offset)&32767u),&sample,2);c->acc*=scale;
+ x=fminf(32767.0f/32768.0f,fmaxf(-1.0f,x));sample=(uint16_t)(int16_t)(int32_t)(x*32768.0f);
+ c->mem[at]=(unsigned char)sample;c->mem[at+1]=(unsigned char)(sample>>8);c->acc*=scale;
 }
 static void mi_ap(mi_context *c,unsigned base,unsigned length,float gain) {
  c->previous=mi_read(c,base+length-1);c->acc+=c->previous*gain;
@@ -37,7 +39,7 @@ static float mi_clip(float x) {
  float x2;if(x < -3.0f)return -1;if(x>3.0f)return 1;
  x2=x*x;return x*((27.0f+x2)/(27.0f+9.0f*x2));
 }
-static void render_miverb(const fm_graph *g,fm_voice *v,fm_scratch *b,const fm_node *n,fm_state *s,float *mem,unsigned count,int initializing) {
+static __attribute__((noinline)) void render_miverb(const fm_graph *g,fm_voice *v,fm_scratch *b,const fm_node *n,fm_state *s,float *mem,unsigned count,int initializing) {
  unsigned j;float time=input(g,b,n,0,0),amount=input(g,b,n,1,0),lp=input(g,b,n,2,0),hp=input(g,b,n,3,0);
  float gain=0.2f,kap=input(g,b,n,5,0);int freeze=input(g,b,n,4,0)>0;
  mi_context c;c.mem=(unsigned char*)mem;c.voice=v;

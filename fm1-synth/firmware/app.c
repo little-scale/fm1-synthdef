@@ -11,6 +11,8 @@
 #endif
 #include <string.h>
 #include <math.h>
+#include "battery.h"
+#include "key_confirm.h"
 static fms_performance instrument PLAT_POOL;
 static fm_graph synth_graph PLAT_POOL;
 /* The effect fits ordinary RAM; both voices and its delay lines share the pool. */
@@ -18,19 +20,28 @@ static fm_graph effect_graph;
 static fm_voice effect_voice;
 static int effect_ready,effect_reset_pending;
 static uint8_t package[FMS_PAYLOAD+1] PLAT_POOL;
-static uint32_t held_keys,held_buttons,overlay_until,last_frame,source_len;
+static volatile uint32_t key_note_events,midi_note_events;
+static uint32_t rejected_key_events,rejected_key_mask,unconfirmed_keys;
+static uint32_t panel_held_keys,held_buttons,overlay_until,last_frame,source_len;
 static unsigned slot,view_slot,scroll_line,total_lines=1;
 static int overlay=-1,loaded;
 static const char *source="// Empty slot";
 static char title[64]="Empty",notice[64];
 static volatile unsigned paused,panic_pending,qread,qwrite;
 static volatile uint32_t overloads,render_peak_us,render_last_us,start_peak_us,steady_peak_us;
-static uint32_t microseconds(void){
+static uint32_t timer_ticks(void){
 #ifdef PLAT_HOST
  return plat_ms()*1000u;
 #else
- return fm1_ticks()/FM1_TICKS_PER_US;
+ return fm1_ticks();
 #endif
+}
+static uint32_t elapsed_us(uint32_t start){
+ uint32_t elapsed=timer_ticks()-start;
+#ifndef PLAT_HOST
+ elapsed/=FM1_TICKS_PER_US;
+#endif
+ return elapsed;
 }
 typedef struct {unsigned kind,key,value;} panel_event;
 static panel_event queue[64];
@@ -55,7 +66,7 @@ static void event(unsigned kind,unsigned key,unsigned value){
  plat_unlock(f);
 }
 static uint32_t little32(const uint8_t *p){return (uint32_t)p[0]|(uint32_t)p[1]<<8|(uint32_t)p[2]<<16|(uint32_t)p[3]<<24;}
-void app_panic(void){panic_pending=1;held_keys=0;}
+void app_panic(void){panic_pending=1;panel_held_keys=0;}
 void app_overload(void){fms_panic(&instrument);effect_voice.active=0;overloads++;}
 static int package_graph(fm_graph *graph,const void *ptr,uint32_t n){
  const uint8_t *p=ptr;uint32_t m,s,b;char err[100];
@@ -111,39 +122,42 @@ static void view_code(unsigned index){
  done:total_lines=fms_code(source,source_len,0,0,38,0,0);
 }
 
-void app_init(void){held_keys=held_buttons=0;overlay_until=last_frame=0;memset(&instrument,0,sizeof instrument);memset(&link,0,sizeof link);link.flash=(fms_flash){0,flash_read,flash_erase,flash_write};load_effect();choose(0);}
+void app_init(void){panel_held_keys=held_buttons=0;overlay_until=last_frame=0;memset(&instrument,0,sizeof instrument);memset(&link,0,sizeof link);link.flash=(fms_flash){0,flash_read,flash_erase,flash_write};load_effect();choose(0);}
 static uint32_t midi_id(unsigned port,unsigned channel,unsigned key){return 0x20000u+(port<<12)+(channel<<8)+key;}
 void app_render(int32_t *lr,uint32_t n,uint32_t master_q12){
- uint32_t packet,j,count=0,base,t0=microseconds(),serial=instrument.serial,elapsed;int port;float out[FM_BLOCK*2];
+ uint32_t packet,j,count=0,base,t0=timer_ticks(),serial=instrument.serial,elapsed;int port;float out[FM_BLOCK*2];
  if(paused){memset(lr,0,n*2*sizeof *lr);while(count++<32 && plat_midi_in(&packet,&port)){}return;}
  if(panic_pending){fms_panic(&instrument);fms_reset_effect(&instrument);qread=qwrite;panic_pending=0;}
  while(qread!=qwrite){panel_event e=queue[qread];qread=(qread+1)%64;
-  if(e.kind==0 && loaded)fms_key(&instrument,e.key,e.value&127,e.value>>7);
+  if(e.kind==0 && loaded){if(e.value>>7)key_note_events++;fms_key(&instrument,e.key,e.value&127,e.value>>7);}
   else if(e.kind==1)fms_octave(&instrument,e.value?1:-1);
   else if(e.kind==2)fms_knob(&instrument,e.key,(float)e.value/100);
  }
  while(count++<32 && plat_midi_in(&packet,&port)){
   unsigned status=packet>>8&255,key=packet>>16&127,velocity=packet>>24&127;uint32_t id=midi_id((unsigned)port,status&15,key);
-  if((status&240)==144){if(loaded)fms_note_on(&instrument,id,key,velocity);}
+  if((status&240)==144){if(loaded){if(velocity)midi_note_events++;fms_note_on(&instrument,id,key,velocity);}}
   else if((status&240)==128)fms_note_off(&instrument,id);
   else if((status&240)==176 && (key==120 || key==123))fms_panic(&instrument);
  }
  instrument.master=(float)master_q12/4096;
  if(n%FM_BLOCK || (!loaded && !effect_ready)){memset(lr,0,n*2*sizeof *lr);return;}
  for(base=0;base<n;base+=FM_BLOCK){fms_render(&instrument,out);for(j=0;j<FM_BLOCK*2;j++)lr[base*2+j]=(int32_t)(out[j]*8388607.0f);}
- elapsed=microseconds()-t0;render_last_us=elapsed;if(elapsed>render_peak_us)render_peak_us=elapsed;
+ elapsed=elapsed_us(t0);render_last_us=elapsed;if(elapsed>render_peak_us)render_peak_us=elapsed;
  if(instrument.serial!=serial){if(elapsed>start_peak_us)start_peak_us=elapsed;}else if(elapsed>steady_peak_us)steady_peak_us=elapsed;
 }
 static void inputs(void){
- unsigned k;uint32_t keys,buttons=plat_buttons(),pressed=buttons&~held_buttons;int e;
- touch_poll();keys=touch_keys();
+ unsigned k;uint32_t keys,sensed,contacts,rejected,buttons=plat_buttons(),pressed=buttons&~held_buttons;int e;
+ touch_poll();sensed=touch_keys();contacts=plat_keys();
+ rejected=sensed & ~(contacts | panel_held_keys);
+ for(k=0;k<NKEYS;k++)if((rejected & ~unconfirmed_keys)&(1u<<k)){rejected_key_events++;rejected_key_mask=1u<<k;}
+ unconfirmed_keys=rejected;keys=fms_confirm_keys(sensed,contacts,panel_held_keys);
  if(pressed&(1u<<B_OCTUP))event(1,0,1);if(pressed&(1u<<B_OCTDN))event(1,0,0);
- if(pressed&(1u<<B_HOME)){app_panic();held_keys=keys;}
- if((e=plat_enc(EN_PRESET))){int pick=((int)view_slot+e)%9;if(pick<0)pick+=9;if((unsigned)pick==FMS_FX_SLOT || (unsigned)pick==slot)view_code((unsigned)pick);else{choose((unsigned)pick);held_keys=keys;}}
- for(k=0;k<NKEYS;k++){uint32_t bit=1u<<k;if((keys&bit) && !(held_keys&bit)){if(loaded)event(0,k,128u+touch_vel(k));}else if(!(keys&bit) && held_keys&bit)event(0,k,0);}
+ if(pressed&(1u<<B_HOME)){app_panic();panel_held_keys=keys;}
+ if((e=plat_enc(EN_PRESET))){int pick=((int)view_slot+e)%9;if(pick<0)pick+=9;if((unsigned)pick==FMS_FX_SLOT || (unsigned)pick==slot)view_code((unsigned)pick);else{choose((unsigned)pick);panel_held_keys=keys;}}
+ for(k=0;k<NKEYS;k++){uint32_t bit=1u<<k;if((keys&bit) && !(panel_held_keys&bit)){if(loaded)event(0,k,128u+touch_vel(k));}else if(!(keys&bit) && panel_held_keys&bit)event(0,k,0);}
  if((e=plat_enc(EN_SELECT))){int next=(int)scroll_line+e,max=total_lines>15?(int)total_lines-15:0;scroll_line=(unsigned)clamp(next,0,max);}
  for(k=0;k<4;k++)if((e=plat_enc(EN_K1+(int)k))){unsigned v=(unsigned)clamp((int)(ui_knobs[k]*100+0.5f)+2*e,0,100);ui_knobs[k]=(float)v/100;event(2,k,v);overlay=(int)k;overlay_until=plat_ms()+1200;}
- held_keys=keys;held_buttons=buttons;plat_glow(1);plat_leds(buttons,keys);
+ panel_held_keys=keys;held_buttons=buttons;plat_glow(1);plat_leds(buttons,keys);
 }
 void app_input_only(void){inputs();}
 static unsigned draw_row;
@@ -155,10 +169,10 @@ static void draw(void){
  char text[64];unsigned row,k;
  cv_begin(240,24,C_WHITE);
  if(view_slot==FMS_FX_SLOT){
-  snprintf(text,sizeof text,"00 FX %.26s",title);cv_text(6,0,&FONT_XS,text,C_BLACK);
+  snprintf(text,sizeof text,"00 FX %.22s",title);cv_text(6,0,&FONT_XS,text,C_BLACK);
   snprintf(text,sizeof text,"PLAY %02u %.24s",slot+1,loaded?synth_graph.name:"Empty");cv_text(6,12,&FONT_XS,text,C_BLACK);
  }else{snprintf(text,sizeof text,"%02u/08 %.18s%s",slot+1,title,effect_ready?(effect_voice.active?" FX":" FX!"):"");cv_text(6,5,&FONT_XS,text,C_BLACK);}
- cv_blit(0,0);
+ battery_draw();cv_blit(0,0);
  for(row=0;row<15;row++){cv_begin(240,12,C_WHITE);draw_row=row;fms_code(source,source_len,scroll_line,15,38,code_glyph,0);cv_blit(0,26+(int)row*12);}
  cv_begin(240,24,C_WHITE);snprintf(text,sizeof text,"%u/%u OCT%+d",scroll_line+1,total_lines,instrument.octave);cv_text(6,7,&FONT_XS,text,C_BLACK);
  for(k=0;k<2;k++){float peak=instrument.peak[k],db=peak>0.001f?20*log10f(peak):-60;int width=(int)(90*fminf(1,fmaxf(0,(db+60)/60)));cv_text(130,1+(int)k*11,&FONT_XS,k?"R":"L",C_BLACK);cv_rect(140,4+(int)k*11,90,5,RGB(235,235,235));cv_rect(140,4+(int)k*11,width,5,instrument.clip[k]?RGB(191,0,0):C_BLACK);}
@@ -166,12 +180,15 @@ static void draw(void){
  if(overlay>=0 && plat_ms()<overlay_until){unsigned value=(unsigned)(ui_knobs[overlay]*100+0.5f);cv_begin(228,24,C_WHITE);snprintf(text,sizeof text,"knob%d   %u.%02u",overlay+1,value/100,value%100);cv_text(6,1,&FONT_XS,text,C_BLACK);cv_rect(6,18,(int)(210*ui_knobs[overlay]),3,C_BLACK);cv_blit(6,180);}
 }
 void app_ui_init(void){touch_on(1);lcd_fill(0,0,240,240,C_WHITE);draw();}
-void app_frame(void){inputs();if(plat_ms()-last_frame>=40){draw();last_frame=plat_ms();}}
+void app_frame(void){inputs();battery_poll();if(plat_ms()-last_frame>=40){draw();last_frame=plat_ms();}}
 void app_say(const char *a,const char *b){snprintf(notice,sizeof notice,"%.30s %.30s",a?a:"",b?b:"");}
 int app_expect(const char *what,int *got){
  unsigned i;if(!strcmp(what,"slot"))*got=(int)slot;else if(!strcmp(what,"view"))*got=(int)view_slot;else if(!strcmp(what,"loaded"))*got=loaded;else if(!strcmp(what,"octave"))*got=instrument.octave;else if(!strcmp(what,"scroll"))*got=(int)scroll_line;
  else if(!strcmp(what,"held")){*got=0;for(i=0;i<FMS_VOICES;i++)*got+=instrument.voice[i].held;}
  else if(!strcmp(what,"active")){*got=0;for(i=0;i<FMS_VOICES;i++)*got+=instrument.voice[i].synth.active;}
+ else if(!strcmp(what,"battery"))*got=battery_bars;
+ else if(!strcmp(what,"battery_raw"))*got=battery_raw;
+ else if(!strcmp(what,"battery_usb"))*got=battery_usb;
  else if(!strcmp(what,"faults"))*got=(int)instrument.faults;
  else if(!strcmp(what,"effect"))*got=effect_ready && effect_voice.active;
  else if(!strcmp(what,"knob1"))*got=(int)(instrument.knobs[0]*100+0.5f);else return 0;return 1;
@@ -196,21 +213,43 @@ int app_sysex(const uint8_t *p,uint32_t n){
  static const uint8_t prefix[]={0x7d,0x46,0x4d,0x53,1};
  uint8_t raw[FMS_FRAME],reply[FMS_FRAME],wire[310];unsigned i=5,j=0,k,count,h,r,w;int commit;
  if(n<5 || memcmp(p,prefix,5))return 0;
+ /* Input-source diagnostics; optional sampling toggle for an ADC A/B test.
+  * It changes no stored settings and does not disable the keyboard or audio. */
+ if((n==6 || (n==7 && p[6]<=1)) && p[5]==0x7b){
+  uint32_t values[10],flags;
+  if(n==7)battery_poll_enabled=p[6];
+  flags=plat_lock();values[0]=key_note_events;values[1]=midi_note_events;
+  values[2]=panel_held_keys;values[3]=touch_keys();values[4]=instrument.voice[0].id;
+  values[5]=instrument.voice[1].id;values[6]=battery_samples;values[7]=battery_poll_enabled;values[8]=rejected_key_events;values[9]=rejected_key_mask;plat_unlock(flags);
+  wire[0]=0xf0;memcpy(wire+1,prefix,5);wire[6]=0x7b;w=7;
+  for(k=0;k<10;k++)for(j=0;j<5;j++)wire[w++]=(uint8_t)(values[k]>>(7*j))&127;
+  wire[w++]=0xf7;plat_sysex_send(wire,w);return 1;
+ }
+ /* Battery diagnostics: values are biased by one so unknown is wire-safe. */
+ if(n==6 && p[5]==0x7c){
+  uint32_t values[4]={(uint32_t)(battery_raw+1),(uint32_t)(battery_bars+1),(uint32_t)battery_usb,0};
+#ifndef PLAT_HOST
+  values[3]=fm1_an.timeouts;
+#endif
+  wire[0]=0xf0;memcpy(wire+1,prefix,5);wire[6]=0x7c;w=7;
+  for(k=0;k<4;k++)for(j=0;j<5;j++)wire[w++]=(uint8_t)(values[k]>>(7*j))&127;
+  wire[w++]=0xf7;plat_sysex_send(wire,w);return 1;
+ }
  /* Explicit diagnostic: benchmark while the audio ISR emits silence, then reload. */
  if(n==6 && p[5]==0x7e){
   uint32_t values[8]={0},t,elapsed;float out[FM_BLOCK*2];
   suspend_audio();
   if(loaded){
    instrument.voice_limit=FMS_VOICES; /* isolated benchmark only */
-   t=microseconds();fms_note_on(&instrument,0x777,60,70);values[0]=microseconds()-t;
-   t=microseconds();fms_render(&instrument,out);values[1]=microseconds()-t;
-   for(k=0;k<16;k++){t=microseconds();fms_render(&instrument,out);elapsed=microseconds()-t;if(elapsed>values[2])values[2]=elapsed;}
-   t=microseconds();fms_note_on(&instrument,0x778,67,70);values[3]=microseconds()-t;
-   t=microseconds();fms_render(&instrument,out);values[4]=microseconds()-t;
-   for(k=0;k<16;k++){t=microseconds();fms_render(&instrument,out);elapsed=microseconds()-t;if(elapsed>values[5])values[5]=elapsed;}
+   t=timer_ticks();fms_note_on(&instrument,0x777,60,70);values[0]=elapsed_us(t);
+   t=timer_ticks();fms_render(&instrument,out);values[1]=elapsed_us(t);
+   for(k=0;k<16;k++){t=timer_ticks();fms_render(&instrument,out);elapsed=elapsed_us(t);if(elapsed>values[2])values[2]=elapsed;}
+   t=timer_ticks();fms_note_on(&instrument,0x778,67,70);values[3]=elapsed_us(t);
+   t=timer_ticks();fms_render(&instrument,out);values[4]=elapsed_us(t);
+   for(k=0;k<16;k++){t=timer_ticks();fms_render(&instrument,out);elapsed=elapsed_us(t);if(elapsed>values[5])values[5]=elapsed;}
    values[6]=instrument.faults;values[7]=1;
   }
-  choose(slot);held_keys=touch_keys();wire[0]=0xf0;memcpy(wire+1,prefix,5);wire[6]=0x7e;w=7;
+  choose(slot);panel_held_keys=touch_keys();wire[0]=0xf0;memcpy(wire+1,prefix,5);wire[6]=0x7e;w=7;
   for(k=0;k<8;k++)for(j=0;j<5;j++)wire[w++]=(uint8_t)(values[k]>>(7*j))&127;
   wire[w++]=0xf7;plat_sysex_send(wire,w);return 1;
  }
@@ -226,7 +265,7 @@ int app_sysex(const uint8_t *p,uint32_t n){
   for(k=0;k<count;k++){if(p[i]>=128)return 1;raw[j++]=p[i++]|((h>>k&1)<<7);}}
  commit=j>=2 && raw[1]==FMS_COMMIT;
  if(commit)suspend_audio();link.validate=validate_package;r=fms_request(&link,raw,j,reply);
- if(commit){unsigned old_view=view_slot;load_effect();choose(slot);if(old_view==FMS_FX_SLOT)view_code(old_view);held_keys=touch_keys();}
+ if(commit){unsigned old_view=view_slot;load_effect();choose(slot);if(old_view==FMS_FX_SLOT)view_code(old_view);panel_held_keys=touch_keys();}
  if(!r)return 1;
  wire[0]=0xf0;memcpy(wire+1,prefix,5);w=6;
  for(i=0;i<r;i+=count){count=r-i<7?r-i:7;h=0;for(k=0;k<count;k++)h|=(reply[i+k]>>7)<<k;wire[w++]=(uint8_t)h;for(k=0;k<count;k++)wire[w++]=reply[i+k]&127;}

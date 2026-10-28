@@ -1,6 +1,6 @@
 {
   "id": "host-8",
-  "status": "development: emulation verified; new UGens not yet tested on FM-1 hardware",
+  "status": "development: 77 types verified in emulation; battery and selected two-voice reverb scenarios verified on FM-1",
   "implemented_types": [
     "Control",
     "SinOsc",
@@ -263,22 +263,23 @@
   "output_bus_parameter": "literal zero or initial/control expression resolving to zero; nonzero runtime bus faults and silences the voice",
   "target": {
     "identity": "FM-1_1200",
-    "status": "development build verified; previous 53-type preview passed hardware tests",
+    "status": "installed; selected reverb scenarios passed; two Addy voices through FreeVerb overload",
     "voices": 2,
     "hardware_block_frames": 256,
     "engine_block_frames": 64,
     "knob_increment": 0.02,
-    "image_bytes": 226972,
-    "static_ram_bytes": 78384,
+    "image_bytes": 226104,
+    "static_ram_bytes": 78432,
     "pool_bytes": 325992,
     "pool_capacity_bytes": 344064,
     "note_preparation_frames": 128,
-    "verification": "../evidence/reverbs-emulation.json",
+    "verification": "../evidence/battery-indicator.json",
     "effect_slot": 0,
     "synth_slots": 8,
     "slot_count": 9,
     "effect_capacity_bytes": 7936,
-    "previous_hardware_verification": "../evidence/master-effect.json"
+    "previous_hardware_verification": "../evidence/master-effect.json",
+    "reverb_verification": "../evidence/reverbs-hardware.json"
   },
   "input_bus": {
     "ugen": "In.ar",
@@ -316,6 +317,6 @@
     "MiVerb_inputs": "one or two audio channels; stereo output",
     "MiVerb_source": "v7b1/mi-UGens at 10f6824f68ad63475f67dfe3fe5016e2d2634f84",
     "MiVerb_storage": "packed signed 16-bit delay samples; float computation; upstream output soft clipping including dry signal",
-    "hardware_status": "not tested; no USB FM-1 detected"
+    "hardware_status": "Keys, triple saw, two-op FM and Dust chimes passed with two voices through each reverb; two Addy voices through FreeVerb overload"
   }
 }

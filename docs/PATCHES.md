@@ -28,4 +28,4 @@ These packages require the new development firmware. They are not installed auto
 | `master-freeverb2.fmslot` | Wet/dry, up to 60% wet | Room 0.2–0.95 |
 | `master-miverb.fmslot` | Wet/dry, up to 60% wet | Decay parameter 0.45–0.95 |
 
-Source and compiled forms are beside the packages in `fm1-synth/examples/`. FreeVerb's wet signal is mono while its example preserves dry stereo; FreeVerb2 and MiVerb provide stereo reverb. MiVerb exposes `freeze=0` for custom mappings. Knobs remain shared with synths that reference the same arguments. All examples passed emulation; physical playback/timing is pending.
+Source and compiled forms are beside the packages in `fm1-synth/examples/`. FreeVerb's wet signal is mono while its example preserves dry stereo; FreeVerb2 and MiVerb provide stereo reverb. MiVerb exposes `freeze=0` for custom mappings. Knobs remain shared with synths that reference the same arguments. All three passed hardware playback and tail checks with two voices of Keys, triple saw, two-op FM and Dust chimes. Two Addy voices through FreeVerb overload the device; see [verification](VERIFICATION.md).

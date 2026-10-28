@@ -8,6 +8,10 @@ build/libinstrument.dylib: $(SOURCES) $(wildcard src/*.h $(ENGINE)/*.h $(ENGINE)
 	mkdir -p build
 	$(CC) $(CFLAGS) -Isrc -I$(ENGINE) -fPIC -shared $(SOURCES) -lm -o $@
 test: all
+	$(CC) $(CFLAGS) tests/battery.c -o build/battery-test
+	build/battery-test
+	$(CC) $(CFLAGS) tests/input.c -o build/input-test
+	build/input-test
 	$(CC) $(CFLAGS) -Isrc -I$(ENGINE) $(SOURCES) tests/core.c -lm -o build/core-test
 	build/core-test
 	python3 -m unittest discover -s tests -p 'test_*.py' -v

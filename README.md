@@ -41,6 +41,8 @@ The development source supports these **77 compiled UGen types**, verified in em
 - `Env.perc`, `Env.adsr`, `Env.asr` and other Env constructors are source-language helpers compiled into `EnvGen` data. All nine EnvGen curve types are implemented, with done actions 0/2 and the documented segment limits.
 - `Mix`, `LinLin` and `PMOsc` can compile into existing supported nodes; they are not additional runtime types. Simple examples were compiled and host-rendered during the compatibility review. `DynKlang`/`DynKlank` likewise expand into supported oscillator/resonator graphs within the documented limits. This does not guarantee every argument/rate combination or CPU load.
 
+The development firmware adds a three-bar battery indicator and USB-power symbol in the top-right corner, including the slot 0 effect view.
+
 See [implementation status and remaining additions](docs/UGEN-ROADMAP.md). Three [slot-0 reverb examples](docs/PATCHES.md#development-reverb-alternatives) are included, with knob 3 for wet/dry and knob 4 for room size or decay. Try the new [Dust chimes source](fm1-synth/examples/dust-chimes.scd) in the development host preview: knob 1 controls event density and knob 2 decay time. It is not installed into the example bank automatically.
 
 ## Start here
@@ -67,7 +69,7 @@ Knobs 3–4 also affect echo while playing Triple saw. PRESET can display slot 0
 
 ## Status
 
-The development engine passes 553 SuperCollider reference comparisons on three rendering backends, 34 API test groups and 440,000 sanitizer mutation/truncation cases. The full instrument simulator also covers the additions with two voices and master echo. The earlier 53-type preview was tested on one FM-1 and an Apple silicon Mac; its recorded hardware checks cover two voices, stealing, release, live knobs, persistent effects and code browsing. See [verification and limitations](docs/VERIFICATION.md).
+The development engine passes 553 SuperCollider reference comparisons on three rendering backends, 34 API test groups and 440,000 sanitizer mutation/truncation cases. The full instrument simulator also covers the additions with two voices and master echo. The development build also passed 189 hardware checks of the three reverbs with four lighter two-voice synths; two Addy voices through FreeVerb exceed the processing budget. The earlier 53-type preview was tested on one FM-1 and an Apple silicon Mac; its recorded hardware checks cover two voices, stealing, release, live knobs, persistent effects and code browsing. See [verification and limitations](docs/VERIFICATION.md).
 
 Passing the graph and memory checks does **not** guarantee that an arbitrary patch fits the audio processing budget. The overload guard stops notes and disables effects when the device is over budget. Final-release power-cycle persistence and recovery are not yet part of the acceptance record. This is an independent project, not an official M-VAVE or SuperCollider product.
 

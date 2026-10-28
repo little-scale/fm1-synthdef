@@ -1,0 +1,123 @@
+{
+  "date": "2026-10-28",
+  "scope": "Top-right battery indicator; hardware sensor and UI tests",
+  "firmware": {
+    "synthdef.bin": "fe7575aeadf5eaf13fd3279a9da77d84e572a9f23a185f24b550544f1dd75954",
+    "synthdef.fwsc": "7c158a04ef83778d5013f67a0343cac372996a0d25d1ab13cfca1814d4268890"
+  },
+  "image_bytes": 226104,
+  "static_ram_bytes": 78432,
+  "pool_bytes": 325992,
+  "installed": true,
+  "display": "Three battery bars, USB-host plug symbol, ? for unknown; synth and FX views",
+  "thresholds_adc": [
+    531,
+    561,
+    591
+  ],
+  "percentage_or_charging_claim": false,
+  "host_panel_states": 6,
+  "host_panel_assertions": {
+    "battery": 42,
+    "original": 23,
+    "extensions": 31,
+    "reverbs": 114
+  },
+  "adc_contract_test": "Idle converter ownership, scan restore, rate limit, USB state, threshold and hysteresis checks passed",
+  "physical_reading": {
+    "raw": 628,
+    "bars": 3,
+    "usb_power": true,
+    "adc_timeouts": 1
+  },
+  "battery_discharge_calibration": "Not measured; uses stock coarse thresholds",
+  "physical_unplugged_display": "Not yet visually confirmed",
+  "timer_wraparound_test": "Elapsed ticks subtracted before division; wraparound case passed",
+  "engine_reference_comparisons": {
+    "ordinary": 553,
+    "optimized_host": 553,
+    "device_math": 553
+  },
+  "engine_api_tests": 34,
+  "identical_input_miverb_cases": 8,
+  "sanitizer_mutations": 440000,
+  "all_original_slot_contents_restored": true,
+  "idle_observation": {
+    "seconds": 10,
+    "no_extra_notes": true,
+    "no_new_adc_timeouts": true,
+    "samples": [
+      628,
+      628,
+      628,
+      628,
+      628,
+      628,
+      628,
+      628,
+      628,
+      628
+    ]
+  },
+  "source_sha256": {
+    "fm1-synth/firmware/app.c": "7e457c5f5a8034e43472e78f92c0c073e75c4dccbcc37190b8e3edfb93c490e2",
+    "fm1-synth/firmware/battery.h": "b68374aa9e5f9fa36fc4919c7bb77e9506738a44ca00dd87346496a45c337e44",
+    "synthdef-engine/src/fm_extensions.inc": "44bd11fc16ca227afe96168cb66e6f5964d9c3b3c26f83a93ad17e591a57ab6a",
+    "synthdef-engine/src/fm_reverb.inc": "8e1597b401d9173e742c259c5f03adb899b83391a04b937dcc6de6e4c0f3b9c2",
+    "synthdef-engine/src/fm_miverb.inc": "32dfdc758d98bd2dcf0383232274b7854cf2ddcd966e9672a0a74a46aecdf248",
+    "synthdef-engine/src/fm_freeverb.inc": "1423264fb788a04675ce32e6874eca5086ba16e6300fb50f7bd10544590da726",
+    "fm1-synth/tools/test-reverbs-device.py": "6b81bac57b222edfd5c3c8ccf8aa1e8e1731dadf9ce125d911b692e84ed69d69",
+    "fm1-synth/firmware/key_confirm.h": "5ed95f1559b36c65540cb9f3fdcf0063ec2cec2d70db0f066adbeaa550e4f335",
+    "fm1-synth/tools/device.py": "0de002d5dcddd38811514a008b858145a2b8769fe946168aecd4e00c7732a169",
+    "fm1-synth/tools/test-input-device.py": "5b718c6a8d90a1b02b6be4bd00df2f6b58e6fc1958608a6ee7b7c2bf99217e20",
+    "fm1-synth/tests/input.c": "3e726ed2352be58da66ce76f5e6f7bfa161c5a7db5f843b1d1ce2f3f9ecc66c8"
+  },
+  "unexplained_previous_note_events": {
+    "occurred": true,
+    "user_confirmed_not_playing_in_earlier_run": true,
+    "source": "keyboard-sensing path; reproduced while battery sampling was disabled",
+    "contact_guard": "New presses require contact confirmation; velocity and held-note analog release retained",
+    "limitation": "Earlier extra notes also appeared through both sensing paths. Their underlying cause is not established; no unexpected notes occurred in the subsequent confirmed hands-off run.",
+    "physical_key_feel": "User check pending"
+  },
+  "previous_installed_build": {
+    "synthdef.bin": "ad74e68d66f93c864ffc0ba7701d5da9a6e98d12fbb957c694a78dc83e18ecb9",
+    "synthdef.fwsc": "495c3bde480665c5fb86ac4be2b4225675dd79d0df0539494c88f9b5d3b66b38"
+  },
+  "confirmed_hands_off_comparison": {
+    "duration_seconds_minimum": 120,
+    "chords": 190,
+    "notes": 380,
+    "sequence": [
+      {
+        "sampling": false,
+        "chords": 47
+      },
+      {
+        "sampling": true,
+        "chords": 48
+      },
+      {
+        "sampling": false,
+        "chords": 47
+      },
+      {
+        "sampling": true,
+        "chords": 48
+      }
+    ],
+    "unexpected_keyboard_notes": 0,
+    "unexpected_midi_notes": 0,
+    "new_overloads": 0,
+    "new_xruns": 0,
+    "numerical_faults": 0,
+    "final_battery": {
+      "raw": 628,
+      "bars": 3,
+      "usb_power": true,
+      "adc_timeouts": 0
+    },
+    "contact_guard_rejections_during_run": 0
+  },
+  "contact_regression_cases": 10
+}

@@ -28,5 +28,5 @@ for name in ('FreeVerb','FreeVerb2'):
  body=body.replace('inNumSamples','count')
  # Explicit float literals avoid accidental soft-double code on the MCU.
  body=re.sub(r'(?<![\w.])(1|0)\.(?![\d\w])',r'\1.0f',body)
- text+='static void render_'+name.lower()+'(const fm_graph *g,fm_scratch *b,const fm_node *n,float *mem,int count) {'+body+'\n}\n'
+ text+='static __attribute__((noinline)) void render_'+name.lower()+'(const fm_graph *g,fm_scratch *b,const fm_node *n,float *mem,int count) {'+body+'\n}\n'
 (root/'synthdef-engine/src/fm_freeverb.inc').write_text(text)

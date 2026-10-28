@@ -1,8 +1,24 @@
 # Verification record
 
+## Battery indicator and reverb hardware checks — 28 October 2026
+
+The current development build is installed on the test FM-1. It adds a top-right three-bar battery icon and USB-host power symbol in both synth and effect code views. The physical sensor read 628 (three bars); six simulator states passed 42 assertions. ADC ownership, scan restoration, polling and hysteresis checks passed. A ten-second idle observation showed stable sensor readings and no new ADC timeouts. Battery discharge calibration and the unplugged physical display have not been verified.
+
+FreeVerb, FreeVerb2 and MiVerb each passed **63 hardware assertions (189 total)** with **Keys, triple saw, two-op FM and Dust chimes**, using two voices at default/minimum/maximum knobs, live controls, stealing, release, FX viewing and panic. All produced nonzero stereo USB recordings and measurable post-release tails, with no new overloads, overruns or numerical faults. Tails use separate uninterrupted recordings because USB recordings can omit frames during patch loads. Per-effect sampled render maxima were 3,607 / 3,651 / 3,800 microseconds; these are sampled values, not exhaustive maxima.
+
+**Two Addy voices through FreeVerb exceed the processing budget.** The overload guard silenced that combination at a measured 5,409 microseconds in the optimized build. Two Addy voices with FreeVerb2/MiVerb have not been accepted. Import validation establishes memory capacity, not realtime capacity.
+
+The final application is **226,104 bytes**, with **78,432/98,304 bytes static RAM** and **325,992/344,064 bytes pool use**. All 553 reference comparisons still pass on three backends, the eight identical-input MiVerb comparisons remain exact, and 440,000 sanitizer cases pass. Reverb kernels are kept outside the main renderer; packed MiVerb samples use alias-safe byte access. Performance diagnostics now subtract the wrapping tick counter before converting to microseconds.
+
+Two earlier runs registered extra notes despite the user not touching the instrument. Input-source diagnostics later traced an event to the keyboard-sensing path while battery sampling was disabled. New presses now require contact-matrix confirmation while retaining velocity measurement and analog release. This did not establish the underlying cause: subsequent events appeared through both sensing paths too.
+
+After the user confirmed the keys were clear, the final contact-confirmation build passed **190 two-note chords over at least two minutes**, alternating battery sampling off/on/off/on, with zero unexpected keyboard/MIDI notes, overloads, overruns or numerical faults. Sampling and physical MASTER control were restored. Ten contact regression cases and 210 host panel assertions pass. Physical light-keypress feel remains a user check. The earlier source-traced 189 reverb checks used the preceding diagnostic build; its DSP is unchanged in the final build.
+
+All nine original slot contents were verified after restoration. The restored echo also passed 42 two-voice Keys/Addy chords (60 checks), with no new overloads, overruns or faults. The published preview download is unchanged. Physical listening and a final-build power cycle remain user checks. Exact build/source hashes and scoped results are in [battery evidence](../evidence/battery-indicator.json) and [reverb hardware evidence](../evidence/reverbs-hardware.json).
+
 ## Development reverbs — 28 October 2026
 
-FreeVerb, FreeVerb2 and MiVerb bring the development profile to **77 UGen types**. No FM-1 USB MIDI port was available, so these results cover emulation and compilation only; physical playback/timing is pending. The published preview firmware is unchanged.
+FreeVerb, FreeVerb2 and MiVerb bring the development profile to **77 UGen types**. At the initial emulation run no FM-1 USB MIDI port was available. Subsequent device results are recorded above. The published preview firmware is unchanged.
 
 - **553/553 reference graphs** pass on ordinary host, optimized host and freestanding device-math backends. The 37 new graphs run for approximately four seconds each, covering wet/dry, stereo excitation, parameter clamps, noise bursts, live changes, diffusion, freeze and saturation.
 - An isolated MiVerb plugin is built from pinned upstream source and pinned SC headers. No installed user plugins are used by the reference renderer.
@@ -12,7 +28,7 @@ FreeVerb, FreeVerb2 and MiVerb bring the development profile to **77 UGen types*
 - **114 reverb panel assertions** across six simulations (three reverbs × Keys/Dust chimes), with two voices, stealing, live knobs, release tails, effect browsing and panic. All produce nonzero stereo recordings and measurable post-release tails without numerical faults. The earlier 23 + 31 panel assertions also pass.
 - Firmware builds at **226,972 bytes**, with Bluetooth disabled, no software-double routines, unchanged static RAM **78,384/98,304 bytes**, and unchanged pool use **325,992/344,064 bytes**.
 
-Reverb storage is reserved from the existing arena only when used: FreeVerb 50,492 bytes; FreeVerb2 102,088 bytes; MiVerb 65,536 bytes. Memory admission does not prove realtime performance. The examples are available as source, compiled SynthDefs and slot packages; none was sent to a device. See `evidence/reverbs-emulation.json` and its companion comparison records.
+Reverb storage is reserved from the existing arena only when used: FreeVerb 50,492 bytes; FreeVerb2 102,088 bytes; MiVerb 65,536 bytes. Memory admission does not prove realtime performance. The examples are available as source, compiled SynthDefs and slot packages. They were initially tested in emulation; the later device run is recorded above. See `evidence/reverbs-emulation.json` and its companion comparison records.
 
 ## Development UGen expansion — 28 October 2026
 

@@ -1,0 +1,141 @@
+{
+  "date": "2026-10-28",
+  "scope": "77-type development firmware, selected two-voice synths through three reverbs",
+  "firmware": {
+    "synthdef.bin": "ad74e68d66f93c864ffc0ba7701d5da9a6e98d12fbb957c694a78dc83e18ecb9",
+    "synthdef.fwsc": "495c3bde480665c5fb86ac4be2b4225675dd79d0df0539494c88f9b5d3b66b38"
+  },
+  "image_bytes": 226012,
+  "static_ram_bytes": 78416,
+  "pool_bytes": 325992,
+  "hardware_flashed": true,
+  "tested_synths": [
+    "Keys",
+    "Triple saw",
+    "Two-op FM",
+    "Dust chimes"
+  ],
+  "voices": 2,
+  "checks": 189,
+  "results": [
+    {
+      "effect": "freeverb",
+      "synth_slots": [
+        1,
+        3,
+        4,
+        8
+      ],
+      "voices": 2,
+      "checks": 63,
+      "stereo_peaks": [
+        0.06414794921875,
+        0.06414794921875
+      ],
+      "tail_rms": 0.00016272310880361524,
+      "new_overloads": 0,
+      "new_xruns": 0,
+      "sampled_render_max_us": 3607,
+      "tail_hold_seconds": 0.1553477080015,
+      "tail_onset_sample": 67377
+    },
+    {
+      "effect": "freeverb2",
+      "synth_slots": [
+        1,
+        3,
+        4,
+        8
+      ],
+      "voices": 2,
+      "checks": 63,
+      "stereo_peaks": [
+        0.0523681640625,
+        0.06329345703125
+      ],
+      "tail_rms": 0.0005092724957606728,
+      "new_overloads": 0,
+      "new_xruns": 0,
+      "sampled_render_max_us": 3651,
+      "tail_hold_seconds": 0.15332058400963433,
+      "tail_onset_sample": 64395
+    },
+    {
+      "effect": "miverb",
+      "synth_slots": [
+        1,
+        3,
+        4,
+        8
+      ],
+      "voices": 2,
+      "checks": 63,
+      "stereo_peaks": [
+        0.05072021484375,
+        0.0517578125
+      ],
+      "tail_rms": 0.0005879323645314312,
+      "new_overloads": 0,
+      "new_xruns": 0,
+      "sampled_render_max_us": 3800,
+      "tail_hold_seconds": 0.15070308398571797,
+      "tail_onset_sample": 65595
+    }
+  ],
+  "all_original_slot_contents_restored": true,
+  "new_overloads": 0,
+  "new_xruns": 0,
+  "numerical_faults": 0,
+  "callback_peak_us": 3845,
+  "cpu_limit": {
+    "combination": "Two Addy voices through FreeVerb",
+    "initial_build_peak_us": 5338,
+    "optimized_build_peak_us": 5409,
+    "result": "overload guard silenced playback; patches restored",
+    "scope": "Addy with reverbs not hardware accepted; FreeVerb2/MiVerb with two Addy voices not tested"
+  },
+  "measurement_notes": [
+    "Matrix captures may omit audio frames during slot changes; separate uninterrupted takes verify tails.",
+    "Earlier runs interrupted by extra note input were discarded; cause of that input not confirmed.",
+    "Reported sampled render maxima are samples, not exhaustive per-effect maxima.",
+    "Performance-counter wraparound was corrected before the accepted final run."
+  ],
+  "listening_confirmation": false,
+  "power_cycle_confirmation": false,
+  "release_assets_changed": false,
+  "source_sha256": {
+    "fm1-synth/firmware/app.c": "a120cbd710a0892dd2841c8ca0155ff1ddea4c6e99c8eeef1c3482f9a26344d5",
+    "fm1-synth/firmware/battery.h": "b68374aa9e5f9fa36fc4919c7bb77e9506738a44ca00dd87346496a45c337e44",
+    "synthdef-engine/src/fm_extensions.inc": "44bd11fc16ca227afe96168cb66e6f5964d9c3b3c26f83a93ad17e591a57ab6a",
+    "synthdef-engine/src/fm_reverb.inc": "8e1597b401d9173e742c259c5f03adb899b83391a04b937dcc6de6e4c0f3b9c2",
+    "synthdef-engine/src/fm_miverb.inc": "32dfdc758d98bd2dcf0383232274b7854cf2ddcd966e9672a0a74a46aecdf248",
+    "synthdef-engine/src/fm_freeverb.inc": "1423264fb788a04675ce32e6874eca5086ba16e6300fb50f7bd10544590da726",
+    "fm1-synth/tools/test-reverbs-device.py": "6b81bac57b222edfd5c3c8ccf8aa1e8e1731dadf9ce125d911b692e84ed69d69"
+  },
+  "callback_peak_scope": "Cumulative since input-diagnostic firmware boot",
+  "original_echo_recheck": {
+    "chords": 42,
+    "checks": 60,
+    "new_overloads": 0,
+    "new_xruns": 0,
+    "faults": 0,
+    "cumulative_render_peak_us": 5057,
+    "build_scope": "Previous verified battery build, before input-source diagnostics"
+  },
+  "previous_verified_build": {
+    "synthdef.bin": "0423471b88172f76c2492f4c2b5a8a53fef81266f94594f7d4577c0251c7af9e",
+    "synthdef.fwsc": "3b532654d2257f64117361b5d897523b78730f02e5ecfba4cecf7291b6eeec42"
+  },
+  "source_traced_checks": 189,
+  "unexpected_keyboard_notes": 0,
+  "unexpected_midi_notes": 0,
+  "unexplained_previous_note_events": {
+    "occurred": true,
+    "user_confirmed_not_playing_in_earlier_run": true,
+    "source": "keyboard-sensing path; reproduced while battery sampling was disabled",
+    "contact_guard": "New presses require contact confirmation; velocity and held-note analog release retained",
+    "limitation": "Earlier extra notes also appeared through both sensing paths. Their underlying cause is not established; no unexpected notes occurred in the subsequent confirmed hands-off run.",
+    "physical_key_feel": "User check pending"
+  },
+  "build_scope": "Input-diagnostic build preceding the final contact-confirmation adapter change; DSP sources unchanged"
+}

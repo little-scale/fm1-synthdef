@@ -64,6 +64,29 @@ class Device:
   actual,revision=self.read(slot)
   if actual!=data or revision!=generation+1:raise ValueError('Slot readback did not match')
   return revision
+ def inputs(self,battery_sampling=None):
+  data=PREFIX+bytes([0x7b])+ (b'' if battery_sampling is None else bytes([int(bool(battery_sampling))]))
+  for attempt in range(3):
+   self.out.send(mido.Message('sysex',data=data));end=time.monotonic()+.2
+   while time.monotonic()<end:
+    for message in self.inp.iter_pending():
+     p=bytes(message.data) if message.type=='sysex' else b''
+     if len(p)==56 and p[:6]==PREFIX+bytes([0x7b]):
+      v=[sum(p[6+i*5+j]<<(7*j) for j in range(5)) for i in range(10)]
+      return dict(zip(['key_note_events','midi_note_events','held_keys','touch_keys','voice0_id','voice1_id','battery_samples','battery_sampling','rejected_key_events','rejected_key_mask'],v))
+    time.sleep(.002)
+  raise TimeoutError('No input-source telemetry')
+ def battery(self):
+  for attempt in range(3):
+   self.out.send(mido.Message('sysex',data=PREFIX+bytes([0x7c])));end=time.monotonic()+.2
+   while time.monotonic()<end:
+    for message in self.inp.iter_pending():
+     p=bytes(message.data) if message.type=='sysex' else b''
+     if len(p)==26 and p[:6]==PREFIX+bytes([0x7c]):
+      v=[sum(p[6+i*5+j]<<(7*j) for j in range(5)) for i in range(4)]
+      return dict(raw=v[0]-1,bars=v[1]-1,usb_power=bool(v[2]),adc_timeouts=v[3])
+    time.sleep(.002)
+  raise TimeoutError('No battery telemetry (requires battery-indicator firmware)')
  def stats(self,benchmark=False):
   code=0x7e if benchmark else 0x7f
   # Telemetry is read-only and may retry a dropped USB reply. Benchmarking
@@ -80,12 +103,14 @@ class Device:
     time.sleep(0.002)
   raise TimeoutError('No device telemetry')
 def main():
- p=argparse.ArgumentParser(description=__doc__);p.add_argument('action',choices=['info','read','write','clear','stats','benchmark']);p.add_argument('--slot',type=int,default=1);p.add_argument('--file',type=Path);p.add_argument('--port');a=p.parse_args()
+ p=argparse.ArgumentParser(description=__doc__);p.add_argument('action',choices=['info','read','write','clear','stats','benchmark','battery','inputs']);p.add_argument('--slot',type=int,default=1);p.add_argument('--file',type=Path);p.add_argument('--port');a=p.parse_args()
  if not 0<=a.slot<=8:p.error('Slot is 0–8 (0 is the permanent effect)')
  if a.action in ('read','write') and not a.file:p.error('--file is required')
  dev=Device(a.port)
  try:
   if a.action=='info':print(json.dumps(dict(port=dev.port,slots=dev.info[1],effect_capacity=struct.unpack_from('<I',dev.info,15)[0],voices=dev.info[2],capacity=struct.unpack_from('<I',dev.info,3)[0])))
+  elif a.action=='inputs':print(json.dumps(dev.inputs()))
+  elif a.action=='battery':print(json.dumps(dev.battery()))
   elif a.action in ('stats','benchmark'):print(json.dumps(dev.stats(a.action=='benchmark')))
   elif a.action=='read':data,rev=dev.read((a.slot-1)%9);a.file.write_bytes(data);print('Read slot',a.slot,'revision',rev,'bytes',len(data))
   else:print('Verified slot',a.slot,'revision',dev.write((a.slot-1)%9,b'' if a.action=='clear' else a.file.read_bytes()))

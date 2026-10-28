@@ -112,6 +112,14 @@ Run `../.venv/bin/python tools/test-extensions-panel.py` for a temporary two-pat
 
 `examples/master-freeverb.fmslot`, `master-freeverb2.fmslot` and `master-miverb.fmslot` are alternatives for slot 0. Knob 3 sets wet/dry (0–60% wet); knob 4 sets room/decay. The mono FreeVerb example preserves the dry stereo image and adds a shared mono wet signal. MiVerb also exposes a `freeze` control, default 0; its example stays below self-sustaining feedback.
 
-All three passed temporary-bank simulations with Keys and Dust chimes, two voices, stealing, live knobs, release tails and FX browsing (114 assertions), plus the earlier 54 panel assertions. Run `tools/test-reverbs-panel.py` to reproduce. The new firmware builds at 226,972 bytes with unchanged static RAM/pool allocation. Device timing and listening checks remain pending because the FM-1 was not connected. These packages require the development firmware; v0.1.0-preview cannot load them.
+All three passed temporary-bank simulations with Keys and Dust chimes, two voices, stealing, live knobs, release tails and FX browsing (114 assertions), plus the earlier 54 panel assertions. Run `tools/test-reverbs-panel.py` to reproduce. The current battery-display firmware builds at 226,104 bytes, with 78,432 bytes static RAM and 325,992 bytes pool use. It is installed on the test FM-1. Two Addy voices through FreeVerb exceeded the processing budget; see the current device results and limits in `../docs/VERIFICATION.md`. These packages require the development firmware; v0.1.0-preview cannot load them.
 
 Compilation uses the stock SuperCollider class library plus our pinned MiVerb class. User extension/quark classes are not loaded into this compiler. The ordinary SuperCollider application configuration is unchanged.
+
+## Battery display
+
+The top-right corner shows a three-bar battery icon in both synth and slot 0 code views. A small plug indicates an active USB host connection; it does not claim that the battery is charging. An unknown reading shows `?`. The indicator uses the stock ADC thresholds (531, 561 and 591), a slow average and hysteresis rather than an uncalibrated percentage.
+
+Battery sampling runs once a second and claims only an idle gap in the key scanner's ADC schedule. It leaves audio interrupts enabled and restores the scan configuration immediately afterwards. The pinned platform is unchanged. `tools/device.py battery` reads the measured ADC value, bars, USB state and ADC timeout count. `tools/test-battery-panel.py` checks six simulated states and saves synth/FX screenshots; `tests/battery.c` checks ADC ownership, polling and threshold behaviour.
+
+New keyboard notes require both the velocity sensor and the debounced contact matrix. Once a note starts, its existing analog release behaviour is retained. This prevents an isolated sensor event from starting a note. `tools/device.py inputs` exposes separate keyboard/MIDI note counters and rejected unconfirmed presses; `tools/test-input-device.py --output <directory>` compares playback with battery sampling off and on, then restores normal sampling and panel control. Leave the keys untouched during that automated test.

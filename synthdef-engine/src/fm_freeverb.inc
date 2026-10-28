@@ -4,7 +4,7 @@
  * Generated with tools/generate-freeverb.py; arithmetic/order retained.
  * All rings, counters and recurrence state live in the caller's float arena.
  */
-static void render_freeverb(const fm_graph *g,fm_scratch *b,const fm_node *n,float *mem,int count) {
+static __attribute__((noinline)) void render_freeverb(const fm_graph *g,fm_scratch *b,const fm_node *n,float *mem,int count) {
     float* input0 = b->signal[g->node[g->ref[n->input+0].node].output+g->ref[n->input+0].output];
     float* output0 = b->signal[n->output+0];
 
@@ -222,7 +222,7 @@ static void render_freeverb(const fm_graph *g,fm_scratch *b,const fm_node *n,flo
     mem[35] = R19_0;
 
 }
-static void render_freeverb2(const fm_graph *g,fm_scratch *b,const fm_node *n,float *mem,int count) {
+static __attribute__((noinline)) void render_freeverb2(const fm_graph *g,fm_scratch *b,const fm_node *n,float *mem,int count) {
     float* input0 = b->signal[g->node[g->ref[n->input+0].node].output+g->ref[n->input+0].output];
     float* input1 = b->signal[g->node[g->ref[n->input+1].node].output+g->ref[n->input+1].output];
     float* output0 = b->signal[n->output+0];
