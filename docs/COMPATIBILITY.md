@@ -2,7 +2,7 @@
 
 The on-device program executes a compiled SynthDef graph. Source-language constructs such as `Array.fill`, `.sum` and Env constructors run in SuperCollider on the Mac during compilation; their resulting graph must fit this profile. The device does not interpret arbitrary SuperCollider source.
 
-The authoritative type/operator list is [profile.json](../synthdef-engine/profile.json), with per-UGen rates and parameter rules in the [engine README](../synthdef-engine/README.md). There are 53 supported types, including SinOsc, Saw/Pulse, LF oscillators, noise, Rand/ExpRand, EnvGen, filters, Resonz/Ringz, Klang/Klank and Delay/Comb/Allpass N/L/C.
+The authoritative type/operator list is [profile.json](../synthdef-engine/profile.json), with per-UGen rates and parameter rules in the [engine README](../synthdef-engine/README.md). The development source supports 74 types, including the new Dust/Dust2, Decay/Decay2, Impulse, triggered random, sample/track-and-hold and one-sample filter/delay families. The published v0.1.0-preview firmware has the earlier 53 types and rejects the new nodes. Host compilation success does not update the connected device. New firmware has passed emulation and build checks, but still needs hardware playback/timing verification.
 
 All nine EnvGen curve types are supported, with sustain, loop, retrigger and forced-release behaviour. Env.perc, adsr, dadsr, asr, cutoff, linen, triangle, sine and custom breakpoints are covered. Done actions are 0 and 2; effects require 0. This is not a server node tree.
 

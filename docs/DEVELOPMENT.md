@@ -13,6 +13,7 @@ make -C fm1-synth test
 make -C synthdef-engine sanitize
 make -C fm1-synth sanitize
 python3 fm1-synth/tools/test-panel.py
+python3 fm1-synth/tools/test-extensions-panel.py
 ```
 
 The screen/protocol tests need Node.js. The simulator needs the pinned font dependencies and a working Pillow RAQM installation (`brew install fribidi` if needed). No connected FM-1 is required for these checks. Sanitizers use undefined-behaviour, bounds and float-cast checks; ASan is not claimed because its runtime hung before main on the test Mac.
@@ -26,6 +27,8 @@ python3 fm1-synth/tools/test-device-math.py
 ```
 
 Run those reference commands sequentially: they share generated files. Reference audio is generated locally, not shipped as a large build cache. See the engine README for tolerances and fixture regeneration.
+
+The development UGen additions require a new device build. The 0.1.0-preview release assets retain the earlier, hardware-tested 53-type firmware. See VERIFICATION.md for the distinction.
 
 ## Device firmware
 

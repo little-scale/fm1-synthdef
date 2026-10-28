@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #define FM_VALID 0x464d5331u
-static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In"};
+static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In","SampleRate","SampleDur","ControlRate","ControlDur","BlockSize","RadiansPerSample","Delay1","Delay2","OnePole","OneZero","LPZ1","HPZ1","Latch","Gate","TRand","TExpRand","Dust","Dust2","Impulse","Decay","Decay2"};
 const char *fm_type_name(unsigned type) { return type < FM_TYPES ? types[type] : "unknown"; }
 typedef struct { const uint8_t *p; size_t left; int failed; } reader;
 static uint32_t rd(reader *r, unsigned n) {
@@ -95,6 +95,10 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
    if(u->type==FM_Pan2) expected=2;
    if(u->outputs!=expected) BAD("Invalid output count");
    switch(u->type) {
+    case FM_SampleRate: case FM_SampleDur: case FM_ControlRate: case FM_ControlDur: case FM_BlockSize: case FM_RadiansPerSample: n=0; break;
+    case FM_Delay1: case FM_OnePole: case FM_OneZero: case FM_Latch: case FM_Gate: case FM_Impulse: case FM_Decay: n=2; break;
+    case FM_TRand: case FM_TExpRand: case FM_Decay2: n=3; break;
+    case FM_Delay2: n=3; break;
     case FM_Rand: case FM_ExpRand: n=2; break;
     case FM_DelayN: case FM_DelayL: case FM_DelayC: n=3; break;
     case FM_CombN: case FM_CombL: case FM_CombC: case FM_AllpassN: case FM_AllpassL: case FM_AllpassC: n=4; break;
@@ -120,7 +124,7 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
     if(u->inputs==4) {fm_ref *ref=&g->ref[u->input+3];if(ref->node>=0 && g->node[ref->node].rate==2) BAD("Delay decaytime requires initial/control rate");}
    }
    if(u->type==FM_BinaryOpUGen && !(u->special==0 || u->special==1 || u->special==2 || u->special==4 || (u->special>=6 && u->special<=13))) BAD("Unsupported binary operator selector");
-   if(u->type==FM_UnaryOpUGen && !(u->special==0 || u->special==5 || (u->special>=8 && u->special<=17) || (u->special>=25 && u->special<=31) || u->special==42 || u->special==43)) BAD("Unsupported unary operator selector");
+   if(u->type==FM_UnaryOpUGen && !(u->special==0 || u->special==5 || (u->special>=8 && u->special<=22) || (u->special>=25 && u->special<=31) || u->special==42 || u->special==43)) BAD("Unsupported unary operator selector");
    if(u->type==FM_EnvGen) {
     for(j=1;j<u->inputs;j++) {fm_ref *ref=&g->ref[u->input+j];if(ref->node>=0 && g->node[ref->node].rate==2) BAD("Only the EnvGen gate may be audio rate in this profile");}
     if(!u->rate || !literal(g,u,6,&v) || v<1 || v>FM_SEGMENTS || v!=(int)v || u->inputs!=9+4*(int)v) BAD("EnvGen needs 1..32 literal segments");
@@ -128,8 +132,17 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
     if(!literal(g,u,4,&v) || (v!=0 && v!=2)) BAD("Only literal doneAction 0 and 2 supported");
     for(j=11;j<u->inputs;j+=4) if(!literal(g,u,j,&v) || v<0 || v>8 || v!=(int)v) BAD("Envelope curve shape must be literal 0..8");
    }
-   if(u->type>=FM_LFSaw && u->type!=FM_Select && u->type!=FM_RandSeed && u->type!=FM_Rand && u->type!=FM_ExpRand && !u->rate) BAD("UGen requires audio/control rate");
+   if(u->type>=FM_SampleRate && u->type<=FM_RadiansPerSample && u->rate!=0) BAD("Information UGen requires initial rate");
+   if((u->type==FM_Delay1 || u->type==FM_Delay2)){for(j=1;j<u->inputs;j++){fm_ref *ref=&g->ref[u->input+j];if(ref->node>=0 && g->node[ref->node].rate==2) BAD("Delay initial values require initial/control rate");}}
+   if(u->type>=FM_LFSaw && !(u->type>=FM_SampleRate && u->type<=FM_RadiansPerSample) && u->type!=FM_Select && u->type!=FM_RandSeed && u->type!=FM_Rand && u->type!=FM_ExpRand && !u->rate) BAD("UGen requires audio/control rate");
    if((u->type==FM_Rand || u->type==FM_ExpRand) && u->rate!=0) BAD("Rand/ExpRand require initial rate");
+   if(u->type==FM_OnePole || u->type==FM_OneZero || u->type==FM_Decay || u->type==FM_Decay2){
+    for(j=1;j<u->inputs;j++){fm_ref *ref=&g->ref[u->input+j];if(ref->node>=0 && g->node[ref->node].rate==2) BAD("Filter coefficients/times require initial/control rate");}
+   }
+   if(u->type==FM_Dust || u->type==FM_Dust2){fm_ref *ref=&g->ref[u->input];if(ref->node>=0 && g->node[ref->node].rate==2) BAD("Dust density requires initial/control rate");}
+   if((u->type==FM_TRand || u->type==FM_TExpRand) && u->rate==2){fm_ref *ref=&g->ref[u->input+2];if(ref->node<0 || g->node[ref->node].rate!=2) BAD("Audio triggered random requires audio trigger; use K2A or DC");}
+   if(u->type==FM_TRand || u->type==FM_TExpRand){for(j=0;j<2;j++){fm_ref *ref=&g->ref[u->input+j];if(ref->node>=0 && g->node[ref->node].rate==2) BAD("Triggered random bounds require initial/control rate");}}
+   if(u->type==FM_Impulse){fm_ref *ref=&g->ref[u->input+1];if(ref->node>=0 && g->node[ref->node].rate!=0) BAD("Impulse phase requires initial rate in this profile");}
    if(u->type==FM_RandSeed && (!literal(g,u,1,&v) || v < -16777216 || v > 16777216 || v!=(int)v)) BAD("RandSeed requires an exact literal integer seed in +/-2^24");
    if(u->type==FM_Saw || u->type==FM_Pulse || u->type==FM_LFNoise0 || u->type==FM_LFNoise1 || u->type==FM_LFNoise2) {
     for(j=0;j<u->inputs;j++) {fm_ref *ref=&g->ref[u->input+j];if(ref->node>=0 && g->node[ref->node].rate==2) BAD("Band-limited oscillator and LFNoise parameters require initial/control rate");}

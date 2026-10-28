@@ -171,6 +171,9 @@ void app_say(const char *a,const char *b){snprintf(notice,sizeof notice,"%.30s %
 int app_expect(const char *what,int *got){
  unsigned i;if(!strcmp(what,"slot"))*got=(int)slot;else if(!strcmp(what,"view"))*got=(int)view_slot;else if(!strcmp(what,"loaded"))*got=loaded;else if(!strcmp(what,"octave"))*got=instrument.octave;else if(!strcmp(what,"scroll"))*got=(int)scroll_line;
  else if(!strcmp(what,"held")){*got=0;for(i=0;i<FMS_VOICES;i++)*got+=instrument.voice[i].held;}
+ else if(!strcmp(what,"active")){*got=0;for(i=0;i<FMS_VOICES;i++)*got+=instrument.voice[i].synth.active;}
+ else if(!strcmp(what,"faults"))*got=(int)instrument.faults;
+ else if(!strcmp(what,"effect"))*got=effect_ready && effect_voice.active;
  else if(!strcmp(what,"knob1"))*got=(int)(instrument.knobs[0]*100+0.5f);else return 0;return 1;
 }
 /* The wire namespace is separate from the platform's updater and remote panel. */

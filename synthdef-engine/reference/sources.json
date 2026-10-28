@@ -16,6 +16,7 @@
     "SC_RGen.h": "19c68e1b6c34dcde7515fe5df70e5d0c9d89c07474513526a4e55b0cc390f3fc",
     "../LICENSE": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
     "DelayUGens.cpp": "688a76b94948d120f6ff6ddcebca9ea353a157d638ad73bdbd2d5bb4e51b455f",
-    "SC_InlineUnaryOp.h": "ae9b928de6681008b73a3db9a449dda52635b11b10b406d3df5dbccc8f3652b2"
+    "SC_InlineUnaryOp.h": "ae9b928de6681008b73a3db9a449dda52635b11b10b406d3df5dbccc8f3652b2",
+    "TriggerUGens.cpp": "929960745bb2aebf7a7ca76d2472498fa5c54deb0ed2a70ffb9bcc86c4e5fddc"
   }
 }

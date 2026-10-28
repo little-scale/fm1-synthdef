@@ -27,6 +27,9 @@ static float unary(int op,float a) {
  case 10:return a-floorf(a); case 11:return (a>0)-(a<0); case 12:return a*a; case 13:return a*a*a;
  case 14:return a<0?-sqrtf(-a):sqrtf(a); case 15:return expf(a); case 16:return 1.0f/a;
  case 17:return 440.0f*powf(2.0f,(a-69.0f)/12.0f);
+ case 18:return log2f(a/440.0f)*12.0f+69.0f;
+ case 19:return powf(2.0f,a/12.0f); case 20:return 12.0f*log2f(a);
+ case 21:return powf(10.0f,a*0.05f); case 22:return log10f(a)*20.0f;
  case 25:return logf(fabsf(a)); case 26:return log2f(fabsf(a)); case 27:return log10f(fabsf(a));
  case 28:return sinf(a); case 29:return cosf(a); case 30:return tanf(a); case 31:return asinf(a);
  case 42:return a/(1.0f+fabsf(a)); case 43:return fabsf(a)<=0.5f?a:(fabsf(a)-0.25f)/a;
@@ -190,6 +193,8 @@ static __attribute__((noinline)) void fast_envelope(const fm_graph *g,fm_voice *
  if(initializing)envelope_init(g,b,n,s,0);
 }
 
+#include "fm_extensions.inc"
+
 static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *stereo,int initializing,const float *input_stereo) {
  unsigned ni,j,k;int free_voice=0;float mixed[FM_BLOCK*2];memset(mixed,0,sizeof mixed);
  if(!v->active || g->valid!=FM_VALID)return;
@@ -246,6 +251,7 @@ static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *ster
   if(n->type==FM_SinOsc){fast_sine(g,v,b,n,s,count,sr,initializing);continue;}
   if(n->type==FM_Pan2 && input_rate(g,n,1)!=2){fast_pan(g,v,b,n,s,count);continue;}
   if(n->type==FM_Saw || n->type==FM_Pulse){bandlimited(g,v,b,n,s,count,sr,initializing);continue;}
+  if(n->type>=FM_OnePole && n->type<=FM_Decay2){extensions(g,v,b,n,s,count,sr,initializing);continue;}
   if(fm_is_delay(n->type)){delay_render(g,v,b,n,s,count,sr,initializing);continue;}
   if(!s->initialized && (n->type==FM_Klang || n->type==FM_Klank)) {
    j=0;
@@ -281,6 +287,16 @@ static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *ster
     }
    }
    switch(n->type) {
+   case FM_SampleRate:out=v->sample_rate;break;
+   case FM_SampleDur:out=1.0f/v->sample_rate;break;
+   case FM_ControlRate:out=v->sample_rate/FM_BLOCK;break;
+   case FM_ControlDur:out=FM_BLOCK/v->sample_rate;break;
+   case FM_BlockSize:out=FM_BLOCK;break;
+   case FM_RadiansPerSample:out=TAU/v->sample_rate;break;
+   case FM_Delay1:case FM_Delay2:
+    if(!s->initialized){s->y1=IN(1);s->y2=n->type==FM_Delay2?IN(2):0;}
+    out=n->type==FM_Delay1?s->y1:s->y2;
+    if(!initializing){s->y2=s->y1;s->y1=a;}break;
    case FM_Rand:case FM_ExpRand:
     if(!s->initialized){
      float hi=IN(1),r=random_uniform(v);

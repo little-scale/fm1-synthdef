@@ -51,6 +51,71 @@ class Engine:
     def render(self,seed=0):
         out=(C.c_float*128)(*[seed]*128);lib.fm_render(self.g,self.v,self.b,out);return list(out)
 class Tests(unittest.TestCase):
+    def test_information_ugens_units_rates_and_shared_scratch(self):
+        for name in ('SampleRate','SampleDur','ControlRate','ControlDur','BlockSize','RadiansPerSample'):
+            data=synth([node(name,rate=0),node('DC',[(0,0)]),node('Out',[(-1,0),(1,0)],outputs=[])])
+            for sr in (8000,44100,48000,192000):
+                expected=dict(SampleRate=sr,SampleDur=1/sr,ControlRate=sr/64,ControlDur=64/sr,BlockSize=64,RadiansPerSample=2*math.pi/sr)[name]
+                e=Engine(data);other=Engine(data)
+                self.assertTrue(e.ok,e.error);self.assertTrue(e.start(sr));other.start(32000)
+                lib.fm_prepare(e.g,e.v,e.b);other.b=e.b
+                for _ in range(3):
+                    other.render();a=e.render()
+                    self.assertAlmostEqual(a[0],expected,delta=max(1e-9,abs(expected)*1e-6))
+                    self.assertEqual(a[::2],[a[0]]*64)
+            for rate in (1,2):self.assertFalse(Engine(synth([node(name,rate=rate)])).ok)
+            self.assertFalse(Engine(synth([node(name,[(-1,0)],rate=0)])).ok)
+
+    def test_short_delay_samples_across_blocks_and_restart(self):
+        base=[node('SinOsc',[(-1,1),(-1,2)])]
+        dry=Engine(synth(base+[node('Out',[(-1,0),(0,0)],outputs=[])],constants=(0,73,.4,.25,-.5)))
+        for name,initial in (('Delay1',[.25]),('Delay2',[-.5,.25])):
+            refs=[(0,0),(-1,3)]+([(-1,4)] if name=='Delay2' else [])
+            e=Engine(synth(base+[node(name,refs),node('Out',[(-1,0),(1,0)],outputs=[])],constants=(0,73,.4,.25,-.5)))
+            self.assertTrue(e.ok,e.error)
+            for _ in range(2):
+                dry.start();e.start();a=[];b=[]
+                lib.fm_prepare(e.g,e.v,e.b)
+                for _ in range(4):a+=dry.render()[::2];b+=e.render()[::2]
+                self.assertEqual(b,initial+a[:-len(initial)])
+
+    def test_extension_domains_and_rate_rejection(self):
+        for name,params in (('OnePole',(1.1,)),('OneZero',(-1.1,)),('Decay',(-.1,)),('Decay2',(.1,-.2)),('TExpRand',(0,1))):
+            constants=(0,1)+params
+            refs=([(-1,2),(-1,3),(-1,0)] if name=='TExpRand' else [(-1,1)]+[(-1,2+j) for j in range(len(params))])
+            nodes=[node(name,refs),node('Out',[(-1,0),(0,0)],outputs=[])]
+            if name=='TExpRand':
+                nodes=[node('DC',[(-1,0)]),node(name,[(-1,2),(-1,3),(0,0)]),node('Out',[(-1,0),(1,0)],outputs=[])]
+            e=Engine(synth(nodes,constants=constants))
+            self.assertTrue(e.ok,e.error);e.start();self.assertEqual(e.render(),[0]*128);self.assertTrue(lib.test_fault(e.v))
+        for name,refs in (('Dust',[(0,0)]),('Dust2',[(0,0)]),('OnePole',[(0,0),(0,0)]),('Decay',[(0,0),(0,0)]),('TRand',[(0,0),(-1,1),(-1,0)]),('Impulse',[(-1,1),(0,0)])):
+            self.assertFalse(Engine(synth([node('DC',[(-1,1)]),node(name,refs)])).ok,name)
+        for selector in (18,20,22):
+            e=Engine(synth([node('DC',[(-1,2)]),node('UnaryOpUGen',[(0,0)],special=selector),node('Out',[(-1,0),(1,0)],outputs=[])],constants=(0,1,-1)))
+            self.assertTrue(e.ok,e.error);e.start();self.assertEqual(e.render(),[0]*128);self.assertTrue(lib.test_fault(e.v))
+
+    def test_extensions_preparation_isolation_and_restart(self):
+        for path in sorted((ROOT/'fixtures').glob('m6_*.scsyndef')):
+            normal,prepared,other=[Engine(path.read_bytes()) for _ in range(3)]
+            for e in (normal,prepared,other):self.assertTrue(e.ok,(path.name,e.error));self.assertTrue(e.start())
+            lib.fm_prepare(prepared.g,prepared.v,prepared.b);lib.fm_prepare(prepared.g,prepared.v,prepared.b)
+            other.b=prepared.b
+            first=[]
+            for block in range(4):
+                other.render();a=normal.render();self.assertEqual(a,prepared.render(),(path.name,block));first+=a
+            normal.start();again=[]
+            for _ in range(4):again+=normal.render()
+            self.assertEqual(first,again,path.name)
+            self.assertFalse(lib.test_fault(prepared.v),path.name)
+
+    def test_impulse_timing_oracle_rejects_missing_extra_and_large_offsets(self):
+        from compare_reference import impulse_timing
+        def pulses(indices):return [(.1 if i//2 in indices and i%2==0 else 0) for i in range(128)]
+        ref=pulses([10,30,50])
+        self.assertTrue(impulse_timing(pulses([9,31,50]),ref)['timing_passed'])
+        for bad in ([10,30],[10,20,30,50],[10,32,50]):
+            self.assertFalse(impulse_timing(pulses(bad),ref)['timing_passed'])
+
     def test_stereo_input_bus(self):
         data=synth([node('In',[(-1,0)],outputs=[2,2]),node('Out',[(-1,0),(0,0),(0,1)],outputs=[])])
         e=Engine(data);self.assertTrue(e.ok,e.error);self.assertTrue(e.start())

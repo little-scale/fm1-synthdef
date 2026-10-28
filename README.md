@@ -4,7 +4,7 @@
 
 FM1 SynthDef is an experimental embedded SynthDef runtime and programmable instrument. Write a patch in the local browser editor, compile it with SuperCollider on your Mac, send it over USB, and play it on the FM-1.
 
-The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and executes that graph using a bounded set of 53 supported UGen types. This is not the full SuperCollider language, scsynth server or plugin ecosystem.
+The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and executes that graph using a bounded set of 74 supported UGen types in the development source. This is not the full SuperCollider language, scsynth server or plugin ecosystem.
 
 ## What it does
 
@@ -18,28 +18,29 @@ The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and exec
 
 ## Supported UGens
 
-The current firmware supports these **53 compiled UGen types**. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
+The development source supports these **74 compiled UGen types**, verified in emulation. The published **v0.1.0-preview firmware contains 53 types**; the additions below require a new build and have not yet been tested on the physical FM-1. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
 
 | Category | UGen types |
 | --- | --- |
-| Oscillators | `SinOsc`, `Saw`, `Pulse`, `LFSaw`, `LFTri`, `LFPulse` |
-| Noise | `WhiteNoise`, `PinkNoise`, `LFNoise0`, `LFNoise1`, `LFNoise2` |
-| Random values and seed | `Rand`, `ExpRand`, `RandSeed` |
-| Envelopes and ramps | `EnvGen`, `Line`, `XLine` |
-| Filters and DC removal | `LPF`, `HPF`, `RLPF`, `BPF`, `LeakDC` |
+| Oscillators | `SinOsc`, `Saw`, `Pulse`, `LFSaw`, `LFTri`, `LFPulse`, `Impulse` |
+| Noise | `WhiteNoise`, `PinkNoise`, `LFNoise0`, `LFNoise1`, `LFNoise2`, `Dust`, `Dust2` |
+| Random values and seed | `Rand`, `ExpRand`, `RandSeed`, `TRand`, `TExpRand` |
+| Envelopes and ramps | `EnvGen`, `Line`, `XLine`, `Decay`, `Decay2` |
+| Filters and DC removal | `LPF`, `HPF`, `RLPF`, `BPF`, `LeakDC`, `OnePole`, `OneZero`, `LPZ1`, `HPZ1` |
 | Resonators and oscillator banks | `Resonz`, `Ringz`, `Klang`, `Klank` |
-| Delay and feedback filters | `DelayN`, `DelayL`, `DelayC`, `CombN`, `CombL`, `CombC`, `AllpassN`, `AllpassL`, `AllpassC` |
-| Controls and smoothing | `Control`, `LagControl`, `TrigControl`, `Lag`, `LagUD` |
+| Delay and feedback filters | `Delay1`, `Delay2`, `DelayN`, `DelayL`, `DelayC`, `CombN`, `CombL`, `CombC`, `AllpassN`, `AllpassL`, `AllpassC` |
+| Controls and smoothing | `Control`, `LagControl`, `TrigControl`, `Lag`, `LagUD`, `Latch`, `Gate` |
 | Routing, selection and panning | `In`, `Out`, `Select`, `Pan2` |
 | Constants, rate conversion and bounds | `DC`, `K2A`, `A2K`, `Clip` |
+| Timing information (initial rate) | `SampleRate`, `SampleDur`, `ControlRate`, `ControlDur`, `BlockSize`, `RadiansPerSample` |
 | Arithmetic | `UnaryOpUGen`, `BinaryOpUGen`, `MulAdd`, `Sum3`, `Sum4` |
 
 - `In.ar(0, 1/2)` is available only in the permanent effect slot. `Out.ar` writes stereo bus 0.
-- `UnaryOpUGen` and `BinaryOpUGen` accept only the [documented selectors](synthdef-engine/README.md#supported-profile). For example, signal `.midiratio` and general `pow` are not currently supported.
+- `UnaryOpUGen` and `BinaryOpUGen` accept only the [documented selectors](synthdef-engine/README.md#supported-profile). Pitch/gain conversions `.cpsmidi`, `.midiratio`, `.ratiomidi`, `.dbamp` and `.ampdb` are now supported. General `pow` remains unsupported.
 - `Env.perc`, `Env.adsr`, `Env.asr` and other Env constructors are source-language helpers compiled into `EnvGen` data. All nine EnvGen curve types are implemented, with done actions 0/2 and the documented segment limits.
 - `Mix`, `LinLin` and `PMOsc` can compile into existing supported nodes; they are not additional runtime types. Simple examples were compiled and host-rendered during the compatibility review. `DynKlang`/`DynKlank` likewise expand into supported oscillator/resonator graphs within the documented limits. This does not guarantee every argument/rate combination or CPU load.
 
-See [possible additions and implementation analysis](docs/UGEN-ROADMAP.md) for candidates. Those candidates are **not implemented** in this release.
+See [implementation status and remaining additions](docs/UGEN-ROADMAP.md). Try the new [Dust chimes source](fm1-synth/examples/dust-chimes.scd) in the development host preview: knob 1 controls event density and knob 2 decay time. It is not installed into the example bank automatically.
 
 ## Start here
 
@@ -65,7 +66,7 @@ Knobs 3–4 also affect echo while playing Triple saw. PRESET can display slot 0
 
 ## Status
 
-Experimental preview, tested on one FM-1 and an Apple silicon Mac. The engine has 326 SuperCollider reference comparisons, 26 API test groups and 220,000 sanitizer mutation/truncation cases. Recorded hardware checks cover two voices, stealing, release, live knobs, persistent effects and code browsing. See [verification and limitations](docs/VERIFICATION.md).
+The development engine passes 516 SuperCollider reference comparisons on three rendering backends, 31 API test groups and 380,000 sanitizer mutation/truncation cases. The full instrument simulator also covers the additions with two voices and master echo. The earlier 53-type preview was tested on one FM-1 and an Apple silicon Mac; its recorded hardware checks cover two voices, stealing, release, live knobs, persistent effects and code browsing. See [verification and limitations](docs/VERIFICATION.md).
 
 Passing the graph and memory checks does **not** guarantee that an arbitrary patch fits the audio processing budget. The overload guard stops notes and disables effects when the device is over budget. Final-release power-cycle persistence and recovery are not yet part of the acceptance record. This is an independent project, not an official M-VAVE or SuperCollider product.
 

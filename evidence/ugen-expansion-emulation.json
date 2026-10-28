@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-28",
+  "scope": "development UGen expansion; emulation and build only",
+  "hardware_flashed": false,
+  "hardware_realtime_verified": false,
+  "release_assets_changed": false,
+  "supercollider": "3.14.1",
+  "ugen_types": 74,
+  "new_ugen_types": 21,
+  "new_unary_selectors": [
+    18,
+    19,
+    20,
+    21,
+    22
+  ],
+  "reference_comparisons": {
+    "reference": {
+      "passed": 516,
+      "total": 516
+    },
+    "optimized_host": {
+      "passed": 516,
+      "total": 516
+    },
+    "device_math": {
+      "passed": 516,
+      "total": 516
+    }
+  },
+  "engine_api_groups": 31,
+  "sanitizer_cases": 380000,
+  "sanitizer_families": 19,
+  "instrument_core_and_sanitizers": "passed",
+  "bank_tests": 6,
+  "synth_journal_interruption_boundaries": 68,
+  "effect_journal_interruption_boundaries": 34,
+  "screen_and_transport": "passed",
+  "original_panel_assertions": 23,
+  "extension_panel": {
+    "assertions": 31,
+    "stereo_peaks": [
+      0.213653564453125,
+      0.213653564453125
+    ],
+    "dust_nodes": 19,
+    "trigger_nodes": 37,
+    "hardware_flashed": false
+  },
+  "build": {
+    "identity": "FM-1_1200",
+    "bluetooth": false,
+    "image_bytes": 215956,
+    "static_ram_bytes": 78384,
+    "static_ram_capacity": 98304,
+    "pool_bytes": 325992,
+    "pool_capacity": 344064,
+    "soft_double_routines": false
+  },
+  "comparison_note": "m6_Impulse_ar_fm uses equal pulse count/amplitude and <= 1 sample timing error; all other fixtures use waveform thresholds. See per-fixture results.",
+  "source_sha256": {
+    "synthdef-engine/src/fm_bandlimited.inc": "28d80e96ae8b16f6c70aa5e34de2cba30de6b1d28b8633170ee5a354bb6250db",
+    "synthdef-engine/src/fm_delay.inc": "cbb60a2c95bf697375e80559117493a9745213a23964a356018244d98c0c0451",
+    "synthdef-engine/src/fm_extensions.inc": "b2f376cffa371ec86cc9b86d1034272b3aa4ed1df3da3992addf5acadc85405a",
+    "synthdef-engine/src/fm_fast.inc": "634eb3d00b8722d0d9ee2fab515b5a85120bb514fbcd0ecc1d167c11b580b6c3",
+    "synthdef-engine/src/fm_filters.inc": "faf3b5145ca89c648075939e5e791094606e7318bebf4ddde9cf1cd2e1cc64c2",
+    "synthdef-engine/src/fm_load.c": "9d973a476df362fe0e432beea0efaffe2d21c5547d41bb3ae6b586f47a6f5776",
+    "synthdef-engine/src/fm_noise.inc": "40f45b5a156ac9e1b64751f06a0dbdfacadf45347541f2dab3c588bef4a60b5d",
+    "synthdef-engine/src/fm_render.c": "ef9958059fcfa30b91ab82fb07dbbebc41fb030039b0fd13e432f2362ada0d30",
+    "synthdef-engine/src/fm_synth.h": "7f048d8429ac3c2b64060b5499dbea6b7261d5e17c92e9c9f02653a8db4135ab",
+    "synthdef-engine/src/fm_tables.inc": "62e9c48491adaf0827426059d8fe7f5b06fcf02d5d2ae005ef111b4fb9214a10",
+    "fm1-synth/src/codeview.c": "e69ca3a2de228b21a33971e8d030258fbca49fd9fe133015a2b13373a7c40f0e",
+    "fm1-synth/src/codeview.h": "0ebde7b23711e9300f1f0889ef377a0a597f2f210d5ad29fdc420577082f7a9a",
+    "fm1-synth/src/performance.c": "ecf9fa41279a8bab4d4e1eafbeb7dd1c1d7a0a5278c28373566c2a5149700858",
+    "fm1-synth/src/performance.h": "ef7d2cc5cefdc6ed2bf9c7b747dc5b447393b1e983b07cf20339d32751a437d1",
+    "fm1-synth/src/protocol.c": "243fe5edbbc88235f3232b6cccb5dbb143eb0b7bc99ca29ae4c6775299c2abcb",
+    "fm1-synth/src/protocol.h": "38133b6dd4bc3d450c227497c8302a7cece6bf614011da329f41956ef3986f5a",
+    "fm1-synth/src/slots.c": "d34a4aca9add77407868b3d1ae2273b035a25fcd3bf2321c815694d0d9c03993",
+    "fm1-synth/src/slots.h": "064918c56f36cd6f605ed19dd07d59b5a3c8c8aa40c25f2b8abe35573e6561ed",
+    "fm1-synth/firmware/app.c": "89dba9ba3ed29ce5464c6b6586f36e7bd3f72a2cb990e9f15f3b35188d489a57",
+    "fm1-synth/firmware/codeview.c": "312d266baef693c4b69ebb3b28ff7ecdf8c1486c4b728eceeed86bc45cb0cd1a",
+    "fm1-synth/firmware/load.c": "66c1a765250504f51f857369473f043a7bdc3c08143e8e407c02f4b227b3dd32",
+    "fm1-synth/firmware/player.c": "a75929262a0b34377d79eef7ab055cfad524f4f6d0190d803267a3bbfb84432e",
+    "fm1-synth/firmware/protocol.c": "350f9e251313c654ab25d71f2dea559567c472990a56018e4b6e90a221dc4ff0",
+    "fm1-synth/firmware/render.c": "e1b3385fa4bd30b4ced4e85435e11610927d3cfa66db3805916444ad34b5be48",
+    "fm1-synth/firmware/runtime.c": "38f74a54b2c39b6633ff3feb7dca95b2ba9d26dbcfa0fb505813aea76fb6b133",
+    "fm1-synth/firmware/slots.c": "d418ece9029add14f22a9a64d8e8832416c7b8f3510b2879af66308c4ee8b8bc",
+    "fm1-synth/firmware/device_include/math.h": "d0e4990fc9fad5b07908fe38918066e2e6f3d9ac350f2e9f5ba3e28ad48b024d",
+    "synthdef-engine/profile.json": "4dd324f01283e6b65672dcb26fae04eb1c5191101a891c750efc4fd5254a1ebd",
+    "synthdef-engine/reference/fixtures.json": "f03faeedcf28620cfd6b3365d7ed9cd0cd18f38a3541f8563c9bffd94460bd53"
+  },
+  "build_sha256": {
+    "fm1-synth/firmware/build/synthdef.bin": "c286f2c768c80be23b8385d77af675aa7693e687edcabf1b2f35c148de98e653",
+    "fm1-synth/firmware/build/synthdef.fwsc": "2ade2680f0e2758f0fc18d7b233a9b36d16f15b19903ece02558ef8f061e6a1b"
+  }
+}

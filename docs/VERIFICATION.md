@@ -1,4 +1,21 @@
-# Verification record — 0.1.0-preview
+# Verification record
+
+## Development UGen expansion — 28 October 2026
+
+The 74-type development source adds 21 UGens and five unary conversions. These results are **emulation/build verification**, not new hardware acceptance. The connected FM-1 and v0.1.0-preview release binaries remain unchanged.
+
+- 516/516 SuperCollider 3.14.1 comparisons passed on the ordinary host, optimized host and freestanding device-math backends.
+- 31 engine API groups passed, including multiple sample rates for timing information, restart/preparation, shared scratch, invalid rates/domains and timing-oracle checks.
+- 380,000 engine sanitizer mutation/truncation cases passed across 19 graph families.
+- Instrument core and sanitizer checks passed, including 68 synth and 34 effect interrupted-write boundaries; six package/bank tests and screen/protocol tests passed.
+- The existing panel simulation passed 23 assertions. A new temporary-bank simulation passed 31 assertions with two voices, stealing, knob extremes, release, FX code browsing and master echo. Its stereo recording peaks at approximately 0.214 full scale, with no numerical faults.
+- New development firmware compiled with Bluetooth disabled and no software-double routines. Application size: 215,956 bytes. Static RAM remains 78,384/98,304 bytes; pool remains 325,992/344,064 bytes.
+
+Dust/Decay/Decay2 are covered at audio and control rates, including seeded random density changes and zero/equal/near-equal/very short Decay2 times. One sinusoidally frequency-modulated Impulse test compares pulse count/amplitude and allows at most one sample of timing difference; all other fixtures use waveform limits. Exact-valued Impulse frequency modulation has a separate waveform comparison. The engine README records the pinned TExpRand audio-trigger quirk and all input restrictions.
+
+See `evidence/ugen-expansion-emulation.json` and the accompanying per-fixture comparison records for source/build hashes and results. Host render speed does not measure FM-1 realtime capacity. Physical playback/timing and power-cycle tests of this new build remain outstanding; the release packager still requires hardware-accepted hashes.
+
+## Published 0.1.0-preview
 
 Acceptance on 28 October 2026 used one FM-1, Apple silicon macOS, SuperCollider 3.14.1 and the pinned compiler/platform sources. Evidence JSON is in `evidence/`.
 

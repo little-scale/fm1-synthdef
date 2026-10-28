@@ -1,6 +1,6 @@
 # FM1 SynthDef engine
 
-A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The current profile implements 53 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
+A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 74 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
 
 ## Try it
 
@@ -15,7 +15,7 @@ build/fm-inspect fixtures/fm1_voice.scsyndef
 python3 tools/render-wav.py fixtures/fm1_voice.scsyndef build/fm1-voice.wav
 ```
 
-`make test` needs a C99 compiler and Python 3, with no Python packages. `make reference-test` additionally uses the installed SuperCollider **3.14.1** offline server, without opening audio hardware. Override `SCSYNTH` to change its location. The recorded fixtures are sufficient to run these tests; regeneration uses `python3 tools/export-all.py` with the installed `sclang` 3.14.1. It runs all four export scripts with timeouts and refreshes the fixture integrity manifest. The Makefile currently targets macOS shared libraries.
+`make test` needs a C99 compiler and Python 3, with no Python packages. `make reference-test` additionally uses the installed SuperCollider **3.14.1** offline server, without opening audio hardware. Override `SCSYNTH` to change its location. The recorded fixtures are sufficient to run these tests; regeneration uses `python3 tools/export-all.py` with the installed `sclang` 3.14.1. It runs all six export scripts with timeouts and refreshes the fixture integrity manifest. The Makefile currently targets macOS shared libraries.
 
 The example in `examples/subtractive.scd` combines Saw, Pulse, a modulated RLPF, envelopes and panning. `build/subtractive-voice.wav` is its host-rendered companion test voice.
 
@@ -34,6 +34,15 @@ The simpler example in `examples/voice.scd` exports a playable gated sine voice 
 | LFNoise0, LFNoise1, LFNoise2 | audio, control | Initial/control frequency, sampled when generating the next segment |
 | Rand / ExpRand | initial | Bounds sampled once per voice; initial/control bounds accepted. ExpRand requires nonzero bounds of the same sign |
 | RandSeed (additional) | initial, control, audio | Rising-edge reseeding; seed must be a literal integer within ±2²⁴ |
+| SampleRate, SampleDur, ControlRate, ControlDur, BlockSize, RadiansPerSample | initial | Information for this voice; control rate uses engine block size 64 |
+| Delay1, Delay2 | audio, control | One/two calculation-sample delay; explicit initial values are initial/control inputs |
+| OnePole, OneZero | audio, control | Initial/control coefficient in [-1,1], interpolated across audio blocks |
+| LPZ1, HPZ1 | audio, control | One-sample average/difference; reference constructor state |
+| Latch, Gate | audio, control | Rising-edge capture / positive-trigger tracking; inputs no faster than output |
+| TRand, TExpRand | audio, control | Initial/control bounds; audio outputs require audio triggers; exponential bounds nonzero and same sign |
+| Dust, Dust2 | audio, control | Initial/control density; deterministic per-voice random stream; nonpositive density produces silence |
+| Impulse | audio, control | Frequency may be audio rate; phase must be initial rate; zero and negative frequency supported |
+| Decay, Decay2 | audio, control | Initial/control times, nonnegative; -60 dB time constants; zero and equal-time cases supported |
 | EnvGen | audio, control | All nine curve codes; up to 32 segments; details below |
 | Pan2 | audio, control | Position can be audio rate; level must be initial/control rate |
 | In | audio | Bus 0, one or two channels from the immutable input mix; effect slot only in the instrument |
@@ -55,11 +64,19 @@ The simpler example in `examples/voice.scd` exports a playable gated sine voice 
 
 This is a tested compatibility subset, not full scsynth compatibility or bit-identical output. `DynKlang` expands to supported oscillators and arithmetic. `DynKlank` expands to Ringz and arithmetic, including control-rate frequency/decay modulation. Fixed Klang/Klank banks retain initial-rate parameter restrictions.
 
-Unary selectors: neg (0), abs (5), ceil (8), floor (9), frac (10), sign (11), squared (12), cubed (13), sqrt (14), exp (15), reciprocal (16), midicps (17), log (25), log2 (26), log10 (27), sin (28), cos (29), tan (30), asin (31), distort (42), softclip (43).
+Unary selectors: neg (0), abs (5), ceil (8), floor (9), frac (10), sign (11), squared (12), cubed (13), sqrt (14), exp (15), reciprocal (16), midicps (17), cpsmidi (18), midiratio (19), ratiomidi (20), dbamp (21), ampdb (22), log (25), log2 (26), log10 (27), sin (28), cos (29), tan (30), asin (31), distort (42), softclip (43).
 
 Mixed audio/control arithmetic interpolates control operands across the block, including optimizer-generated MulAdd/Sum3/Sum4 nodes. A separate constructor pass initializes upstream outputs before the first audio block.
 
 Binary selectors: add (0), subtract (1), multiply (2), divide (4), equal (6), unequal (7), less (8), greater (9), less-or-equal (10), greater-or-equal (11), min (12), max (13). Other selectors are rejected. Supporting the arithmetic UGen names does not imply support for every SuperCollider operator.
+
+### Trigger and decay compatibility
+
+These additions are verified in host emulation and the freestanding device-math backend; they are not in the published 0.1.0-preview firmware and have not been hardware-tested. `Dust` emits positive random impulses; `Dust2` emits bipolar impulses. `Decay` smooths its input with one exponential tail; `Decay2` subtracts attack and decay recurrences. Overlapping triggers add, so they are not amplitude-normalized envelopes. Equal attack/decay times yield zero; an attack longer than decay can yield negative output. Negative times fault the voice. Compensated single-precision state preserves long-tail accuracy without double arithmetic or extra allocation.
+
+`TRand`/`TExpRand` draw once at construction and subsequently on triggers, using the shared seeded voice stream. For `.ar`, provide an audio trigger; wrap control triggers with `K2A.ar` and constant triggers with `DC.ar`. Bounds may change at control rate. `TExpRand.ar` deliberately matches the pinned **SuperCollider 3.14.1** implementation: throughout an audio block, it compares triggers with the previous block's final trigger. A positive held trigger can therefore cause several draws in that block. `.kr` uses ordinary rising-edge behavior. This version-specific quirk is reference-tested.
+
+The new logarithmic conversions require positive input; zero/negative domains fault and silence the voice. Information UGens use the actual voice sample rate, including constructor-time caching. Delay1/Delay2 need no delay arena; at control rate their unit is one control block.
 
 ### Envelopes
 
@@ -91,11 +108,11 @@ The render block is 64 samples. Host references use 44.1 kHz. `fm_start` accepts
 
 ## Validation and remaining work
 
-Verified on 2026-10-28: **326/326 SuperCollider reference graphs, 26 API test groups, and 220,000 sanitizer mutation/truncation cases passed**. The first 52 types appear in the reference suite; stereo In is covered by dedicated API checks. The saved verification record is in `../evidence/`.
+Verified on 2026-10-28: **516/516 SuperCollider reference graphs, 31 API test groups, and 380,000 sanitizer mutation/truncation cases passed**. All 73 types other than In appear in the reference suite; stereo In is covered by dedicated API checks. The saved verification record is in `../evidence/`.
 
-The reference suite compares exported graphs against SuperCollider 3.14.1 and writes per-fixture errors to `build/reference-results.json`. Envelope tests use a peak-error limit of 5e-6 and RMS limit of 1e-6. New control/filter/noise/oscillator/delay fixtures use peak 5e-6 / RMS 1e-6, except audio-rate LagUD (peak 2e-5 / RMS 8e-6) for accumulated single-precision rounding. Earlier non-envelope fixtures use peak 1e-4 / RMS 3e-5, except audio-rate panning (peak 1e-3) because small floating-point differences can select adjacent pan-table entries. Passing these finite fixtures is not an exhaustive guarantee over every possible graph or parameter range.
+The reference suite compares exported graphs against SuperCollider 3.14.1 and writes per-fixture errors to `build/reference-results.json`. Envelope tests use a peak-error limit of 5e-6 and RMS limit of 1e-6. New control/filter/noise/oscillator/delay fixtures use peak 5e-6 / RMS 1e-6, except audio-rate LagUD (peak 2e-5 / RMS 8e-6) for accumulated single-precision rounding. Earlier non-envelope fixtures use peak 1e-4 / RMS 3e-5, except audio-rate panning (peak 1e-3) because small floating-point differences can select adjacent pan-table entries. The m6 additions use peak 1e-4 / RMS 3e-5. One sinusoidally frequency-modulated Impulse fixture uses a pulse-count/amplitude oracle with a maximum one-sample timing difference, because upstream oscillator rounding can move a discontinuous wrap. A separate exact-valued frequency-modulation fixture retains ordinary waveform comparison. The timing oracle is tested to reject missing, extra and two-sample-shifted pulses. Passing these finite fixtures is not an exhaustive guarantee over every possible graph or parameter range.
 
-API tests cover controls, restart, done actions, mixing, scratch reuse, invalidation on failed load, malformed references, every truncation of a fixture, numerical faults and deterministic mutations. `make sanitize` exercises 220,000 mutations/truncations across eleven graph families with bounds, undefined-behaviour and float-conversion checks. Apple's installed AddressSanitizer deadlocked in its own startup before `main`; no ASan success is claimed. A stack sample is retained under `build/asan-startup-sample.txt`.
+API tests cover controls, restart, done actions, mixing, scratch reuse, invalidation on failed load, malformed references, every truncation of a fixture, numerical faults and deterministic mutations. `make sanitize` exercises 380,000 mutations/truncations across nineteen graph families with bounds, undefined-behaviour and float-conversion checks. Apple's installed AddressSanitizer deadlocked in its own startup before `main`; no ASan success is claimed. A stack sample is retained under `build/asan-startup-sample.txt`.
 
 All 49 planned UGen names are implemented. This does not imply support for every scsynth graph, operator selector or parameter combination. Unsupported types/rates/selectors are rejected; numerical faults retire the voice. In particular:
 
