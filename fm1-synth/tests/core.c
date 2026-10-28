@@ -25,7 +25,7 @@ static void storage_test(void){
   assert(fms_slot_read(&f,7,got,&n,&g)==0 && n==5 && g==1 && !memcmp(got,old,n));
  }
  memcpy(nor,saved,sizeof nor);assert(fms_slot_write(&f,0,fresh,100,0,scratch)==-2);
- assert(fms_slot_write(&f,9,fresh,100,0,scratch)==-1);
+ assert(fms_slot_write(&f,FMS_SLOTS,fresh,100,0,scratch)==-1);
  assert(fms_slot_write(&f,0,fresh,FMS_PAYLOAD+1,1,scratch)==-1);
  assert(fms_slot_write(&f,0,0,0,1,scratch)==0);
  assert(fms_slot_read(&f,0,got,&n,&g)==0 && n==0 && g==2);
@@ -38,18 +38,36 @@ static void effect_storage_test(void){
  fms_flash f={0,read_flash,erase_flash,program_flash};uint32_t n,g;int total,op;
  memset(nor,255,sizeof nor);nor[0xDB000]=0x35;nor[0xDC000]=0x73;
  assert(!fms_slot_write(&f,7,old,10,0,scratch));
- assert(!fms_slot_write(&f,FMS_FX_SLOT,old,FMS_FX_PAYLOAD,0,scratch));
+ assert(!fms_slot_write(&f,FMS_FX_SLOT,old,(FMS_FX_PAYLOAD-20),0,scratch));
  memcpy(saved,nor,sizeof nor);operations=0;
- assert(!fms_slot_write(&f,FMS_FX_SLOT,fresh,FMS_FX_PAYLOAD,1,scratch));total=operations;
+ assert(!fms_slot_write(&f,FMS_FX_SLOT,fresh,(FMS_FX_PAYLOAD-20),1,scratch));total=operations;
  for(op=0;op<total;op++){
   memcpy(nor,saved,sizeof nor);cut=op;operations=0;
-  assert(fms_slot_write(&f,FMS_FX_SLOT,fresh,FMS_FX_PAYLOAD,1,scratch)<0);cut=-1;
-  assert(!fms_slot_read(&f,FMS_FX_SLOT,got,&n,&g) && n==FMS_FX_PAYLOAD && g==1 && !memcmp(got,old,n));
+  assert(fms_slot_write(&f,FMS_FX_SLOT,fresh,(FMS_FX_PAYLOAD-20),1,scratch)<0);cut=-1;
+  assert(!fms_slot_read(&f,FMS_FX_SLOT,got,&n,&g) && n==(FMS_FX_PAYLOAD-20) && g==1 && !memcmp(got,old,n));
   assert(!fms_slot_read(&f,7,got,&n,&g) && n==10 && !memcmp(got,old,n));
   assert(nor[0xDB000]==0x35 && nor[0xDC000]==0x73);
  }
- assert(fms_slot_write(&f,FMS_FX_SLOT,fresh,FMS_FX_PAYLOAD+1,1,scratch)<0);
+ assert(fms_slot_write(&f,FMS_FX_SLOT,fresh,(FMS_FX_PAYLOAD-20)+1,1,scratch)<0);
  printf("Effect journal: %d interrupted writes preserve slot 0, slot 8 and reserved flash\n",total);
+}
+static void effect_bank_test(void){
+ fms_flash f={0,read_flash,erase_flash,program_flash};uint32_t n,g;int op,total;unsigned i;
+ memset(nor,255,sizeof nor);
+ for(i=0;i<4;i++)assert(!fms_slot_write(&f,8+i,old,100+i,i,scratch));
+ memcpy(saved,nor,sizeof nor);operations=0;
+ assert(!fms_slot_write(&f,10,fresh,7000,4,scratch));total=operations;
+ for(op=0;op<total;op++){
+  memcpy(nor,saved,sizeof nor);cut=op;operations=0;
+  assert(fms_slot_write(&f,10,fresh,7000,4,scratch)<0);cut=-1;
+  for(i=0;i<4;i++)assert(!fms_slot_read(&f,8+i,got,&n,&g) && g==4 && n==100+i && !memcmp(got,old,n));
+ }
+ memcpy(nor,saved,sizeof nor);
+ assert(fms_slot_write(&f,9,fresh,100,3,scratch)==-2);
+ assert(fms_slot_write(&f,9,fresh,FMS_FX_PAYLOAD-20,4,scratch)==-3);
+ assert(!fms_slot_write(&f,9,0,0,4,scratch));
+ for(i=0;i<4;i++)assert(!fms_slot_read(&f,8+i,got,&n,&g) && g==5 && n==(i==1?0:100+i));
+ printf("Four-FX bank: %d interrupted commits preserve every effect; shared revisions and capacity passed\n",total);
 }
 static uint32_t request(unsigned cmd,const uint8_t *body,unsigned len,uint8_t *reply){
  static unsigned seq;uint8_t in[FMS_FRAME];uint32_t crc;unsigned i;
@@ -59,7 +77,7 @@ static int valid_package(unsigned slot,const void *data,uint32_t n){(void)slot;r
 static void protocol_test(void){
  uint8_t p[32]={0},reply[FMS_FRAME],cached[FMS_FRAME];uint32_t crc,n,g;unsigned i;
  memset(nor,255,sizeof nor);memset(&link,0,sizeof link);link.flash=(fms_flash){0,read_flash,erase_flash,program_flash};link.validate=valid_package;
- assert(request(FMS_INFO,0,0,reply)==30 && reply[6]==FMS_OK && reply[8]==9);
+ assert(request(FMS_INFO,0,0,reply)==30 && reply[6]==FMS_OK && reply[8]==FMS_SLOTS);
  p[5]=5;p[13]=42;crc=fms_crc("valid",5);for(i=0;i<4;i++)p[9+i]=(uint8_t)(crc>>(8*i));
  assert(request(FMS_BEGIN,p,17,reply)>0 && reply[6]==FMS_OK);
  memset(p,0,sizeof p);p[0]=42;p[4]=1;memcpy(p+8,"valid",5);
@@ -135,18 +153,18 @@ static fm_graph fxgraph;static fm_voice fxvoice;
 static void effect_test(void){
  FILE *f=fopen("examples/master-echo.scsyndef","rb");uint8_t data[FM_FILE_BYTES];size_t n;char err[100];float out[128],energy=0;unsigned i,j;uint32_t blocks;
  assert(f);n=fread(data,1,sizeof data,f);fclose(f);assert(fm_load(&fxgraph,data,n,err,sizeof err) && fms_effect_valid(&fxgraph));
- load("examples/keys-master.scsyndef");assert(fms_attach_effect(&player,&fxgraph,&fxvoice));assert(fabsf(player.knobs[2]-.25f)<1e-6f);assert(fms_reset_effect(&player));
- player.master=player.gain=1;fms_knob(&player,2,1);fms_knob(&player,3,0);fms_note_on(&player,1,69,100);
+ load("examples/keys-master.scsyndef");assert(fms_attach_effect(&player,&fxgraph,&fxvoice));assert(fabsf(player.knobs[4]-.25f)<1e-6f);assert(fms_reset_effect(&player));
+ player.master=player.gain=1;fms_knob(&player,0,.8f);assert(fabsf(player.knobs[4]-.25f)<1e-6f);fms_knob(&player,4,1);assert(player.knobs[0]==.8f);fms_knob(&player,5,0);fms_note_on(&player,1,69,100);
  for(i=0;i<200;i++)fms_render(&player,out);
  fms_panic(&player);blocks=fxvoice.blocks;
  for(i=0;i<40;i++){fms_render(&player,out);for(j=0;j<128;j++)energy+=out[j]*out[j];}
  assert(energy>1e-5f && fxvoice.blocks==blocks+40 && fxvoice.active && !player.faults);
  /* Choosing another synth preserves the existing effect and its delay tail. */
- blocks=fxvoice.blocks;assert(fms_init(&player,&graph));assert(fms_attach_effect(&player,&fxgraph,&fxvoice));assert(player.knobs[2]==1);
+ blocks=fxvoice.blocks;assert(fms_init(&player,&graph));assert(fms_attach_effect(&player,&fxgraph,&fxvoice));assert(player.knobs[4]==1);
  player.master=player.gain=1;fms_render(&player,out);assert(fxvoice.blocks==blocks+1);
  assert(fms_reset_effect(&player));
  for(i=0;i<100;i++){fms_render(&player,out);for(j=0;j<128;j++)assert(out[j]==0);}
  assert(fms_attach_effect(&player,0,0) && !player.effect_graph);
  puts("Master effect: routing, inherited knob defaults, live controls, note-free tails, preset continuity, reset and bypass passed");
 }
-int main(void){storage_test();effect_storage_test();protocol_test();performance_test();live_controls_test();mono_test();preparation_test();effect_test();return 0;}
+int main(void){storage_test();effect_storage_test();effect_bank_test();protocol_test();performance_test();live_controls_test();mono_test();preparation_test();effect_test();return 0;}

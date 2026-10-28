@@ -18,8 +18,8 @@ ROOT=Path(__file__).resolve().parents[1]
 CAPACITY=16128
 FX_SLOT=8
 FX_CAPACITY=7936
-SLOT_ORDER=[8,*range(8)]
-def capacity(slot):return FX_CAPACITY if slot==FX_SLOT else CAPACITY
+SLOT_ORDER=[*range(8),8,9,10,11]
+def capacity(slot):return FX_CAPACITY if slot>=FX_SLOT else CAPACITY
 SCLANG=Path('/Applications/SuperCollider.app/Contents/MacOS/sclang')
 import sys
 sys.path.insert(0,str(ROOT.parent/'synthdef-engine/tools'))
@@ -115,7 +115,7 @@ class Bank:
         if any((a&b)!=b for a,b in zip(self.data[off:off+n],data)):return -1
         return self._write(off,data)
     def get(self,slot):
-        if type(slot)!=int or not 0<=slot<9:raise ValueError('Slot must be 0–8 (0 is the permanent effect).' )
+        if type(slot)!=int or not 0<=slot<12:raise ValueError('Choose a synth slot or FX1–FX4.' )
         buf=C.create_string_buffer(CAPACITY);length=C.c_uint32();generation=C.c_uint32()
         if LIB.fms_slot_read(C.byref(self.flash),slot,buf,C.byref(length),C.byref(generation)):raise ValueError('Could not read slot.')
         return buf.raw[:length.value],generation.value
@@ -124,30 +124,34 @@ class Bank:
         self.get(slot)
         if payload:
             if len(payload)>capacity(slot):raise ValueError('Slot capacity exceeded.')
-            _,_,binary=unpack(payload);_,info=validate(binary,slot==FX_SLOT)
-            if slot==FX_SLOT:
-                fx_bytes=info['delay_bytes'];voice_slots=range(8)
+            _,_,binary=unpack(payload);_,info=validate(binary,slot>=FX_SLOT)
+            if slot>=FX_SLOT:
+                total=20+len(payload)+sum(len(self.get(i)[0]) for i in range(8,12) if i!=slot)
+                if total>FX_CAPACITY:raise ValueError(f'FX bank needs {total-20} bytes; four presets share {FX_CAPACITY-20} bytes. Shorten source or clear another effect.')
+                pairs=[(i,info['delay_bytes']) for i in range(8)]
             else:
-                fx,_=self.get(FX_SLOT);fx_bytes=validate(unpack(fx)[2],True)[1]['delay_bytes'] if fx else 0;voice_slots=[slot]
-            for index in voice_slots:
+                pairs=[(slot,validate(unpack(fx)[2],True)[1]['delay_bytes']) for i in range(8,12) if (fx:=self.get(i)[0])]
+            for index,fx_bytes in pairs:
                 body,_=self.get(index)
-                voice_bytes=info['delay_bytes'] if slot!=FX_SLOT else (validate(unpack(body)[2])[1]['delay_bytes'] if body else 0)
-                if voice_bytes*2+fx_bytes>131072:raise ValueError(f'Synth slot {index+1} and slot 0 exceed the shared 128 KiB delay/reverb memory budget.')
+                voice_bytes=info['delay_bytes'] if slot<FX_SLOT else (validate(unpack(body)[2])[1]['delay_bytes'] if body else 0)
+                if voice_bytes*2+fx_bytes>131072:raise ValueError(f'Synth slot {index+1} and an FX preset exceed the shared 128 KiB delay/reverb memory budget.')
         scratch=C.create_string_buffer(CAPACITY)
         rc=LIB.fms_slot_write(C.byref(self.flash),slot,payload,len(payload),expected,scratch)
         if rc==-2:raise ValueError('Slot changed since it was opened. Reload before saving.')
+        if rc==-3:raise ValueError('The four FX presets exceed their shared storage budget.')
         if rc:raise ValueError('Save failed; previous committed copy remains available.')
     def knob_defaults(self,slot,info):
-        other_slot=0 if slot==FX_SLOT else FX_SLOT
+        other_slot=0 if slot>=FX_SLOT else FX_SLOT
         other,_=self.get(other_slot)
-        fallback=validate(unpack(other)[2],other_slot==FX_SLOT)[1]['controls'] if other else {}
-        synth=fallback if slot==FX_SLOT else info['controls']
-        effect=info['controls'] if slot==FX_SLOT else fallback
-        return [max(0,min(1,synth.get('knob'+str(i),effect.get('knob'+str(i),.5)))) for i in range(1,5)]
+        fallback=validate(unpack(other)[2],other_slot>=FX_SLOT)[1]['controls'] if other else {}
+        synth=fallback if slot>=FX_SLOT else info['controls']
+        effect=info['controls'] if slot>=FX_SLOT else fallback
+        return [max(0,min(1,(synth if i<=4 else effect).get('knob'+str(i),.5))) for i in range(1,9)]
     def describe(self,slot,full=False):
-        payload,revision=self.get(slot);result=dict(slot=slot,revision=revision,used=len(payload),capacity=capacity(slot),role='effect' if slot==FX_SLOT else 'synth',empty=not payload)
+        payload,revision=self.get(slot);result=dict(slot=slot,revision=revision,used=len(payload),capacity=capacity(slot),role='effect' if slot>=FX_SLOT else 'synth',empty=not payload)
+        if slot>=FX_SLOT:result.update(bank_used=sum(len(self.get(i)[0]) for i in range(8,12)),bank_capacity=FX_CAPACITY-20)
         if payload:
-            name,source,binary=unpack(payload);_,info=validate(binary,slot==FX_SLOT)
+            name,source,binary=unpack(payload);_,info=validate(binary,slot>=FX_SLOT)
             result.update(name=name,info=info,has_source=bool(source),knob_defaults=self.knob_defaults(slot,info))
             if full:result.update(source=source,binary=base64.b64encode(binary).decode(),package=base64.b64encode(payload).decode())
         return result
@@ -173,7 +177,7 @@ def preview(binary,midi=60,velocity=90,knobs=None,effect_binary=None):
         effect_graph,_=validate(effect_binary,True);effect_voice=C.create_string_buffer(LIB.fms_voice_size())
         if not LIB.fms_attach_effect(player,effect_graph,effect_voice) or not LIB.fms_reset_effect(player):raise ValueError('Synth and effect exceed the shared delay/reverb memory budget.')
     if knobs is not None:
-        if len(knobs)!=4 or not all(isinstance(x,(int,float)) and math.isfinite(x) and 0<=x<=1 for x in knobs):raise ValueError('Four knob values in 0–1 are required.')
+        if len(knobs) not in (4,8) or not all(isinstance(x,(int,float)) and math.isfinite(x) and 0<=x<=1 for x in knobs):raise ValueError('Four or eight knob values in 0–1 are required.')
         for i,x in enumerate(knobs):LIB.fms_knob(player,i,x)
     LIB.fms_note_on(player,1,midi,velocity);frames=array.array('h');meter=[]
     for block in range(2068 if effect_binary else 1379):

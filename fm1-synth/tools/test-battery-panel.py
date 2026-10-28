@@ -13,6 +13,6 @@ with tempfile.TemporaryDirectory(prefix='fm1-battery-') as tmp:
         bank.put(index,pack(name,(ROOT/f'examples/{name}.scd').read_text(),(ROOT/f'examples/{name}.scsyndef').read_bytes(),effect),0)
     for name,raw,bars,usb in [('unknown',-1,-1,0),('empty',500,0,0),('one',545,1,0),('two',575,2,0),('full',610,3,0),('usb',610,3,1)]:
         script=tmp/f'{name}.txt'
-        script.write_text(f'wait 600\nexpect battery {bars}\nexpect battery_raw {raw}\nexpect battery_usb {usb}\nshot {name}.png\nturn PRESET -1\nwait 80\nexpect view 8\nexpect slot 0\nshot {name}-fx.png\nkey 7 down 90\nwait 80\nexpect held 1\nkey 7 up\nwait 80\nexpect held 0\n')
+        script.write_text(f'wait 600\nexpect battery {bars}\nexpect battery_raw {raw}\nexpect battery_usb {usb}\nshot {name}.png\ntap FX\nwait 80\nexpect view 8\nexpect slot 0\nshot {name}-fx.png\nkey 7 down 90\nwait 80\nexpect held 1\nkey 7 up\nwait 80\nexpect held 0\n')
         subprocess.run([str(ROOT/'firmware/build/host/synthdef_host'),str(script),str(output)],env=dict(env,FMS_BANK=str(path),FMS_BATTERY_RAW=str(raw),FMS_BATTERY_USB=str(usb)),check=True)
 print('Battery UI: 6 states, 42 assertions; synth/FX screenshots saved.')

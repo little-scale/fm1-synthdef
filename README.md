@@ -9,8 +9,8 @@ The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and exec
 ## What it does
 
 - Two simultaneous voices with velocity, pitch, gate and live controls.
-- Eight persistent synth slots, plus **slot 0**, a permanent stereo master effect.
-- Four shared knobs: patch argument names determine which controls a synth or effect uses.
+- Eight persistent synth slots and **four selectable master-effect presets**, with one effect running at a time.
+- Four physical knobs with a latching **FX** toggle: `knob1`–`knob4` for synths, `knob5`–`knob8` for effects.
 - Source code on the device screen, syntax colours, stereo meters and scrolling.
 - A local browser editor with paste, compile, preview, import/export and verified USB transfers.
 - Oscillators, filters, noise, envelopes, resonators, delay/comb/allpass filters and initial random values.
@@ -18,7 +18,7 @@ The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and exec
 
 ## Supported UGens
 
-The development source supports these **77 compiled UGen types**, verified in emulation. The published **v0.1.0-preview firmware contains 53 types**; the additions below require a new build and have not yet been tested on the physical FM-1. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
+The development source supports these **77 compiled UGen types**, verified in emulation. The published **v0.1.0-preview firmware contains 53 types**; the additions below require a development build; selected two-voice patches and all three reverbs have also passed hardware tests. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
 
 | Category | UGen types |
 | --- | --- |
@@ -41,9 +41,9 @@ The development source supports these **77 compiled UGen types**, verified in em
 - `Env.perc`, `Env.adsr`, `Env.asr` and other Env constructors are source-language helpers compiled into `EnvGen` data. All nine EnvGen curve types are implemented, with done actions 0/2 and the documented segment limits.
 - `Mix`, `LinLin` and `PMOsc` can compile into existing supported nodes; they are not additional runtime types. Simple examples were compiled and host-rendered during the compatibility review. `DynKlang`/`DynKlank` likewise expand into supported oscillator/resonator graphs within the documented limits. This does not guarantee every argument/rate combination or CPU load.
 
-The development firmware adds a three-bar battery indicator and USB-power symbol in the top-right corner, including the slot 0 effect view.
+The development firmware adds a three-bar battery indicator and USB-power symbol in the top-right corner, including the FX code view.
 
-See [implementation status and remaining additions](docs/UGEN-ROADMAP.md). Three [slot-0 reverb examples](docs/PATCHES.md#development-reverb-alternatives) are included, with knob 3 for wet/dry and knob 4 for room size or decay. Try the new [Dust chimes source](fm1-synth/examples/dust-chimes.scd) in the development host preview: knob 1 controls event density and knob 2 decay time. It is not installed into the example bank automatically.
+See [implementation status and remaining additions](docs/UGEN-ROADMAP.md). Three [slot-0 reverb examples](docs/PATCHES.md#development-reverb-alternatives) are included, with knob 5 for wet/dry and knob 6 for room size or decay. Try the new [Dust chimes source](fm1-synth/examples/dust-chimes.scd) in the development host preview: knob 1 controls event density and knob 2 decay time. It is not installed into the example bank automatically.
 
 ## Start here
 
@@ -58,14 +58,17 @@ Download the complete **0.1.0-preview** archive from the repository's Releases p
 
 | Slot | Patch | Knobs |
 | --- | --- | --- |
-| 0 | Master echo | 3: amount; 4: delay time |
+| FX1 | Master echo | 5: amount; 6: delay time |
+| FX2–FX4 | FreeVerb / FreeVerb2 / MiVerb | 5: wet/dry; 6: room/decay |
 | 1 | Keys | 1: cutoff; 2: resonance |
 | 2 | Addy, five harmonics | No knob arguments |
 | 3 | Triple saw | 1: attack/release; 2: detune; 3: vibrato; 4: cutoff |
 | 4 | Two-op FM | 1: frequency ratio; 2: FM depth |
 | 5–8 | Available | Defined by your patch |
 
-Knobs 3–4 also affect echo while playing Triple saw. PRESET can display slot 0's code while leaving the last synth playable. SELECT scrolls code, OCT± transposes subsequent keyboard notes, and HOME stops notes and clears the effect tail.
+**PRESET** selects synths 1–8. **ALGORITHM** selects bypass or FX1–FX4. Press **FX** once to latch effect control: its LED stays on, the screen shows effect code, and the four knobs send `knob5`–`knob8`. Press again to return to synth code and `knob1`–`knob4`. Toggling preserves both sets of values and held notes. Synth changes preserve the effect and its tail; effect changes briefly fade the output, replace the effect, and fade back in while keeping synth voices alive. The old effect tail ends when it is replaced.
+
+SELECT scrolls the focused code, OCT± transposes subsequent keyboard notes, and HOME stops notes and clears the effect tail. On boot, synth 1 and FX1 load with FX control off. Knob and selection changes do not write flash. See [upgrade and storage details](fm1-synth/README.md#four-master-effect-presets).
 
 ## Status
 

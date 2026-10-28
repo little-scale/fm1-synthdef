@@ -23,7 +23,7 @@ class Device:
   self.inp=mido.open_input(self.port);self.out=mido.open_output(self.port);self.serial=secrets.randbelow(65536)
   try:
    self.info=self.request(0)
-   if len(self.info)!=19 or self.info[:2]!=bytes([2,9]):raise ValueError('Device is not compatible SynthDef firmware')
+   if len(self.info)!=19 or self.info[:2] not in (bytes([2,9]),bytes([3,12])):raise ValueError('Device is not compatible SynthDef firmware')
   except Exception:
    self.close();raise
  def close(self):self.inp.close();self.out.close()
@@ -54,7 +54,7 @@ class Device:
    if len(data)==n:return bytes(data),g
    if len(r)==12:raise ValueError('Truncated slot')
  def write(self,slot,data,expected=None):
-  if not 0<=slot<9 or len(data)>(7936 if slot==8 else 16128):raise ValueError('Invalid slot/package size')
+  if not 0<=slot<self.info[1] or len(data)>(7936 if slot>=8 else 16128):raise ValueError('Invalid slot/package size')
   old,generation=self.read(slot)
   if expected is not None and expected!=generation:raise ValueError("FM-1 slot changed. Check the device again before sending.")
   tx=secrets.randbits(32)
@@ -64,6 +64,17 @@ class Device:
   actual,revision=self.read(slot)
   if actual!=data or revision!=generation+1:raise ValueError('Slot readback did not match')
   return revision
+ def panel(self):
+  for attempt in range(3):
+   self.out.send(mido.Message('sysex',data=PREFIX+bytes([0x7a])));end=time.monotonic()+.2
+   while time.monotonic()<end:
+    for message in self.inp.iter_pending():
+     p=bytes(message.data) if message.type=='sysex' else b''
+     if len(p)==66 and p[:6]==PREFIX+bytes([0x7a]):
+      v=[sum(p[6+i*5+j]<<(7*j) for j in range(5)) for i in range(12)]
+      return dict(fx_mode=v[0],fx_choice=v[1],switching=v[2],knobs=v[3:11],gain=v[11])
+    time.sleep(.002)
+  raise TimeoutError('No control-bank telemetry')
  def inputs(self,battery_sampling=None):
   data=PREFIX+bytes([0x7b])+ (b'' if battery_sampling is None else bytes([int(bool(battery_sampling))]))
   for attempt in range(3):
@@ -103,16 +114,18 @@ class Device:
     time.sleep(0.002)
   raise TimeoutError('No device telemetry')
 def main():
- p=argparse.ArgumentParser(description=__doc__);p.add_argument('action',choices=['info','read','write','clear','stats','benchmark','battery','inputs']);p.add_argument('--slot',type=int,default=1);p.add_argument('--file',type=Path);p.add_argument('--port');a=p.parse_args()
+ p=argparse.ArgumentParser(description=__doc__);p.add_argument('action',choices=['info','read','write','clear','stats','benchmark','battery','inputs','panel']);p.add_argument('--slot',type=int,default=1);p.add_argument('--effect',type=int,choices=range(1,5));p.add_argument('--file',type=Path);p.add_argument('--port');a=p.parse_args()
  if not 0<=a.slot<=8:p.error('Slot is 0–8 (0 is the permanent effect)')
  if a.action in ('read','write') and not a.file:p.error('--file is required')
  dev=Device(a.port)
+ index=7+a.effect if a.effect else (a.slot-1)%9
  try:
   if a.action=='info':print(json.dumps(dict(port=dev.port,slots=dev.info[1],effect_capacity=struct.unpack_from('<I',dev.info,15)[0],voices=dev.info[2],capacity=struct.unpack_from('<I',dev.info,3)[0])))
+  elif a.action=='panel':print(json.dumps(dev.panel()))
   elif a.action=='inputs':print(json.dumps(dev.inputs()))
   elif a.action=='battery':print(json.dumps(dev.battery()))
   elif a.action in ('stats','benchmark'):print(json.dumps(dev.stats(a.action=='benchmark')))
-  elif a.action=='read':data,rev=dev.read((a.slot-1)%9);a.file.write_bytes(data);print('Read slot',a.slot,'revision',rev,'bytes',len(data))
-  else:print('Verified slot',a.slot,'revision',dev.write((a.slot-1)%9,b'' if a.action=='clear' else a.file.read_bytes()))
+  elif a.action=='read':data,rev=dev.read(index);a.file.write_bytes(data);print('Read slot',a.slot,'revision',rev,'bytes',len(data))
+  else:print('Verified slot',a.slot,'revision',dev.write(index,b'' if a.action=='clear' else a.file.read_bytes()))
  finally:dev.close()
 if __name__=='__main__':main()

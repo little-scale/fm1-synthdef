@@ -22,7 +22,7 @@ def home():
 
 def select(index):
     state = dev.stats()
-    remote([3, 2, 64 + index - state['view_slot_index']])
+    remote([3, 2, 64 + index - state['slot_index']])
 
 def notes(keys, on):
     for key in keys:
@@ -40,6 +40,8 @@ def check(label, voices):
     assert state['overloads'] == baseline['overloads']
 
 try:
+    if dev.panel()['fx_mode']:remote([1,1,0]);remote([1,0,0])
+    remote([3,1,65-dev.panel()['fx_choice']])
     remote([4, 0, 8]); select(0); select(2); home()
     baseline = dev.stats()
     with (out / 'capture.log').open('w') as log:

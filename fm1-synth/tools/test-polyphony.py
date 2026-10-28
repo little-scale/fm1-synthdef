@@ -16,7 +16,7 @@ dev=Device();samples=[];baseline=dev.stats()
 def remote(data):
     dev.out.send(mido.Message('sysex',data=[0x7d,0x4c,0x43]+data));time.sleep(.04)
 def select(slot):
-    state=dev.stats();remote([3,2,64+slot-state.get('view_slot_index',state['slot_index'])]);time.sleep(.1)
+    state=dev.stats();remote([3,2,64+slot-state['slot_index']]);time.sleep(.1)
 def note(key,on,velocity=80):
     dev.out.send(mido.Message('note_on' if on else 'note_off',note=key,velocity=velocity if on else 0))
 def check(phase,slot,voices=2):
@@ -25,6 +25,8 @@ def check(phase,slot,voices=2):
     assert not s['faults'] and s['overloads']==baseline['overloads'] and s['xruns']==baseline['xruns'],'Playback fault/overload/overrun'
     assert s['active_voices']==voices,'Expected simultaneous voices'
 try:
+    if dev.panel()['fx_mode']:remote([1,1,0]);remote([1,0,0])
+    remote([3,1,65-dev.panel()['fx_choice']])
     assert dev.info[2]==2,'Device does not advertise two voices'
     remote([4,0,8]);select(0)
     for i in range(24):

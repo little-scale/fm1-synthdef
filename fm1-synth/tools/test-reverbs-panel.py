@@ -9,7 +9,6 @@ subprocess.run([str(workspace/'.venv/bin/python3'),str(workspace/'fm1-base/tools
 results=[]
 for verb in ['freeverb','freeverb2','miverb']:
     path=ROOT/'examples'/('master-'+verb+'.scd');source=path.read_text();binary,info=compile_source(source,True)
-    path.with_suffix('.scsyndef').write_bytes(binary);path.with_suffix('.fmslot').write_bytes(pack('Master '+verb,source,binary,True))
     for synth in ['keys-master','dust-chimes']:
         output=ROOT/'build/reverb-panel'/verb/synth;output.mkdir(parents=True,exist_ok=True)
         voice_source=(ROOT/'examples'/(synth+'.scd')).read_text();voice_binary,voice_info=compile_source(voice_source)

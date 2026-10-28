@@ -34,7 +34,7 @@ class BankTests(unittest.TestCase):
         bank=Bank(self.path)
         for i in range(8):bank.put(i,pack('Voice '+str(i),'',self.binary),0)
         for i in range(8):self.assertEqual(bank.describe(i)['name'],'Voice '+str(i))
-        with self.assertRaises(ValueError):bank.get(9)
+        with self.assertRaises(ValueError):bank.get(12)
         self.assertEqual(self.path.read_bytes()[:0x97000],b'\xff'*0x97000)
         self.assertEqual(self.path.read_bytes()[0xD7000:],b'\xff'*(0x100000-0xD7000))
     def test_preview_audio_and_velocity(self):
@@ -63,5 +63,25 @@ class BankTests(unittest.TestCase):
         self.assertEqual(self.path.read_bytes()[0xDB000:],b'\xff'*(0x100000-0xDB000))
         with self.assertRaises(ValueError):pack('Too large','x'*7936,fx,True)
         with self.assertRaises(ValueError):validate(fx)
+
+    def test_four_effects_and_legacy_migration(self):
+        import zlib
+        examples=FIXTURES.parents[1]/'fm1-synth/examples'
+        old=pack('Echo','', (examples/'master-echo.scsyndef').read_bytes(),True)
+        bank=Bank(self.path)
+        # Real v2 layout: a plain package in physical slot 8, generation 7.
+        header=struct.pack('<4sIIIIII',b'FMS1',8,7,len(old),zlib.crc32(old),0,1)
+        header+=struct.pack('<I',zlib.crc32(header))
+        bank._write(0xD7000,header);bank._write(0xD7100,old)
+        self.assertEqual(bank.get(8),(old,7));self.assertEqual(bank.get(9),(b'',7))
+        for i,name in enumerate(['master-freeverb','master-freeverb2','master-miverb'],9):
+            payload=pack(name,'',(examples/(name+'.scsyndef')).read_bytes(),True)
+            bank.put(i,payload,bank.get(i)[1])
+        self.assertEqual(bank.get(8)[0],old)
+        self.assertTrue(all(bank.get(i)[0] for i in range(8,12)))
+        with self.assertRaises(ValueError):bank.put(8,old,7)
+        old_others=[bank.get(i)[0] for i in (8,10,11)]
+        bank.put(9,b'',bank.get(9)[1])
+        self.assertEqual([bank.get(i)[0] for i in (8,10,11)],old_others)
 
 if __name__=='__main__':unittest.main()

@@ -9,7 +9,7 @@ static uint32_t get16(const uint8_t *p){return (uint32_t)p[0]|(uint32_t)p[1]<<8;
 static void put32(uint8_t *p,uint32_t x){unsigned i;for(i=0;i<4;i++)p[i]=(uint8_t)(x>>(8*i));}
 static uint32_t dispatch(fms_link *l,unsigned cmd,const uint8_t *p,uint32_t n,uint8_t *out){
  uint32_t len,gen,off,amount,tx;int rc;out[0]=FMS_BAD;
- if(cmd==FMS_INFO && !n){out[0]=FMS_OK;out[1]=2;out[2]=FMS_SLOTS;out[3]=FMS_PROTOCOL_VOICES;put32(out+4,FMS_PAYLOAD);put32(out+8,FMS_CHUNK);put32(out+12,16384u*4);put32(out+16,FMS_FX_PAYLOAD);return 20;}
+ if(cmd==FMS_INFO && !n){out[0]=FMS_OK;out[1]=3;out[2]=FMS_SLOTS;out[3]=FMS_PROTOCOL_VOICES;put32(out+4,FMS_PAYLOAD);put32(out+8,FMS_CHUNK);put32(out+12,16384u*4);put32(out+16,FMS_FX_PAYLOAD);return 20;}
  if(cmd==FMS_READ && n==11 && p[0]<FMS_SLOTS){
   off=get32(p+1);amount=get16(p+5);gen=get32(p+7);
   if(amount>FMS_CHUNK)return 1;

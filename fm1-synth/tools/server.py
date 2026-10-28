@@ -44,7 +44,7 @@ def serve(path,port=8765):
                 def bad_constant(value):raise ValueError('Non-finite JSON number: '+value)
                 data=json.loads(self.rfile.read(n),parse_constant=bad_constant)
                 path=urlparse(self.path).path
-                effect=data.get('slot')==FX_SLOT
+                effect=data.get('slot',0)>=FX_SLOT
                 if path=='/api/compile':
                     binary,info=compile_source(data['source'],effect);payload=pack(data.get('name') or info['name'],data['source'],binary,effect)
                     result=dict(binary=base64.b64encode(binary).decode(),info=info,used=len(payload),knob_defaults=bank.knob_defaults(data.get('slot',0),info))
@@ -67,14 +67,14 @@ def serve(path,port=8765):
                     try:
                         if path.endswith('/info'):
                             slots=[]
-                            for i in range(9):
+                            for i in range(dev.info[1]):
                                 body,rev=dev.read(i)
                                 name=unpack(body)[0] if body else 'Empty'
                                 slots.append(dict(slot=i,revision=rev,name=name,empty=not body))
                             result=dict(port=dev.port,voices=dev.info[2],slots=slots,stats=dev.stats())
                         else:
                             slot=data['slot']
-                            if type(slot)!=int or not 0<=slot<9:raise ValueError('Slot must be 0–8.')
+                            if type(slot)!=int or not 0<=slot<dev.info[1]:raise ValueError('Slot index is not supported by this device.')
                             if path.endswith('/write'):
                                 if data.get('clear'):body=b''
                                 else:
@@ -97,7 +97,9 @@ def serve(path,port=8765):
                         effect_binary=binary;voice,_=bank.get(data.get('preview_slot',0))
                         binary=unpack(voice)[2] if voice else (ROOT/'examples/keys-master.scsyndef').read_bytes()
                     else:
-                        fx,_=bank.get(FX_SLOT);effect_binary=unpack(fx)[2] if fx else None
+                        effect_slot=data.get('effect_slot',FX_SLOT)
+                        if type(effect_slot)!=int or effect_slot not in (-1,8,9,10,11):raise ValueError('Invalid preview effect')
+                        fx=bank.get(effect_slot)[0] if effect_slot>=0 else b'';effect_binary=unpack(fx)[2] if fx else None
                     audio,meters=preview(binary,data.get('midi',60),data.get('velocity',90),data.get('knobs'),effect_binary)
                     result=dict(wav=base64.b64encode(audio).decode(),meters=meters,meter_interval=20*64/44100)
                 else:self.send(404,{'error':'Not found'});return

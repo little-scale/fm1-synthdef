@@ -268,18 +268,35 @@
     "hardware_block_frames": 256,
     "engine_block_frames": 64,
     "knob_increment": 0.02,
-    "image_bytes": 226104,
-    "static_ram_bytes": 78432,
-    "pool_bytes": 325992,
+    "image_bytes": 227828,
+    "static_ram_bytes": 78480,
+    "pool_bytes": 326008,
     "pool_capacity_bytes": 344064,
     "note_preparation_frames": 128,
-    "verification": "../evidence/battery-indicator.json",
+    "verification": "../evidence/fx-banks.json",
     "effect_slot": 0,
     "synth_slots": 8,
-    "slot_count": 9,
+    "slot_count": 12,
     "effect_capacity_bytes": 7936,
     "previous_hardware_verification": "../evidence/master-effect.json",
-    "reverb_verification": "../evidence/reverbs-hardware.json"
+    "reverb_verification": "../evidence/reverbs-hardware.json",
+    "effect_presets": 4,
+    "effect_shared_package_bytes": 7916,
+    "control_banks": {
+      "synth": [
+        "knob1",
+        "knob2",
+        "knob3",
+        "knob4"
+      ],
+      "effect": [
+        "knob5",
+        "knob6",
+        "knob7",
+        "knob8"
+      ],
+      "toggle": "latching FX button"
+    }
   },
   "input_bus": {
     "ugen": "In.ar",

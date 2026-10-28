@@ -1,5 +1,16 @@
 # Verification record
 
+
+## Independent synth / FX controls — 28 October 2026
+
+The installed development build is **227,828 bytes**, with **78,480/98,304 bytes static RAM** and **326,008/344,064 bytes pool use**. PRESET selects eight synths, ALGORITHM selects four FX presets or bypass, and the FX button latches independent knob banks 1–4 / 5–8 and code views. The eight original synth packages were read back unchanged. The legacy echo was preserved with its control names migrated, and three empty effect presets received FreeVerb, FreeVerb2 and MiVerb.
+
+Core tests, seven Python package/bank groups, highlighting/framing tests and undefined-behaviour/bounds/float-cast sanitizers pass. Storage tests cover 68 interrupted synth writes, 34 full effect writes and 32 four-effect commits, including neighbor preservation, shared revisions and capacity refusal. The actual host adapter passes **277 assertions**: original panel 23, extensions 31, reverb matrix 114, battery 42, and new FX-bank controls 67.
+
+The exact installed build passed **28 hardware checkpoints** with stereo USB audio: held two-note Keys chords across all four effects and bypass, latching while holding/releasing FX, independent live knobs, effect-code focus, synth changes preserving effect controls, and note-offs during effect replacement. No new overruns, overloads or numerical faults occurred; sampled render time peaked at **3,118 microseconds**. All twelve saved slots matched before/after testing. An earlier attempt missed one unacknowledged remote encoder command; the final passing driver reads each value back before the next command. This result does not establish a physical encoder fault. One overload was already counted before the final run began, before its notes; the count remained at one throughout acceptance. Its cause is unconfirmed, so cold-start acceptance is still incomplete.
+
+The browser passed toggle/value retention, effect compile → local save/readback → audio preview, and shared-capacity display checks. The effect bank uses 4,255 of its 7,916 package bytes. The final build still needs user listening and power-cycle confirmation. These checks do not certify arbitrary synth/FX combinations: the prior two-Addy-voices + FreeVerb overload remains relevant. Exact hashes and scoped results are in [FX-bank evidence](../evidence/fx-banks.json). Earlier results below refer to their recorded builds; release v0.1.0-preview is unchanged.
+
 ## Battery indicator and reverb hardware checks — 28 October 2026
 
 The current development build is installed on the test FM-1. It adds a top-right three-bar battery icon and USB-host power symbol in both synth and effect code views. The physical sensor read 628 (three bars); six simulator states passed 42 assertions. ADC ownership, scan restoration, polling and hysteresis checks passed. A ten-second idle observation showed stable sensor readings and no new ADC timeouts. Battery discharge calibration and the unplugged physical display have not been verified.

@@ -2,7 +2,7 @@
 #include "performance.h"
 #include <math.h>
 #include <string.h>
-static const char *const knobs[]={"knob1","knob2","knob3","knob4"};
+static const char *const knobs[]={"knob1","knob2","knob3","knob4","knob5","knob6","knob7","knob8"};
 static float bound(float x,float a,float b){return fminf(b,fmaxf(a,x));}
 void fms_panic(fms_performance *p){unsigned i;for(i=0;i<FMS_VOICES;i++){p->voice[i].synth.active=0;p->voice[i].held=0;p->voice[i].fade=0;}memset(p->keys,-1,sizeof p->keys);p->peak[0]=p->peak[1]=0;p->clip[0]=p->clip[1]=0;}
 int fms_init(fms_performance *p,const fm_graph *g){
@@ -28,7 +28,7 @@ int fms_effect_valid(const fm_graph *g){
   const fm_node *n=&g->node[i];int done=n->type==FM_EnvGen?4:(n->type==FM_Line || n->type==FM_XLine)?3:-1;
   if(done>=0){const fm_ref *r=&g->ref[n->input+done];if(r->node>=0 || g->constant[r->output]!=0)return 0;}
  }
- for(i=0;i<4;i++)for(j=0;j<g->names;j++)if(!strcmp(knobs[i],g->control_name[j].name)){
+ for(i=4;i<8;i++)for(j=0;j<g->names;j++)if(!strcmp(knobs[i],g->control_name[j].name)){
   unsigned index=g->control_name[j].index;int live=0;
   for(k=0;k<g->nodes;k++){const fm_node *n=&g->node[k];if((n->type==FM_Control || n->type==FM_LagControl) && n->rate==1 && index>=(unsigned)n->special && index<(unsigned)n->special+n->outputs)live=1;}
   if(!live)return 0;
@@ -41,10 +41,9 @@ int fms_attach_effect(fms_performance *p,const fm_graph *g,fm_voice *v){
  need=fm_delay_required(g,44100);
  if(!v || !fms_effect_valid(g) || p->voice_delay_samples*FMS_VOICES>FMS_DELAY_TOTAL-need)return 0;
  p->effect_graph=g;p->effect_voice=v;
- for(i=0;i<4;i++){
-  int synth_uses=0;
-  if(p->graph)for(j=0;j<p->graph->names;j++)if(!strcmp(knobs[i],p->graph->control_name[j].name))synth_uses=1;
-  if(!synth_uses)for(j=0;j<g->names;j++)if(!strcmp(knobs[i],g->control_name[j].name)){
+ for(i=4;i<8;i++){
+  if(!v->active || !v->prepared)p->knobs[i]=0.5f;
+  for(j=0;j<g->names;j++)if(!strcmp(knobs[i],g->control_name[j].name)){
    unsigned index=g->control_name[j].index;
    p->knobs[i]=bound(v->active && v->prepared?v->control[index]:g->defaults[index],0,1);
   }
@@ -57,7 +56,7 @@ int fms_reset_effect(fms_performance *p){
  if(!p->effect_graph || !p->effect_voice)return 1;
  need=fm_delay_required(p->effect_graph,44100);
  if(!fm_start(p->effect_voice,p->effect_graph,44100) || !fm_bind_delay(p->effect_voice,p->effect_graph,p->delays+FMS_DELAY_TOTAL-need,need))return 0;
- for(i=0;i<4;i++)fm_set(p->effect_voice,p->effect_graph,knobs[i],p->knobs[i]);
+ for(i=4;i<8;i++)fm_set(p->effect_voice,p->effect_graph,knobs[i],p->knobs[i]);
  return 1;
 }
 void fms_note_off(fms_performance *p,uint32_t id){unsigned i;for(i=0;i<FMS_VOICES;i++){fms_note *n=&p->voice[i];if(n->held && n->id==id){n->held=0;n->released_frames=0;if(!fm_set(&n->synth,p->graph,"gate",0))n->forced=1;}}}
@@ -88,7 +87,7 @@ void fms_key(fms_performance *p,unsigned key,unsigned velocity,int down){
  else if(!down && p->keys[key]>=0){fms_note_off(p,0x10000u+key);p->keys[key]=-1;}
 }
 void fms_octave(fms_performance *p,int delta){if(delta>0 && p->octave<2)p->octave++;else if(delta<0 && p->octave>-2)p->octave--;}
-void fms_knob(fms_performance *p,unsigned knob,float value){unsigned i;if(knob>=4 || !isfinite(value) || (!p->graph && !p->effect_graph))return;p->knobs[knob]=bound(value,0,1);for(i=0;i<FMS_VOICES;i++)if(p->voice[i].synth.active)fm_set(&p->voice[i].synth,p->graph,knobs[knob],p->knobs[knob]);if(p->effect_graph && p->effect_voice)fm_set(p->effect_voice,p->effect_graph,knobs[knob],p->knobs[knob]);}
+void fms_knob(fms_performance *p,unsigned knob,float value){unsigned i;if(knob>=8 || !isfinite(value) || (!p->graph && !p->effect_graph))return;p->knobs[knob]=bound(value,0,1);if(knob<4)for(i=0;i<FMS_VOICES;i++)if(p->voice[i].synth.active)fm_set(&p->voice[i].synth,p->graph,knobs[knob],p->knobs[knob]);if(knob>=4 && p->effect_graph && p->effect_voice)fm_set(p->effect_voice,p->effect_graph,knobs[knob],p->knobs[knob]);}
 void fms_render(fms_performance *p,float out[FM_BLOCK*2]){
  unsigned i,j,c;float master=bound(p->master,0,1);memset(out,0,FM_BLOCK*2*sizeof(float));
  for(i=0;i<FMS_VOICES;i++){

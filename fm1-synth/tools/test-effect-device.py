@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Record dry/wet note releases and a preset switch through slot 0.
+"""Record dry/wet note releases and a preset switch through FX1.
 
-Requires Keys in slot 1 and masterEcho in slot 0. Temporarily changes knob 3
+Requires Keys in slot 1 and masterEcho in FX1. Temporarily changes effect knob 5
 and MASTER. The effect package should be reloaded afterward to restore defaults.
 """
 import argparse,array,json,math,subprocess,time,wave
@@ -15,14 +15,16 @@ def remote(data):dev.out.send(mido.Message('sysex',data=[0x7d,0x4c,0x43]+data));
 def home():remote([1,64,0]);remote([1,0,0])
 def note(on):dev.out.send(mido.Message('note_on' if on else 'note_off',note=69,velocity=90 if on else 0))
 try:
-    remote([3,2,64-baseline.get('view_slot_index',baseline['slot_index'])]);remote([4,0,8]);remote([3,5,14]);home()
+    remote([3,2,64-baseline['slot_index']]);remote([4,0,8]);remote([3,1,65-dev.panel()['fx_choice']]);home()
+    if not dev.panel()['fx_mode']:remote([1,1,0]);remote([1,0,0])
+    remote([3,3,14])
     with (out/'effect-capture.log').open('w') as log:
         capture=subprocess.Popen(['ffmpeg','-hide_banner','-nostdin','-f','avfoundation','-i',':SynthDef FM-1','-t','12','-ar','44100','-ac','2','-c:a','pcm_s16le','-y',str(out/'effect-tail.wav')],stdout=log,stderr=subprocess.STDOUT)
         t0=time.monotonic();time.sleep(2)
         events['dry_on']=time.monotonic()-t0;note(True);time.sleep(.15)
         events['dry_off']=time.monotonic()-t0;note(False);time.sleep(1.4)
         events['dry_status']=dev.stats()
-        remote([3,5,114]);home();time.sleep(.3)
+        home();remote([3,3,114]);time.sleep(.3)
         events['wet_on']=time.monotonic()-t0;note(True);time.sleep(.15)
         events['wet_off']=time.monotonic()-t0;note(False);time.sleep(.45)
         remote([3,2,65]);events['preset_switch']=time.monotonic()-t0
@@ -30,7 +32,9 @@ try:
         remote([3,2,63]);home();capture.wait(timeout=20)
         assert capture.returncode==0,'USB recording failed'
 finally:
-    note(False);home();remote([4,1,32]);dev.close()
+    note(False);home()
+    if dev.panel()['fx_mode']:remote([1,1,0]);remote([1,0,0])
+    remote([4,1,32]);dev.close()
     if capture and capture.poll() is None:capture.terminate()
     (out/'effect-events.json').write_text(json.dumps(events,indent=2)+'\n')
 with wave.open(str(out/'effect-tail.wav')) as wav:

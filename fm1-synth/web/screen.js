@@ -27,7 +27,7 @@ export function wrap(source,columns=36){
 }
 export function drawScreen(canvas,{source='',slot=0,name='Empty slot',scroll=0,knobs=[0.5,0.5,0.5,0.5],overlay=-1,levels=[0,0],octave=0,draft=false}={}){
  const c=canvas.getContext('2d');c.fillStyle='white';c.fillRect(0,0,240,240);c.fillStyle='black';c.font='bold 11px Monaco, Menlo, monospace';
- c.fillText(`${String(slot===8?0:slot+1).padStart(2,'0')}${slot===8?' FX':' / 08'}   ${draft?'DRAFT':name}`.slice(0,32),7,15);
+ c.fillText(`${(slot>=8?'FX'+(slot-7):String(slot+1).padStart(2,'0'))}${slot>=8?' K5-8':' / 08'}   ${draft?'DRAFT':name}`.slice(0,32),7,15);
  c.strokeStyle='#ddd';c.beginPath();c.moveTo(6,23);c.lineTo(234,23);c.stroke();
  const lines=wrap(source || '// Source unavailable\n// Import a .scd companion or\n// paste and compile code.');const top=Math.max(0,Math.min(scroll,Math.max(0,lines.length-15)));
  c.font='10px Monaco, Menlo, monospace';

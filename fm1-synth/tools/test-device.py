@@ -16,7 +16,9 @@ def sample(label):
  s=dev.stats();s['phase']=label;samples.append(s);print(json.dumps(s),flush=True)
 rec=None
 try:
- initial=dev.stats();turn(2,-initial.get('view_slot_index',initial['slot_index']));remote([4,0,8]) # MASTER 1024 / 4096, temporary
+ if dev.panel()['fx_mode']:remote([1,1,0]);remote([1,0,0])
+ remote([3,1,65-dev.panel()['fx_choice']])
+ initial=dev.stats();turn(2,-initial['slot_index']);remote([4,0,8]) # MASTER 1024 / 4096, temporary
  with (OUT/'capture.log').open('w') as log:
   rec=subprocess.Popen(['ffmpeg','-hide_banner','-nostdin','-f','avfoundation','-i',':SynthDef FM-1','-t','16','-ar','44100','-ac','2','-c:a','pcm_s16le','-y',str(OUT/'hardware-audio.wav')],stdout=log,stderr=subprocess.STDOUT)
   time.sleep(2);sample('keys idle');note(60,True)

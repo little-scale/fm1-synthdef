@@ -8,10 +8,10 @@ All nine EnvGen curve types are supported, with sustain, loop, retrigger and for
 
 | Resource | Limit |
 | --- | --- |
-| Playable slots / master effects | 8 / 1 |
+| Playable slots / stored master-effect presets | 8 / 4 (one effect active) |
 | Simultaneous voices | 2 |
 | Synth slot package | 16,128 bytes including source and metadata |
-| Effect slot package | 7,936 bytes including source and metadata |
+| Effect packages | 7,916 bytes shared across four presets, including source and metadata |
 | Nodes / output signals / input references | 160 / 192 / 1,024 per graph |
 | Constants / controls | 512 / 64 per graph |
 | Envelope segments / bank partials | 32 per envelope / 64 total partials per graph |
@@ -26,8 +26,8 @@ Each delay line rounds up to a power of two with overhead. Reducing the number o
 
 Note arguments are filled when present: `freq` in Hz; `pitch` and `midinote` in MIDI units; `note` = MIDI minus 60; `amp` and `velocity` = velocity/127; `gate` = 1 then 0. This is a small explicit mapping, not the entire SuperCollider Event model.
 
-`knob1`–`knob4` must be control-rate parameters. All four update both synth and effect if referenced, including held notes. Values are 0–1 in steps of 0.02. Initial random values remain fixed for each voice. Envelope segment parameters are read when that segment begins. Released gated voices have a ten-second lifetime cap.
+`knob1`–`knob4` in synths and `knob5`–`knob8` in effects must be control-rate parameters. The FX button latches the physical knobs between these independent banks, including updates during held notes. Values are 0–1 in steps of 0.02. Initial random values remain fixed for each voice. Envelope segment parameters are read when that segment begins. Released gated voices have a ten-second lifetime cap.
 
-PRESET browsing of slot 0 changes the code view only. The header identifies the still-selected synth. HOME stops voices and clears the effect tail. A numerical fault retires a voice; an overload stops notes and disables the effect until reset/reloaded.
+PRESET selects synths; ALGORITHM selects FX1–FX4 or bypass. FX toggles code view and knob bank without changing held notes. Effect replacement fades output briefly and ends the old tail. HOME stops voices and clears the effect tail. A numerical fault retires a voice; an overload stops notes and disables the effect until reset/reloaded.
 
 Reverbs allocate from the same 128 KiB delay arena: FreeVerb 50,492 bytes, FreeVerb2 102,088 bytes, MiVerb 65,536 bytes per instance. Parameters are initial/control rate and signal inputs are audio rate. Prefer slot 0; FreeVerb2 exceeds the per-synth-voice limit. MiVerb supports mono/stereo input, freeze, diffusion and its upstream output soft clipping. The bundled MiVerb class supports compilation without installing extra plugins.

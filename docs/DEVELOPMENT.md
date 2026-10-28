@@ -15,6 +15,8 @@ make -C fm1-synth sanitize
 python3 fm1-synth/tools/test-panel.py
 python3 fm1-synth/tools/test-extensions-panel.py
 python3 fm1-synth/tools/test-reverbs-panel.py
+python3 fm1-synth/tools/test-fx-banks-panel.py
+python3 fm1-synth/tools/test-battery-panel.py
 ```
 
 The screen/protocol tests need Node.js. The simulator needs the pinned font dependencies and a working Pillow RAQM installation (`brew install fribidi` if needed). No connected FM-1 is required for these checks. Sanitizers use undefined-behaviour, bounds and float-cast checks; ASan is not claimed because its runtime hung before main on the test Mac.
@@ -53,3 +55,5 @@ Output: `fm1-synth/firmware/build/synthdef.fwsc`. Inspect the build report for i
 `tools/package-release.py --output <new-directory>` creates a complete release tree and ZIP from this repository. It copies an explicit file set, includes the current built firmware, and writes a per-file SHA-256 manifest. It excludes local banks, virtual environments, compiler downloads, Git metadata and build caches. It requires a firmware matching the recorded acceptance hash, so changed firmware needs new verification before release.
 
 The Git repository carries source, fixtures, example packages and selected evidence. Firmware and the complete source archive are release assets. Retain the GPL source, platform snapshots and third-party notices alongside any redistributed firmware.
+
+For the current control layout, `tools/test-fx-banks-device.py --output <new-directory>` (inside `fm1-synth`) verifies the latching toggle, all four effects plus bypass, held-note continuity, independent knobs, note-offs during switches and unchanged slot contents. It records USB audio and restores physical MASTER control. Keep keys untouched. It expects Keys in synth 1 and four populated effect presets. See the migration helper in the instrument README.

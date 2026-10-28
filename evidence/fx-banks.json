@@ -1,0 +1,130 @@
+{
+  "date": "2026-10-28",
+  "feature": "Independent synth and effect presets with latching FX knob bank",
+  "installed": true,
+  "application_bytes": 227828,
+  "static_ram_bytes": 78480,
+  "pool_bytes": 326008,
+  "sha256": {
+    "synthdef.bin": "24d1adb9958f66375a752092ad0de9fd8c354789ebdae02e716475edbaedf721",
+    "synthdef.fwsc": "cfa93b012dc5458ec16114910228aa28c8c9c45990bf95393f5dba004a360df0"
+  },
+  "source_sha256": {
+    "fm1-synth/firmware/app.c": "bc2a2f7b31f1bbf05c49c697d6b2d45be46c044c86ff68066379cb0d76a6441f",
+    "fm1-synth/src/slots.c": "fd62cbe382698c9dc50d60c1b5c16d5b09966950e201aa10f86bcaeaa0f99bbb",
+    "fm1-synth/src/slots.h": "3c9efe379770cbba20c19c5221affe8be37b68c0ce4894a9a4d514489f7a1fda",
+    "fm1-synth/src/performance.c": "bdcb19a43a1f7dc78462ca70724ad7b9ad95382c0fca520b37283115f0270867",
+    "fm1-synth/src/performance.h": "e37d3d75241e856821102cc456d8034b74874152e0cada585adaf03c5bda2e5e",
+    "fm1-synth/src/protocol.c": "c13669095292344de06e00823a8d44468e942a5e10d0a3d5aeaebf73ddabbfb4",
+    "fm1-synth/tools/migrate-fx-bank.py": "7941c34b40a2a92c7ef1875ef154c564d6807f430b22bb84c7a8c2e353a2b82b",
+    "fm1-synth/tools/test-fx-banks-device.py": "7228f4fa5c1435c47a760a12b8ffc5642fb5332a91da1e9920a2c788e1f28718",
+    "fm1-synth/tools/test-fx-banks-panel.py": "b360ab3ad9973c5561c21cd784cf8e4d8779a66a9732487c5eab33b4b7dc9611"
+  },
+  "host": {
+    "core_and_ubsan": "passed",
+    "python_groups": 7,
+    "legacy_panel_assertions": 23,
+    "extension_panel_assertions": 31,
+    "reverb_panel_assertions": 114,
+    "fx_panel_assertions": 67,
+    "battery_panel_assertions": 42,
+    "interrupted_synth_writes": 68,
+    "interrupted_full_effect_writes": 34,
+    "interrupted_four_effect_commits": 32
+  },
+  "hardware": {
+    "checks": 28,
+    "preserved_slots": 12,
+    "effects": 4,
+    "bypass": true,
+    "fx_latching": true,
+    "independent_knobs": true,
+    "voices": 2,
+    "stereo_peaks": [
+      0.0106201171875,
+      0.0106201171875
+    ],
+    "recorded_seconds": 15.592199546485261,
+    "new_xruns": 0,
+    "new_overloads": 0,
+    "faults": 0,
+    "sampled_render_max_us": 3118,
+    "slot_sha256": {
+      "0": "2e386db12c5d0989208df2fcf67da2c9ea143e19bc0562fbc1275ada05407cdf",
+      "1": "accc95e20badfaac1c37878cf31370539409fe3a86c99a9e3c023917c6be2c7a",
+      "2": "5711a73832595bcec94bd99bb7025e1e3d6d7dd566c5771c8a36398dabe938f6",
+      "3": "909effffe757024ac78a58b9d86b4ecbdfd6acf7d8cebb71f1a4434584cc2f51",
+      "4": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "5": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "6": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "7": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "8": "03e13f01c3d74e23ba099443c043e09a80bfb0f318d7c31ed6c1fed5c6191531",
+      "9": "d9c0369d10d4fc5d8e60e4d5d9bc7b1a2ac5a40b76b7a3ebb70c2b30a77d7437",
+      "10": "293ca2a52451e56d445ef9bb50bd824561a1a9bed3257db58f72fb0a18d81e97",
+      "11": "47dbbd7a861f4819993efe4978442c1aa952fd0679b959d250ed1ea4f38e31e7"
+    },
+    "overloads_at_baseline": 1,
+    "overloads_at_end": 1
+  },
+  "migration": {
+    "original_synths_preserved": 8,
+    "legacy_echo_remapped": true,
+    "empty_effects_filled": 3,
+    "final_panel": {
+      "fx_mode": 0,
+      "fx_choice": 1,
+      "switching": 0,
+      "knobs": [
+        50,
+        30,
+        50,
+        50,
+        25,
+        50,
+        50,
+        50
+      ],
+      "gain": 1000
+    },
+    "battery": {
+      "raw": 627,
+      "bars": 3,
+      "usb_power": true,
+      "adc_timeouts": 0
+    },
+    "stats": {
+      "slot_index": 0,
+      "loaded": 1,
+      "cpu_percent": 10,
+      "xruns": 0,
+      "faults": 0,
+      "overloads": 1,
+      "active_voices": 0,
+      "notes_started": 12,
+      "render_peak_us": 5230,
+      "render_last_us": 650,
+      "start_peak_us": 4892,
+      "steady_peak_us": 5230,
+      "view_slot_index": 0,
+      "effect_active": 1
+    }
+  },
+  "browser": [
+    "12 slot labels",
+    "FX toggle changes knob labels 1-4 / 5-8",
+    "knob values retained across toggle",
+    "effect compile / local save / readback",
+    "synth-through-effect audio preview",
+    "shared FX storage usage",
+    "Connected editor lists all twelve device slots"
+  ],
+  "limitations": [
+    "One earlier final-build test missed an unacknowledged remote encoder command; final passing driver checks each encoder value before continuing.",
+    "Effect changes end the old tail and briefly fade the complete output; they do not run overlapping reverbs.",
+    "Two Addy voices through FreeVerb remain over budget (prior hardware result); arbitrary patches are not certified.",
+    "Current selection and live knob values are not persisted by encoder movement; boot uses synth 1, FX1, FX mode off.",
+    "Physical listening and final-build power cycle remain user checks.",
+    "The published 0.1.0-preview release binary remains unchanged.",
+    "One overload was already counted before final acceptance started (before test notes); it did not recur during the accepted run. Its cause is not established; cold-start acceptance remains incomplete."
+  ]
+}

@@ -40,11 +40,11 @@ bash fm1-synth/tools/serve.sh
 
 Open the complete launch URL printed by the server, including its session token. Keep that URL private. The editor runs locally on `127.0.0.1:8765`; do not expose it to your network. Only one manager should access a given local bank.
 
-Click **Check FM-1**. For each entry in [the patch list](PATCHES.md), select its numbered slot, **Import file**, choose its `.fmslot`, and **Save slot** to keep a local copy. Then **Send to FM-1 slot N** to write the hardware. Wait for the successful readback message. Send the master echo to slot 0 and Keys to slot 1 first.
+Click **Check FM-1**. For each entry in [the patch list](PATCHES.md), select its numbered slot, **Import file**, choose its `.fmslot`, and **Save slot** to keep a local copy. Then **Send to FM-1 slot N** to write the hardware. Wait for the successful readback message. For the development firmware, send master echo to FX1 and Keys to synth slot 1 first. FX2–FX4 can hold the three reverbs. The old v0.1.0-preview release uses a single slot 0 and shared knobs; its controls differ from current main.
 
 A local save does not write hardware. **Read FM-1 slot** retrieves a device patch as a draft; save it locally if you want to retain it. The local bank is created in `fm1-synth/data/local-bank.flash`, and survives a server restart.
 
-Choose slot 1 on the device, raise MASTER gently and play. Knobs 1–2 shape Keys; 3–4 shape the echo. The editor's Listen button is an offline preview using local slot 0; physical knobs update hardware playback live.
+Choose slot 1 on the device, raise MASTER gently and play. With FX off, physical knobs 1–2 shape Keys. Press FX once: they now shape echo amount/time (`knob5`/`knob6`) and the effect code appears. Press again to return to synth controls. ALGORITHM selects the effect; PRESET selects the synth. Listen is an offline preview of the chosen local synth and effect; physical knobs update hardware playback live.
 
 ## 4. Make a patch
 

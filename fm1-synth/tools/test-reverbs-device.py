@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Hardware reverb matrix. Temporarily replaces slot 0 and slot 8; restores both.
+"""Hardware reverb matrix. Temporarily replaces FX1 and synth slot 8; restores both.
 
 Plays two-note chords at low MASTER, records USB audio, tests live controls,
 stealing and release. Requires the four supplied synths in slots 1-4.
@@ -11,15 +11,17 @@ from bank import ROOT,compile_source,pack,unpack,validate
 from device import Device
 parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',type=Path,required=True);parser.add_argument('--skip-addy',action='store_true',help='Test lighter patches after a separately recorded Addy overload')
 args=parser.parse_args();out=args.output;out.mkdir(parents=True,exist_ok=True)
-dev=Device();input_baseline=dev.inputs();expected_midi=[input_baseline["midi_note_events"]];original_stats=dev.stats();original={};samples=[];results=[];capture=None;restore=[]
+dev=Device();original_panel=dev.panel();input_baseline=dev.inputs();expected_midi=[input_baseline["midi_note_events"]];original_stats=dev.stats();original={};samples=[];results=[];capture=None;restore=[]
 def remote(data):
  dev.out.send(mido.Message('sysex',data=[0x7d,0x4c,0x43]+data));time.sleep(.04)
 def home():remote([1,64,0]);remote([1,0,0])
 def select(index):
- state=dev.stats();remote([3,2,64+index-state['view_slot_index']]);time.sleep(.08)
+ state=dev.stats();remote([3,2,64+index-state['slot_index']]);time.sleep(.08)
 def note(key,on):
  dev.out.send(mido.Message('note_on' if on else 'note_off',note=key,velocity=80 if on else 0))
  if on:expected_midi[0]+=1
+def fxmode(value):
+ if dev.panel()['fx_mode']!=value:remote([1,1,0]);remote([1,0,0])
 def controls(values):
  for k,value in enumerate(values):
   remote([3,3+k,14]);steps=round(50*value)
@@ -33,7 +35,7 @@ def check(label,slot,voices,baseline):
  assert state['overloads']==baseline['overloads'] and state['xruns']==baseline['xruns'],state
  return state
 try:
- for index in range(9):
+ for index in range(dev.info[1]):
   data,revision=dev.read(index);original[index]=data
   destination=out/f'pretest-slot-{index}.fmslot'
   if destination.exists():assert destination.read_bytes()==data,'Preserve previous snapshot; choose another output directory'
@@ -41,7 +43,7 @@ try:
   if index<4:assert data,'Expected supplied synth slots 1-4'
  source=(ROOT/'examples/dust-chimes.scd').read_text();binary,info=compile_source(source)
  dust=pack('Dust chimes test',source,binary)
- remote([4,0,16]);home();dev.write(7,dust)
+ remote([4,0,16]);home();fxmode(0);remote([3,1,65-dev.panel()['fx_choice']]);dev.write(7,dust)
  for verb in ['freeverb','freeverb2','miverb']:
   home();select(0);dev.write(8,(ROOT/'examples'/('master-'+verb+'.fmslot')).read_bytes());time.sleep(.15);home()
   baseline=dev.stats();start=len(samples);t0=time.monotonic()
@@ -52,13 +54,13 @@ try:
    for slot in ([0,2,3,7] if args.skip_addy else [0,1,2,3,7]):
     data=dust if slot==7 else original[slot];name,_,binary=unpack(data);_,info=validate(binary)
     for setting in ['default','minimum','maximum']:
-     select(slot);home()
+     select(slot);home();fxmode(0)
      defaults=[info['controls'].get('knob'+str(i+1),[.5,.5,.3,.5][i]) for i in range(4)]
      controls(defaults if setting=='default' else [0 if setting=='minimum' else 1]*4)
      note(60,True);note(67,True);time.sleep(.13)
      label=verb+' / '+name+' / '+setting
      check(label+' chord',slot,2,baseline)
-     remote([3,5,69]);remote([3,6,59]);check(label+' live controls',slot,2,baseline)
+     fxmode(1);remote([3,3,69]);remote([3,4,59]);check(label+' live FX controls',slot,2,baseline);fxmode(0)
      note(72,True);time.sleep(.05);check(label+' third-note steal',slot,2,baseline)
      note(60,False);time.sleep(.03);check(label+' stolen note-off',slot,2,baseline)
      note(67,False);note(72,False)
@@ -69,7 +71,7 @@ try:
    # may omit frames during patch loads, so its wall-clock alignment is not
    # valid for a late tail measurement. Use a separate, uninterrupted take.
    capture.communicate('q\n',timeout=10);assert capture.returncode==0;capture=None
-   select(0);home();controls([.5,.3,1,1])
+   select(0);home();fxmode(0);controls([.5,.3,.5,.5]);fxmode(1);controls([1,1,.5,.5]);fxmode(0)
    with (out/(verb+'-tail-capture.log')).open('w') as tail_log:
     capture=subprocess.Popen(['ffmpeg','-hide_banner','-f','avfoundation','-i',':SynthDef FM-1','-ar','44100','-ac','2','-c:a','pcm_s16le','-y',str(out/(verb+'-tail.wav'))],stdin=subprocess.PIPE,stdout=tail_log,stderr=tail_log,text=True)
     time.sleep(2);assert capture.poll() is None
@@ -78,7 +80,7 @@ try:
     check(verb+' tail only',0,0,baseline);time.sleep(.6)
     capture.communicate('q\n',timeout=10);assert capture.returncode==0;capture=None
    # Viewing the effect must keep the selected playable synth and held voices.
-   note(60,True);note(67,True);time.sleep(.1);select(8);check(verb+' FX code view',0,2,baseline)
+   note(60,True);note(67,True);time.sleep(.1);fxmode(1);check(verb+' FX code view',0,2,baseline)
    home();check(verb+' panic',0,0,baseline);select(0)
   with wave.open(str(out/(verb+'-device.wav'))) as wav:
    rate=wav.getframerate();assert wav.getnchannels()==2 and wav.getsampwidth()==2
@@ -104,7 +106,7 @@ finally:
   for index,data in original.items():
    actual,_=dev.read(index);restore.append(dict(index=index,restored=actual==data,sha256=hashlib.sha256(actual).hexdigest()))
   select(original_stats['slot_index']);home()
-  if original_stats['view_slot_index']==8:select(8)
+  remote([3,1,64+original_panel['fx_choice']-dev.panel()['fx_choice']]);fxmode(original_panel['fx_mode'])
   remote([4,1,32])
  finally:
   dev.close()
@@ -113,5 +115,5 @@ finally:
    except subprocess.TimeoutExpired:capture.terminate()
   (out/'performance.json').write_text(json.dumps(samples,indent=2)+'\n')
   (out/'restoration.json').write_text(json.dumps(restore,indent=2)+'\n')
-assert len(results)==3 and len(restore)==9 and all(r['restored'] for r in restore)
+assert len(results)==3 and len(restore)==12 and all(r['restored'] for r in restore)
 print('All three reverb matrices passed; original slots restored.')

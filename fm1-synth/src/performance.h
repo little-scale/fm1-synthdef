@@ -18,7 +18,7 @@ typedef struct {
  fm_scratch scratch;
  fms_note voice[FMS_VOICES];
  float delays[FMS_DELAY_TOTAL];
- float knobs[4],master,gain,peak[2];
+ float knobs[8],master,gain,peak[2];
  uint32_t clip[2],serial,steals,faults;
  unsigned voice_limit; /* 1..FMS_VOICES; defaults to the full allocation */
  unsigned prepare_blocks; /* optional silent startup blocks; device uses two */

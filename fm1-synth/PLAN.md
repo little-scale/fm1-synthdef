@@ -67,3 +67,16 @@ The first browser manager operates on a clearly labelled local bank and compiles
 - [x] Browser compile, save, preview through effect, slot read/upload with full readback, and clear/bypass controls.
 - [x] Two-voice Keys/Addy stress tests with effect: 42 chords, no overloads/overruns/faults. USB audio confirms dry release reaches silence and wet tail continues after a preset switch.
 - [x] PRESET slot 0 is a code view, separate from the selected playable synth. SELECT scrolls its code; header identifies the last selected synth. Host and device tests preserve two held notes while browsing in and out.
+
+## Independent synth / effect selection (28 October 2026)
+
+- [x] Eight synth slots retained; four FX presets share the old effect journal atomically.
+- [x] PRESET selects synth; ALGORITHM selects FX or bypass; FX is a latching toggle with LED.
+- [x] Separate live knobs 1–4 for synths and 5–8 for effects; values survive toggling.
+- [x] FX code focus and SELECT scrolling; held notes survive effect selection and focus changes.
+- [x] Fade-down/swap/fade-up effect replacement; note-offs retained during swap.
+- [x] Browser edit/import/export/preview for all twelve slots and shared capacity display.
+- [x] Legacy effect migration and original-package backups; unchanged synth storage.
+- [x] Core/sanitizer, interrupted-write, host panel and device control tests.
+
+This supersedes the earlier shared-knob and PRESET-to-slot-0 design above.

@@ -21,7 +21,7 @@ def note(key,on):
  d.out.send(mido.Message('note_on' if on else 'note_off',note=key,velocity=70 if on else 0))
  if on:expected+=1
 try:
- remote([4,0,8]);remote([1,64,0]);remote([1,0,0]);s=d.stats();remote([3,2,64-s['view_slot_index']])
+ remote([4,0,8]);remote([1,64,0]);remote([1,0,0]);s=d.stats();remote([3,2,64-s['slot_index']])
  for enabled in [0,1,0,1]:
   start=d.inputs(bool(enabled));until=time.monotonic()+args.seconds;chords=0
   while time.monotonic()<until:
@@ -32,7 +32,6 @@ try:
    assert row['stats']['overloads']==initial['overloads'] and not row['stats']['faults'],row
   print(json.dumps(dict(battery_sampling=enabled,chords=chords,samples=d.inputs()['battery_samples']-start['battery_samples'],unexpected_notes=0)),flush=True)
 finally:
- d.inputs(bool(base['battery_sampling']));d.out.send(mido.Message('control_change',control=123,value=0));remote([1,64,0]);remote([1,0,0]);s=d.stats();remote([3,2,64+initial['slot_index']-s['view_slot_index']])
- if initial['view_slot_index']==8:remote([3,2,64+8-initial['slot_index']])
+ d.inputs(bool(base['battery_sampling']));d.out.send(mido.Message('control_change',control=123,value=0));remote([1,64,0]);remote([1,0,0]);s=d.stats();remote([3,2,64+initial['slot_index']-s['slot_index']])
  remote([4,1,32]);d.close()
  (args.output/'input-ab.json').write_text(json.dumps(records,indent=2)+'\n')

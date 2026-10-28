@@ -24,11 +24,11 @@ static int current(const fms_flash *f,unsigned slot,void *dst,uint32_t *len,uint
  if(vb){*len=nb;*gen=b;return 1;}
  *len=0;*gen=0;return -1;
 }
-int fms_slot_read(const fms_flash *f,unsigned slot,void *dst,uint32_t *len,uint32_t *gen){
+static int physical_read(const fms_flash *f,unsigned slot,void *dst,uint32_t *len,uint32_t *gen){
  if(slot>=FMS_SLOTS || !f || !dst || !len || !gen)return -1;
  return current(f,slot,dst,len,gen)==-2?-1:0;
 }
-int fms_slot_write(const fms_flash *f,unsigned slot,const void *src,uint32_t len,uint32_t expected,void *scratch){
+static int physical_write(const fms_flash *f,unsigned slot,const void *src,uint32_t len,uint32_t expected,void *scratch){
  uint8_t h[32];uint32_t n,gen,off,i;int bank;
  if(!f || slot>=FMS_SLOTS || len>fms_slot_capacity(slot) || (len && !src) || !scratch || src==scratch)return -1;
  bank=current(f,slot,scratch,&n,&gen);
@@ -42,4 +42,37 @@ int fms_slot_write(const fms_flash *f,unsigned slot,const void *src,uint32_t len
  if(f->program(f->context,off,h,sizeof h))return -1;
  if(read_bank(f,slot,bank==0?1:0,scratch,&n,&i) || n!=len || i!=gen+1 || (len && memcmp(src,scratch,len)))return -1;
  return 0;
+}
+
+/* Four logical FX records share the existing dual-bank journal. A whole bank
+ * is committed atomically; all FX records deliberately share one revision. */
+static int fx_layout(const uint8_t *p,uint32_t n,uint32_t *off,uint32_t *size){
+ unsigned i;uint32_t end=20;
+ if(n && (n<4 || memcmp(p,"FXB1",4))){off[0]=0;size[0]=n;for(i=1;i<4;i++)off[i]=size[i]=0;return 1;}
+ if(!n){for(i=0;i<4;i++)off[i]=size[i]=0;return 1;}
+ if(n<20)return 0;
+ for(i=0;i<4;i++){size[i]=get(p+4+4*i);off[i]=end;if(size[i]>n-end)return 0;end+=size[i];}
+ return end==n;
+}
+int fms_slot_read(const fms_flash *f,unsigned slot,void *dst,uint32_t *len,uint32_t *gen){
+ uint32_t off[4],size[4];
+ if(slot<FMS_FX_SLOT)return physical_read(f,slot,dst,len,gen);
+ if(slot>=FMS_SLOTS || physical_read(f,FMS_FX_SLOT,dst,len,gen))return -1;
+ if(!fx_layout(dst,*len,off,size))return -1;
+ slot-=FMS_FX_SLOT;if(off[slot]){uint32_t j;volatile uint8_t *bytes=dst;for(j=0;j<size[slot];j++)bytes[j]=bytes[off[slot]+j];}*len=size[slot];return 0;
+}
+int fms_slot_write(const fms_flash *f,unsigned slot,const void *src,uint32_t len,uint32_t expected,void *scratch){
+ uint32_t n,gen,off[4],size[4],end=20;unsigned i;
+ uint8_t *old=scratch,*next;
+ if(slot<FMS_FX_SLOT)return physical_write(f,slot,src,len,expected,scratch);
+ if(slot>=FMS_SLOTS || !f || !scratch || src==scratch || (len && !src) || len>FMS_FX_PAYLOAD)return -1;
+ next=old+FMS_FX_PAYLOAD;
+ if(physical_read(f,FMS_FX_SLOT,old,&n,&gen))return -1;
+ if(gen!=expected)return -2;
+ if(!fx_layout(old,n,off,size))return -1;
+ slot-=FMS_FX_SLOT;
+ for(i=0;i<4;i++){uint32_t bytes=i==slot?len:size[i];if(bytes>FMS_FX_PAYLOAD-end)return -3;end+=bytes;}
+ memcpy(next,"FXB1",4);end=20;
+ for(i=0;i<4;i++){uint32_t bytes=i==slot?len:size[i];put(next+4+4*i,bytes);if(bytes)memcpy(next+end,i==slot?src:old+off[i],bytes);end+=bytes;}
+ return physical_write(f,FMS_FX_SLOT,next,end,expected,old);
 }
