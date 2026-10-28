@@ -5,12 +5,13 @@ SRC = src/fm_load.c src/fm_render.c
 all: build/fm-render build/fm-inspect build/libfmsynth.dylib
 build:
 	mkdir -p build
-build/fm-render: $(SRC) src/fm_synth.h src/fm_filters.inc src/fm_noise.inc src/fm_bandlimited.inc src/fm_tables.inc src/fm_delay.inc src/fm_fast.inc $(wildcard src/fm_extensions.inc) tools/render.c | build
+build/fm-render: $(SRC) src/fm_synth.h src/fm_filters.inc src/fm_noise.inc src/fm_bandlimited.inc src/fm_tables.inc src/fm_delay.inc src/fm_fast.inc $(wildcard src/*.inc) tools/render.c | build
 	$(CC) $(CFLAGS) -Isrc $(SRC) tools/render.c -lm -o $@
-build/libfmsynth.dylib: $(SRC) src/fm_synth.h src/fm_filters.inc src/fm_noise.inc src/fm_bandlimited.inc src/fm_tables.inc src/fm_delay.inc src/fm_fast.inc $(wildcard src/fm_extensions.inc) | build
+build/libfmsynth.dylib: $(SRC) src/fm_synth.h src/fm_filters.inc src/fm_noise.inc src/fm_bandlimited.inc src/fm_tables.inc src/fm_delay.inc src/fm_fast.inc $(wildcard src/*.inc) | build
 	$(CC) $(CFLAGS) -fPIC -shared -Isrc $(SRC) -lm -o $@
 test: all
 	python3 tests/test_engine.py
+	python3 tests/test_miverb_oracle.py
 clean:
 	rm -f build/fm-render build/libfmsynth.dylib
 
@@ -39,3 +40,7 @@ sanitize: | build
 	build/fuzz-ubsan fixtures/m6_Dust_ar_2.scsyndef
 	build/fuzz-ubsan fixtures/m6_Impulse_ar_step.scsyndef
 	build/fuzz-ubsan fixtures/m6_Decay2_ar_2.scsyndef
+
+	build/fuzz-ubsan fixtures/m7_FreeVerb_noise.scsyndef
+	build/fuzz-ubsan fixtures/m7_FreeVerb2_noise.scsyndef
+	build/fuzz-ubsan fixtures/m7_MiVerb_freeze.scsyndef

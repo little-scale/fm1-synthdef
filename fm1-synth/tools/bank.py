@@ -21,6 +21,9 @@ FX_CAPACITY=7936
 SLOT_ORDER=[8,*range(8)]
 def capacity(slot):return FX_CAPACITY if slot==FX_SLOT else CAPACITY
 SCLANG=Path('/Applications/SuperCollider.app/Contents/MacOS/sclang')
+import sys
+sys.path.insert(0,str(ROOT.parent/'synthdef-engine/tools'))
+from sc_language import language_command
 LIB=C.CDLL(str(ROOT/'build/libinstrument.dylib'))
 for name in ('fms_graph_size','fms_performance_size','fms_voice_size'):
     getattr(LIB,name).restype=C.c_size_t
@@ -54,7 +57,7 @@ def validate(binary,effect=False):
     graph=C.create_string_buffer(LIB.fms_graph_size());error=C.create_string_buffer(256)
     if not LIB.fm_load(graph,binary,len(binary),error,len(error)):raise ValueError(error.value.decode())
     samples=LIB.fm_delay_required(graph,44100)
-    if samples>(32768 if effect else 16384):raise ValueError('Delay-memory budget exceeded. Reduce maxdelaytime or the number of delay lines.')
+    if samples>(32768 if effect else 16384):raise ValueError('Delay/reverb memory budget exceeded. Reduce delay lengths or effects; prefer slot 0 for a shared reverb.')
     controls={LIB.fms_control_name(graph,i).decode():LIB.fms_control_default(graph,i) for i in range(LIB.fms_controls(graph))}
     check=C.create_string_buffer(LIB.fms_performance_size())
     if effect:
@@ -129,7 +132,7 @@ class Bank:
             for index in voice_slots:
                 body,_=self.get(index)
                 voice_bytes=info['delay_bytes'] if slot!=FX_SLOT else (validate(unpack(body)[2])[1]['delay_bytes'] if body else 0)
-                if voice_bytes*2+fx_bytes>131072:raise ValueError(f'Synth slot {index+1} and slot 0 exceed the shared 128 KiB delay-memory budget.')
+                if voice_bytes*2+fx_bytes>131072:raise ValueError(f'Synth slot {index+1} and slot 0 exceed the shared 128 KiB delay/reverb memory budget.')
         scratch=C.create_string_buffer(CAPACITY)
         rc=LIB.fms_slot_write(C.byref(self.flash),slot,payload,len(payload),expected,scratch)
         if rc==-2:raise ValueError('Slot changed since it was opened. Reload before saving.')
@@ -156,7 +159,7 @@ def compile_source(source,effect=False):
         tmp=Path(tmp);(tmp/'source.scd').write_text(source)
         script='var def;\ndef = File.readAllString('+json.dumps(str(tmp/'source.scd'))+').interpret;\nif(def.isKindOf(SynthDef).not, { "FM1_ERROR: Return one SynthDef expression".postln; 1.exit; });\nFile.use('+json.dumps(str(tmp/'patch.scsyndef'))+', "wb", { |f| f.write(def.asBytes); });\n"FM1_COMPILED".postln;\n0.exit;\n'
         (tmp/'compile.scd').write_text(script)
-        try:run=subprocess.run([str(SCLANG),'-D',str(tmp/'compile.scd')],capture_output=True,text=True,timeout=30)
+        try:run=subprocess.run(language_command(SCLANG,tmp/'compile.scd',tmp),capture_output=True,text=True,timeout=30)
         except subprocess.TimeoutExpired:raise ValueError('Compilation timed out. Check the source for syntax errors or non-terminating code.')
         if run.returncode or 'FM1_COMPILED' not in run.stdout or not (tmp/'patch.scsyndef').exists():raise ValueError((run.stdout+run.stderr)[-5000:])
         binary=(tmp/'patch.scsyndef').read_bytes();_,info=validate(binary,effect)
@@ -168,7 +171,7 @@ def preview(binary,midi=60,velocity=90,knobs=None,effect_binary=None):
     if not LIB.fms_init(player,graph):raise ValueError('Patch cannot start.')
     if effect_binary:
         effect_graph,_=validate(effect_binary,True);effect_voice=C.create_string_buffer(LIB.fms_voice_size())
-        if not LIB.fms_attach_effect(player,effect_graph,effect_voice) or not LIB.fms_reset_effect(player):raise ValueError('Synth and effect exceed the shared delay-memory budget.')
+        if not LIB.fms_attach_effect(player,effect_graph,effect_voice) or not LIB.fms_reset_effect(player):raise ValueError('Synth and effect exceed the shared delay/reverb memory budget.')
     if knobs is not None:
         if len(knobs)!=4 or not all(isinstance(x,(int,float)) and math.isfinite(x) and 0<=x<=1 for x in knobs):raise ValueError('Four knob values in 0–1 are required.')
         for i,x in enumerate(knobs):LIB.fms_knob(player,i,x)

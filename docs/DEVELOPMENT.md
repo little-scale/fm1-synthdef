@@ -14,6 +14,7 @@ make -C synthdef-engine sanitize
 make -C fm1-synth sanitize
 python3 fm1-synth/tools/test-panel.py
 python3 fm1-synth/tools/test-extensions-panel.py
+python3 fm1-synth/tools/test-reverbs-panel.py
 ```
 
 The screen/protocol tests need Node.js. The simulator needs the pinned font dependencies and a working Pillow RAQM installation (`brew install fribidi` if needed). No connected FM-1 is required for these checks. Sanitizers use undefined-behaviour, bounds and float-cast checks; ASan is not claimed because its runtime hung before main on the test Mac.
@@ -25,6 +26,8 @@ make -C synthdef-engine reference-test
 python3 fm1-synth/tools/test-device-math.py --host
 python3 fm1-synth/tools/test-device-math.py
 ```
+
+The test build also uses C++17 for an isolated MiVerb oracle. Pinned DSP sources, plugin headers and the language class are included; no extra system plugin install or network download is required. `make test` includes the identical-input MiVerb comparison. Fixture export and browser compilation load stock SC classes plus the bundled MiVerb class, with user extensions excluded.
 
 Run those reference commands sequentially: they share generated files. Reference audio is generated locally, not shipped as a large build cache. See the engine README for tolerances and fixture regeneration.
 

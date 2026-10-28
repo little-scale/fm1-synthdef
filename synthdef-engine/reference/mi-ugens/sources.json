@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/v7b1/mi-UGens",
+  "commit": "10f6824f68ad63475f67dfe3fe5016e2d2634f84",
+  "sha256": {
+    "projects/MiVerb/MiVerb.cpp": "354ea882db04764001d7cfe53b9866dd696574e582f846b455bde8fe73a1769a",
+    "projects/MiVerb/include/reverb.h": "860ebd64e8b358975c4b7407604b130fba8fa8cc7ef3e54cd9e764a30afd1653",
+    "projects/MiVerb/include/fx_engine.h": "c70be5c1ee01f74ae23d06debbe0bb42282511513f6a24491bf5a530ada4641e",
+    "sc/Classes/MiVerb.sc": "3dbea28ad08447e6408be9c5ba13fc2d5a33cd7748b9f824356cf0c55501d63c",
+    "sc/HelpSource/Classes/MiVerb.schelp": "4a771e0c65631a9f4e0e28003684b659cc2d272bd554bf0479c6ce462d218301",
+    "eurorack/stmlib/dsp/cosine_oscillator.h": "a7f6429e8bca85aa19ce91e3f1908fd7fb1fdf378a61fe2c87717a94d6f30a97",
+    "eurorack/stmlib/dsp/dsp.h": "98b42900c4accbe9fbb2cfe2ec6fada024b57ec9a1becff008b0f35bd4fd8ddb",
+    "eurorack/stmlib/stmlib.h": "3afc8589a951e882d9eea16b3eda8623dd6fb0079dd11dfbce817e65be6cfba9"
+  }
+}

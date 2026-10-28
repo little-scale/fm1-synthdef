@@ -50,6 +50,8 @@ Choose slot 1 on the device, raise MASTER gently and play. Knobs 1–2 shape Key
 
 Paste one expression returning a `SynthDef`, without `.add` or server boot code. Click **Compile on this Mac**, **Save slot**, then **Send to FM-1 slot N**. Unsupported graph features produce an error. Compilation evaluates SuperCollider code on your Mac: only compile source you trust.
 
+The development compiler includes a pinned MiVerb language class; no additional plugin install is needed for the FM1 reverb examples. It loads stock SuperCollider classes plus this class, excluding user extensions/quarks, without changing your ordinary SuperCollider configuration.
+
 Start from an included example, keep `Out.ar(0, ...)`, use a gate envelope with `doneAction: 2`, and name live controls `knob1` through `knob4`. Review [compatibility](COMPATIBILITY.md).
 
 ## Troubleshooting and recovery

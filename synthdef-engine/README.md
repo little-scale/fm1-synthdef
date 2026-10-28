@@ -1,6 +1,6 @@
 # FM1 SynthDef engine
 
-A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 74 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
+A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 77 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
 
 ## Try it
 
@@ -15,7 +15,7 @@ build/fm-inspect fixtures/fm1_voice.scsyndef
 python3 tools/render-wav.py fixtures/fm1_voice.scsyndef build/fm1-voice.wav
 ```
 
-`make test` needs a C99 compiler and Python 3, with no Python packages. `make reference-test` additionally uses the installed SuperCollider **3.14.1** offline server, without opening audio hardware. Override `SCSYNTH` to change its location. The recorded fixtures are sufficient to run these tests; regeneration uses `python3 tools/export-all.py` with the installed `sclang` 3.14.1. It runs all six export scripts with timeouts and refreshes the fixture integrity manifest. The Makefile currently targets macOS shared libraries.
+`make test` needs C99 and C++17 compilers and Python 3, with no Python packages. `make reference-test` additionally uses the installed SuperCollider **3.14.1** offline server, without opening audio hardware. Override `SCSYNTH` to change its location. The recorded fixtures are sufficient to run these tests; regeneration uses `python3 tools/export-all.py` with the installed `sclang` 3.14.1. It runs all seven export scripts with timeouts and refreshes the fixture integrity manifest. The Makefile currently targets macOS shared libraries.
 
 The example in `examples/subtractive.scd` combines Saw, Pulse, a modulated RLPF, envelopes and panning. `build/subtractive-voice.wav` is its host-rendered companion test voice.
 
@@ -34,6 +34,8 @@ The simpler example in `examples/voice.scd` exports a playable gated sine voice 
 | LFNoise0, LFNoise1, LFNoise2 | audio, control | Initial/control frequency, sampled when generating the next segment |
 | Rand / ExpRand | initial | Bounds sampled once per voice; initial/control bounds accepted. ExpRand requires nonzero bounds of the same sign |
 | RandSeed (additional) | initial, control, audio | Rising-edge reseeding; seed must be a literal integer within ±2²⁴ |
+| FreeVerb, FreeVerb2 | audio | Audio signal input(s), initial/control mix/room/damp, parameters clipped to 0–1; caller-owned memory |
+| MiVerb | audio | One/two audio inputs, stereo output; six initial/control parameters, pinned upstream limits; caller-owned memory |
 | SampleRate, SampleDur, ControlRate, ControlDur, BlockSize, RadiansPerSample | initial | Information for this voice; control rate uses engine block size 64 |
 | Delay1, Delay2 | audio, control | One/two calculation-sample delay; explicit initial values are initial/control inputs |
 | OnePole, OneZero | audio, control | Initial/control coefficient in [-1,1], interpolated across audio blocks |
@@ -69,6 +71,22 @@ Unary selectors: neg (0), abs (5), ceil (8), floor (9), frac (10), sign (11), sq
 Mixed audio/control arithmetic interpolates control operands across the block, including optimizer-generated MulAdd/Sum3/Sum4 nodes. A separate constructor pass initializes upstream outputs before the first audio block.
 
 Binary selectors: add (0), subtract (1), multiply (2), divide (4), equal (6), unequal (7), less (8), greater (9), less-or-equal (10), greater-or-equal (11), min (12), max (13). Other selectors are rejected. Supporting the arithmetic UGen names does not imply support for every SuperCollider operator.
+
+### Reverbs
+
+FreeVerb (mono), FreeVerb2 (stereo) and MiVerb (mono/stereo input to stereo output) are implemented at **audio rate only**. Controls must be initial/control rate. Their entire memory reservation is charged to the existing caller-owned delay arena, including FreeVerb recurrence/counter state. `fm_delay_required` therefore budgets both delay and reverb storage. The common graph/voice/scratch structures have not grown.
+
+| Type | Memory per instance | Parameters |
+| --- | --- | --- |
+| FreeVerb | 50,492 bytes | mix, room, damp, clipped to 0–1 |
+| FreeVerb2 | 102,088 bytes | mix, room, damp, clipped to 0–1 |
+| MiVerb | 65,536 bytes | time 0–1.25, drywet 0–1, damp mapped as upstream, hp 0–1, freeze > 0, diffusion 0–0.95 |
+
+FreeVerb follows SuperCollider 3.14.1, including constructor processing, fixed delay lengths and calculation order. `tools/generate-freeverb.py` regenerates its arena-based C kernels from the pinned source. MiVerb follows mi-UGens commit `10f6824f68ad63475f67dfe3fe5016e2d2634f84`: packed signed-16 delay samples, floating-point filters/modulation, freeze input closure and the wrapper's output soft clipping (also applied to dry output). It accepts one or two input channels; arbitrary multichannel folding is outside this profile. Delay tap lengths remain fixed as upstream; sample rate changes modulation rates but do not rescale the rings.
+
+Prefer one reverb in slot 0. FreeVerb2 exceeds the instrument's per-synth-voice 64 KiB limit but fits its shared effect allocation. The total remains `2 * synth memory + effect memory <= 128 KiB`. FreeVerb2 plus the supplied echo exceeds it. MiVerb plus that echo exactly fills the arena and leaves no synth delay memory; CPU feasibility is a separate hardware check.
+
+The pinned MiVerb class is bundled for compilation. The manager/exporter now use the stock SuperCollider class library plus this class, without loading user extensions. No installed MiVerb plugin is needed for FM1 playback or host preview. Reference tests build an isolated upstream MiVerb plugin using the included pinned headers; the reference sources retain their licences. These additions have passed emulation/build tests, but have not been flashed or timed on an FM-1.
 
 ### Trigger and decay compatibility
 
@@ -108,11 +126,11 @@ The render block is 64 samples. Host references use 44.1 kHz. `fm_start` accepts
 
 ## Validation and remaining work
 
-Verified on 2026-10-28: **516/516 SuperCollider reference graphs, 31 API test groups, and 380,000 sanitizer mutation/truncation cases passed**. All 73 types other than In appear in the reference suite; stereo In is covered by dedicated API checks. The saved verification record is in `../evidence/`.
+Verified on 2026-10-28: **553/553 SuperCollider reference graphs, 34 API test groups, and 440,000 sanitizer mutation/truncation cases passed**. All 76 types other than In appear in the reference suite; stereo In is covered by dedicated API checks. The saved verification record is in `../evidence/`.
 
-The reference suite compares exported graphs against SuperCollider 3.14.1 and writes per-fixture errors to `build/reference-results.json`. Envelope tests use a peak-error limit of 5e-6 and RMS limit of 1e-6. New control/filter/noise/oscillator/delay fixtures use peak 5e-6 / RMS 1e-6, except audio-rate LagUD (peak 2e-5 / RMS 8e-6) for accumulated single-precision rounding. Earlier non-envelope fixtures use peak 1e-4 / RMS 3e-5, except audio-rate panning (peak 1e-3) because small floating-point differences can select adjacent pan-table entries. The m6 additions use peak 1e-4 / RMS 3e-5. One sinusoidally frequency-modulated Impulse fixture uses a pulse-count/amplitude oracle with a maximum one-sample timing difference, because upstream oscillator rounding can move a discontinuous wrap. A separate exact-valued frequency-modulation fixture retains ordinary waveform comparison. The timing oracle is tested to reject missing, extra and two-sample-shifted pulses. Passing these finite fixtures is not an exhaustive guarantee over every possible graph or parameter range.
+The reference suite compares exported graphs against SuperCollider 3.14.1 and writes per-fixture errors to `build/reference-results.json`. Envelope tests use a peak-error limit of 5e-6 and RMS limit of 1e-6. New control/filter/noise/oscillator/delay fixtures use peak 5e-6 / RMS 1e-6, except audio-rate LagUD (peak 2e-5 / RMS 8e-6) for accumulated single-precision rounding. Earlier non-envelope fixtures use peak 1e-4 / RMS 3e-5, except audio-rate panning (peak 1e-3) because small floating-point differences can select adjacent pan-table entries. The 37 m7 reverb graphs run for approximately four seconds and use peak 5e-6 / RMS 1e-6, except the overdriven MiVerb oscillator integration case (peak 2e-4 / RMS 2e-5): tiny oscillator differences enter quantized nonlinear feedback. A separate identical-input oracle compares 819,200 frames across four sample rates and two input amplitudes, including control changes, freeze and overdrive; it matches the unmodified upstream DSP exactly on the tested host. The m6 additions use peak 1e-4 / RMS 3e-5. One sinusoidally frequency-modulated Impulse fixture uses a pulse-count/amplitude oracle with a maximum one-sample timing difference, because upstream oscillator rounding can move a discontinuous wrap. A separate exact-valued frequency-modulation fixture retains ordinary waveform comparison. The timing oracle is tested to reject missing, extra and two-sample-shifted pulses. Passing these finite fixtures is not an exhaustive guarantee over every possible graph or parameter range.
 
-API tests cover controls, restart, done actions, mixing, scratch reuse, invalidation on failed load, malformed references, every truncation of a fixture, numerical faults and deterministic mutations. `make sanitize` exercises 380,000 mutations/truncations across nineteen graph families with bounds, undefined-behaviour and float-conversion checks. Apple's installed AddressSanitizer deadlocked in its own startup before `main`; no ASan success is claimed. A stack sample is retained under `build/asan-startup-sample.txt`.
+API tests cover controls, restart, done actions, mixing, scratch reuse, invalidation on failed load, malformed references, every truncation of a fixture, numerical faults and deterministic mutations. `make sanitize` exercises 440,000 mutations/truncations across twenty-two graph families with bounds, undefined-behaviour and float-conversion checks. Apple's installed AddressSanitizer deadlocked in its own startup before `main`; no ASan success is claimed. A stack sample is retained under `build/asan-startup-sample.txt`.
 
 All 49 planned UGen names are implemented. This does not imply support for every scsynth graph, operator selector or parameter combination. Unsupported types/rates/selectors are rejected; numerical faults retire the voice. In particular:
 
@@ -123,7 +141,7 @@ All 49 planned UGen names are implemented. This does not imply support for every
 
 The seeded white/pink noise and mixed-noise reference cases match the reference samples exactly at audio rate. Other kernels are assessed by the explicit tolerances above; the full runtime is not claimed bit-identical.
 
-The companion `../fm1-synth/` provides the two-voice instrument, eight playable slots plus a permanent effect, browser manager, physical flash journal and USB MIDI transfer. Both the host and freestanding device math backends have passed the 326 reference comparisons. The supplied patches have separate hardware timing checks; admitted graph size is not a guarantee of realtime performance.
+The companion `../fm1-synth/` provides the two-voice instrument, eight playable slots plus a permanent effect, browser manager, physical flash journal and USB MIDI transfer. Both the host and freestanding device math backends have passed the 553 reference comparisons. The supplied patches have separate hardware timing checks; admitted graph size is not a guarantee of realtime performance.
 
 ## Provenance
 
@@ -139,4 +157,4 @@ The polyphony update adds a 25th API test group verifying idempotent early prepa
 
 ## Stereo input and permanent effects
 
-`In.ar(0, 1)` reads the left channel and `In.ar(0, 2)` reads both channels from the immutable stereo input passed to `fm_render_input`. Missing input is silence. Nonzero buses fault the voice. The instrument admits this UGen only in its dedicated effect slot; ordinary note SynthDefs keep using `Out.ar(0, ...)`. Effect output replaces the instrument mix before final gain/metering; it is not recursively fed into the same input bus. The 26th API test group verifies channel mapping, silence and bus/rate rejection. Existing 326 SuperCollider reference comparisons still pass on both host and device math backends.
+`In.ar(0, 1)` reads the left channel and `In.ar(0, 2)` reads both channels from the immutable stereo input passed to `fm_render_input`. Missing input is silence. Nonzero buses fault the voice. The instrument admits this UGen only in its dedicated effect slot; ordinary note SynthDefs keep using `Out.ar(0, ...)`. Effect output replaces the instrument mix before final gain/metering; it is not recursively fed into the same input bus. The 26th API test group verifies channel mapping, silence and bus/rate rejection. The full 553-graph SuperCollider suite also passes on host and device-math backends.

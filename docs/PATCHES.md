@@ -17,3 +17,15 @@ Triple saw uses lighter, unbandlimited `LFSaw` oscillators because three band-li
 Two-op FM uses a 10 ms attack, 300 ms decay, 0.6 sustain and 450 ms release; its envelope shapes both amplitude and FM depth. At knob 2 = 0 it is a pure sine. Both synth knobs update held notes with 30 ms smoothing.
 
 The older `keys.fmslot` contains its own comb effect and uses all four knobs. It is retained as a separate example; use `keys-master.fmslot` for the recommended master-effect setup.
+
+## Development reverb alternatives
+
+These packages require the new development firmware. They are not installed automatically, and are not compatible with v0.1.0-preview. Choose **one** as a replacement for slot 0's master echo:
+
+| Package | Knob 3 | Knob 4 |
+| --- | --- | --- |
+| `master-freeverb.fmslot` | Wet/dry, up to 60% wet | Room 0.2–0.95 |
+| `master-freeverb2.fmslot` | Wet/dry, up to 60% wet | Room 0.2–0.95 |
+| `master-miverb.fmslot` | Wet/dry, up to 60% wet | Decay parameter 0.45–0.95 |
+
+Source and compiled forms are beside the packages in `fm1-synth/examples/`. FreeVerb's wet signal is mono while its example preserves dry stereo; FreeVerb2 and MiVerb provide stereo reverb. MiVerb exposes `freeze=0` for custom mappings. Knobs remain shared with synths that reference the same arguments. All examples passed emulation; physical playback/timing is pending.

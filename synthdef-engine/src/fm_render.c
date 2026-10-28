@@ -194,6 +194,7 @@ static __attribute__((noinline)) void fast_envelope(const fm_graph *g,fm_voice *
 }
 
 #include "fm_extensions.inc"
+#include "fm_reverb.inc"
 
 static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *stereo,int initializing,const float *input_stereo) {
  unsigned ni,j,k;int free_voice=0;float mixed[FM_BLOCK*2];memset(mixed,0,sizeof mixed);
@@ -252,6 +253,7 @@ static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *ster
   if(n->type==FM_Pan2 && input_rate(g,n,1)!=2){fast_pan(g,v,b,n,s,count);continue;}
   if(n->type==FM_Saw || n->type==FM_Pulse){bandlimited(g,v,b,n,s,count,sr,initializing);continue;}
   if(n->type>=FM_OnePole && n->type<=FM_Decay2){extensions(g,v,b,n,s,count,sr,initializing);continue;}
+  if(fm_is_reverb(n->type)){reverb_render(g,v,b,n,s,count,initializing);continue;}
   if(fm_is_delay(n->type)){delay_render(g,v,b,n,s,count,sr,initializing);continue;}
   if(!s->initialized && (n->type==FM_Klang || n->type==FM_Klank)) {
    j=0;

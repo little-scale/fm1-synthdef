@@ -17,6 +17,7 @@
     "../LICENSE": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
     "DelayUGens.cpp": "688a76b94948d120f6ff6ddcebca9ea353a157d638ad73bdbd2d5bb4e51b455f",
     "SC_InlineUnaryOp.h": "ae9b928de6681008b73a3db9a449dda52635b11b10b406d3df5dbccc8f3652b2",
-    "TriggerUGens.cpp": "929960745bb2aebf7a7ca76d2472498fa5c54deb0ed2a70ffb9bcc86c4e5fddc"
+    "TriggerUGens.cpp": "929960745bb2aebf7a7ca76d2472498fa5c54deb0ed2a70ffb9bcc86c4e5fddc",
+    "ReverbUGens.cpp": "c3cebdf729874c7a8bfc3d449238c87dc23aa02cfe2a9fffefcd1c6a49362fe4"
   }
 }

@@ -51,7 +51,7 @@ This builds `firmware/` using the pinned fm1-base with Bluetooth disabled, creat
 
 The panel adapter draws a white screen with black Terminus 12 text, blue UGen/class names, red `arg`/`var`, purple numbers, green strings/symbols and grey comments. Terminus is a redistributable bitmap monospace face; Apple's Monaco is used only as a locally installed browser font. Non-ASCII source is preserved in storage, but unsupported display glyphs currently show `?` on the device-sized bitmap renderer.
 
-The device adapter uses a bounded queue for panel events. Its audio callback owns voice state; slot loading and commits suspend rendering before touching that state. Overflow triggers panic rather than dropping note-offs silently. Device flash callbacks stay inside the slot region and validate graphs before committing. The hardware buffer is 256 frames, calculated in four 64-sample engine blocks. Device maths are freestanding, single precision, and compared against all 516 SuperCollider fixtures with a separate target tolerance (peak < 0.001, RMS < 0.0001). The additive patch is substantially closer than those limits.
+The device adapter uses a bounded queue for panel events. Its audio callback owns voice state; slot loading and commits suspend rendering before touching that state. Overflow triggers panic rather than dropping note-offs silently. Device flash callbacks stay inside the slot region and validate graphs before committing. The hardware buffer is 256 frames, calculated in four 64-sample engine blocks. Device maths are freestanding, single precision, and compared against all 553 SuperCollider fixtures with a separate target tolerance (peak < 0.001, RMS < 0.0001). The additive patch is substantially closer than those limits.
 
 ## Protocol
 
@@ -59,7 +59,7 @@ The device adapter uses a bounded queue for panel events. Its audio callback own
 
 ## Verification
 
-- Development engine: 516 SuperCollider comparisons, including 99 delay-family graphs; 31 API test groups; 380,000 sanitizer mutations/truncations.
+- Development engine: 553 SuperCollider comparisons, including 99 delay-family graphs; 34 API test groups; 440,000 sanitizer mutations/truncations.
 - Journal: simulated power failure at all 68 erase/program operations of a full slot replacement; revision conflict, delete, read failure and region isolation.
 - Performance: pitch/velocity conversion, held notes across octave changes, note identity, stealing, no-gate release, panic, active/new voice knob updates, stereo output and clipping.
 - Browser/core: six package/bank/audio test groups, lexical highlighting and MIDI framing tests. Browser compile → save → listen was exercised with the Keys + comb patch.
@@ -102,8 +102,16 @@ Admission checks require `2 * synth_delay_samples + effect_delay_samples <= 3276
 
 ## Development UGen expansion
 
-The source now supports 74 types. Dust, Dust2, Decay, Decay2, Impulse, Latch/Gate, TRand/TExpRand and simple filters are available at audio and control rate, with the engine profile's input restrictions. The five new pitch/gain conversions include `.midiratio` and `.dbamp`.
+The source now supports 77 types. Dust, Dust2, Decay, Decay2, Impulse, Latch/Gate, TRand/TExpRand and simple filters are available at audio and control rate, with the engine profile's input restrictions. The five new pitch/gain conversions include `.midiratio` and `.dbamp`.
 
 `examples/dust-chimes.scd` is a 19-node example using Dust → TRand → SinOsc with Decay2 excitation. Knob 1 sets 2–40 events/second; knob 2 sets a 30–730 ms tail. Its outer gated envelope releases the note normally. Paste it into a spare local slot for host preview. It requires a development firmware build on the device; it has not been sent to the connected FM-1.
 
 Run `../.venv/bin/python tools/test-extensions-panel.py` for a temporary two-patch bank exercising the real panel adapter, two voices, stealing, live controls, release and permanent master echo. The test preserves user banks. Host simulation does not measure FM-1 realtime CPU load. See [the development verification record](../docs/VERIFICATION.md).
+
+## Development slot-0 reverbs
+
+`examples/master-freeverb.fmslot`, `master-freeverb2.fmslot` and `master-miverb.fmslot` are alternatives for slot 0. Knob 3 sets wet/dry (0–60% wet); knob 4 sets room/decay. The mono FreeVerb example preserves the dry stereo image and adds a shared mono wet signal. MiVerb also exposes a `freeze` control, default 0; its example stays below self-sustaining feedback.
+
+All three passed temporary-bank simulations with Keys and Dust chimes, two voices, stealing, live knobs, release tails and FX browsing (114 assertions), plus the earlier 54 panel assertions. Run `tools/test-reverbs-panel.py` to reproduce. The new firmware builds at 226,972 bytes with unchanged static RAM/pool allocation. Device timing and listening checks remain pending because the FM-1 was not connected. These packages require the development firmware; v0.1.0-preview cannot load them.
+
+Compilation uses the stock SuperCollider class library plus our pinned MiVerb class. User extension/quark classes are not loaded into this compiler. The ordinary SuperCollider application configuration is unchanged.

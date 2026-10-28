@@ -37,7 +37,7 @@ function paint(){
  $('state').textContent=ready()?(unsaved?'Ready to save':'Saved'):(binary?'Source changed · compile to update':'Draft · not compiled');
  $('save').disabled=busy || !ready();$('listen').disabled=busy || !ready();$('export').disabled=busy || unsaved || !binary;
  $('device-send').disabled=busy || !ready() || !deviceSlots;$('device-read').disabled=busy || !deviceSlots;$('device-clear').disabled=busy || !deviceSlots;$('device-send').textContent=`Send to FM-1 slot ${slotNumber(selected)}`;
- $('info').textContent=info?`${info.nodes} graph nodes · ${(info.delay_bytes/1024).toFixed(0)} KiB delay RAM ${selected===8?'· permanent stereo effect':'/ voice · 2 voices'}`:'';
+ $('info').textContent=info?`${info.nodes} graph nodes · ${(info.delay_bytes/1024).toFixed(0)} KiB delay/reverb RAM ${selected===8?'· permanent stereo effect':'/ voice · 2 voices'}`:'';
  screen();
 }
 function screen(levels=[0,0]){scroll=drawScreen($('screen'),{source:$('source').value,slot:selected,name:$('name').value||'Empty slot',scroll,knobs,overlay,levels,octave,draft:unsaved});}

@@ -51,6 +51,51 @@ class Engine:
     def render(self,seed=0):
         out=(C.c_float*128)(*[seed]*128);lib.fm_render(self.g,self.v,self.b,out);return list(out)
 class Tests(unittest.TestCase):
+    def test_reverb_memory_binding_bounds_and_guards(self):
+        for name,need in [('FreeVerb',12623),('FreeVerb2',25522),('MiVerb',16384)]:
+            e=Engine((ROOT/'fixtures'/('m7_'+name+'_impulse2.scsyndef')).read_bytes())
+            self.assertTrue(e.ok,e.error);self.assertEqual(lib.fm_delay_required(e.g,44100),need)
+            self.assertTrue(lib.fm_start(e.v,e.g,44100))
+            memory=(C.c_float*(need+2))();memory[0]=123;memory[-1]=456
+            pointer=C.cast(C.byref(memory,4),C.c_void_p)
+            self.assertFalse(lib.fm_bind_delay(e.v,e.g,pointer,need-1))
+            self.assertFalse(lib.fm_bind_delay(e.v,e.g,None,need))
+            self.assertTrue(lib.fm_bind_delay(e.v,e.g,pointer,need))
+            for _ in range(100):e.render()
+            self.assertEqual(memory[0],123);self.assertEqual(memory[-1],456)
+            self.assertFalse(lib.test_fault(e.v))
+            self.assertFalse(lib.fm_bind_delay(e.v,e.g,pointer,need))
+            self.assertTrue(lib.fm_start(e.v,e.g,44100));self.assertEqual(e.render(),[0]*128)
+            self.assertTrue(lib.test_fault(e.v))
+
+    def test_reverb_preparation_restart_and_shared_scratch(self):
+        for name in ('FreeVerb','FreeVerb2','MiVerb'):
+            data=(ROOT/'fixtures'/('m7_'+name+'_noise.scsyndef')).read_bytes()
+            normal,prepared,other=[Engine(data) for _ in range(3)]
+            for e in (normal,prepared,other):self.assertTrue(e.start())
+            lib.fm_prepare(prepared.g,prepared.v,prepared.b);lib.fm_prepare(prepared.g,prepared.v,prepared.b)
+            other.b=prepared.b;first=[]
+            for _ in range(100):
+                other.render();a=normal.render();self.assertEqual(a,prepared.render());first+=a
+            self.assertGreater(max(map(abs,first)),0.001)
+            normal.start();again=[]
+            for _ in range(100):again+=normal.render()
+            self.assertEqual(first,again)
+
+    def test_reverb_layout_rates_and_total_budget(self):
+        for name,refs,outputs in [('FreeVerb',[(0,0),(-1,1),(-1,1),(-1,1)],[2]),('FreeVerb2',[(0,0),(0,0),(-1,1),(-1,1),(-1,1)],[2,2]),('MiVerb',[(-1,1)]*6+[(0,0),(0,0)],[2,2])]:
+            base=[node('DC',[(-1,0)])]
+            for rate in (0,1):self.assertFalse(Engine(synth(base+[node(name,refs,rate=rate,outputs=[rate]*len(outputs))])).ok)
+            invalid=refs[:6] if name=='MiVerb' else refs[:-1]
+            self.assertFalse(Engine(synth(base+[node(name,invalid,outputs=outputs)])).ok)
+            bad=list(refs);bad[6 if name=='MiVerb' else 0]=(-1,0)
+            self.assertFalse(Engine(synth(base+[node(name,bad,outputs=outputs)])).ok)
+            bad=list(refs);bad[0 if name=='MiVerb' else (2 if name=='FreeVerb2' else 1)]=(0,0)
+            self.assertFalse(Engine(synth(base+[node(name,bad,outputs=outputs)])).ok)
+        refs=[(0,0),(0,0),(-1,1),(-1,1),(-1,1)]
+        e=Engine(synth([node('DC',[(-1,0)])]+[node('FreeVerb2',refs,outputs=[2,2])]*3))
+        self.assertTrue(e.ok,e.error);self.assertEqual(lib.fm_delay_required(e.g,44100),0xffffffff);self.assertFalse(e.start())
+
     def test_information_ugens_units_rates_and_shared_scratch(self):
         for name in ('SampleRate','SampleDur','ControlRate','ControlDur','BlockSize','RadiansPerSample'):
             data=synth([node(name,rate=0),node('DC',[(0,0)]),node('Out',[(-1,0),(1,0)],outputs=[])])

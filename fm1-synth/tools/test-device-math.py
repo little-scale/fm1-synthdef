@@ -9,8 +9,10 @@ exe=OUT/('host-fast-render' if host else 'device-math-render')
 limits={r['name']:r for r in json.loads((ENGINE/'build/reference-results.json').read_text())}
 subprocess.run(['cc','-O2','-std=c99','-fno-fast-math','-ffp-contract=off','-DPLAT_HOST',*([] if host else ['-I'+str(ROOT/'fm1-synth/firmware/device_include')]),'-I'+str(ROOT/'fm1-base/include'),'-I'+str(ENGINE/'src'),str(ENGINE/'src/fm_load.c'),str(ENGINE/'src/fm_render.c'),str(ENGINE/'tools/render.c'),*(['-lm'] if host else []),'-o',str(exe)],check=True)
 results=[]
+if set(limits)!={p.stem for p in (ENGINE/'fixtures').glob('*.scsyndef')}:
+ raise RuntimeError('Run the complete engine reference suite before backend comparisons.')
 for p in sorted((ENGINE/'fixtures').glob('*.scsyndef')):
- name=p.stem;blocks=827 if name=='m5_addy' else 345;dest=OUT/'device-math.f32'
+ name=p.stem;blocks=ref.fixture_blocks(name);dest=OUT/'device-math.f32'
  events=ref.EVENTS.get(name,[(0.25,0)] if name.startswith('env_') else [])
  if p.with_suffix('.events.json').exists():events=json.loads(p.with_suffix('.events.json').read_text())
  args=[str(exe),str(p),str(dest),str(blocks)]

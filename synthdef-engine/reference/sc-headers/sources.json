@@ -1,0 +1,32 @@
+{
+  "repository": "https://github.com/supercollider/supercollider",
+  "tag": "Version-3.14.1",
+  "sha256": {
+    "include/plugin_interface/SC_PlugIn.h": "ba38dd929ccd8d472dfc475199a98cd03db902392c9780cefc70c53655057750",
+    "include/plugin_interface/SC_World.h": "7f212d9117ee15726dca10bd4145e7984cffce6f36475197a4409f9182557132",
+    "include/common/SC_Types.h": "8239fe5b77ec4909d15d743d9c312662d87274f6a20675863e19033be2f8773b",
+    "include/plugin_interface/SC_Rate.h": "da696482c7e13c2103f74c023edab33f4bde1a20051dc8cafe9a1fd4729c605b",
+    "include/plugin_interface/SC_SndBuf.h": "76e83e5f6ee93922ae69c6c83d95c966e7cb17f6b44223b7812695c4065c0a5a",
+    "include/plugin_interface/SC_RGen.h": "19c68e1b6c34dcde7515fe5df70e5d0c9d89c07474513526a4e55b0cc390f3fc",
+    "include/common/SC_Endian.h": "a0afdd6572fc27bca599d9b132aa9ac54d825acfa1eb25b0b3bee017853ccf8d",
+    "include/common/SC_BoundsMacros.h": "d92ed72a31bbd4231c091774f38560de0661d88c29c51db908e03d4db4fcaac8",
+    "include/plugin_interface/Hash.h": "c12b9895895241f8eda206e58c116e909ec1d13f7cde637bece1b5ab0ade6fa3",
+    "include/plugin_interface/SC_Graph.h": "b0c2394639e47285a63c9e2e9e1b72beeb300f9728a3f1d964f13b3eb94e1ecc",
+    "include/plugin_interface/SC_Node.h": "7c71216b956c9687a906d85bf49fc2242f07b455de166482293019800e1a6cb4",
+    "include/plugin_interface/SC_Unit.h": "aaafcb4a9613a6255b776b95b5c6c81b9b7a6a38440325d25d1590e58f2c920c",
+    "include/plugin_interface/SC_Wire.h": "dfaa713ed8b5dd81dc8120731373df03c113e39490d43c47986037c1463c84e3",
+    "include/plugin_interface/SC_InterfaceTable.h": "244a85cd45769a591c108f61b099cab69494127749f1ecfd04489016392f54c6",
+    "include/plugin_interface/SC_BufGen.h": "fb5297b496424202097d3fb5e3e39cb0c2d478930ecdeb56604c00d789c4f1ef",
+    "include/plugin_interface/SC_FifoMsg.h": "66e289e95323049ca527662e1e23c22062f5f58da60f0384d275cec44137c423",
+    "include/common/SC_fftlib.h": "1c425ec4962cfbab034c8cb22c87f47bd5c0be1e2673086de77f55577e3517ce",
+    "include/common/SC_Export.h": "4a643c3cd1dd3965d8b5910f67b44e040ddb9b65e16491580883c4e33d4eb947",
+    "include/plugin_interface/Unroll.h": "d1b3eb4e1e06a9c84f187c068b3ef1e9e9b9db62fbfc0d43cd6d38f14cd04edf",
+    "include/plugin_interface/SC_InlineUnaryOp.h": "ae9b928de6681008b73a3db9a449dda52635b11b10b406d3df5dbccc8f3652b2",
+    "include/plugin_interface/SC_Constants.h": "07cce20204b8b6580662abf976fd0a57f888b8d4612b77e13c5002121db08e7e",
+    "include/plugin_interface/SC_InlineBinaryOp.h": "d825c9701dbf0ff23ca89154561ecb5f558f7a99db1036f76457520715d613ba",
+    "include/plugin_interface/SC_DemandUnit.h": "7cd7643e58366a1095e7afd77c420b40e6d90c44baa548f3b84d5d2b271372ca",
+    "include/common/clz.h": "cb7491dc3183fe08d28e888d6649c8c0b0a3435790f5547eb6f0fe1890e53f23",
+    "include/plugin_interface/sc_msg_iter.h": "8903a4b3c7f465e92a5c9f7269e2734a254f07ca7aef3512a4e57980bc59e235",
+    "include/common/SC_Alloca.h": "021a9d3084ee069ffcf2ae166a05607b8c77702da08088fcd4b01cb375465ae8"
+  }
+}

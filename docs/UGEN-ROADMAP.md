@@ -1,6 +1,6 @@
 # UGen additions: implementation status
 
-Updated 28 October 2026. The development source now implements **74 UGen types**, up from 53 in the published **v0.1.0-preview** firmware. The additions below passed emulation and firmware build checks; physical FM-1 playback and timing remain to be checked. Release assets have not changed.
+Updated 28 October 2026. The development source now implements **77 UGen types**, up from 53 in the published **v0.1.0-preview** firmware. The additions below passed emulation and firmware build checks; physical FM-1 playback and timing remain to be checked. Release assets have not changed.
 
 ## Implemented from the initial analysis
 
@@ -14,11 +14,14 @@ Updated 28 October 2026. The development source now implements **74 UGen types**
 | `Dust`, `Dust2` | Audio/control | Seeded streams, density scaling, zero/negative/high density, live density changes |
 | `Impulse` | Audio/control | Startup, zero/negative frequency, phase offsets, block changes and audio frequency modulation |
 | `Decay`, `Decay2` | Audio/control | Accurate long tails, changing times, repeated triggers, zero/equal/near-equal/very short times |
+| `FreeVerb`, `FreeVerb2`, `MiVerb` | Audio | Exact-size caller-owned state, constructor behavior, stereo routing, freeze, parameter clamps, pinned upstream oracles |
 | `.cpsmidi`, `.midiratio`, `.ratiomidi`, `.dbamp`, `.ampdb` | Initial/control/audio operators | Domain checks and host/device-math comparison |
 
-The implementation reuses existing per-node state. Static RAM remains **78,384 bytes** and pool use **325,992 of 344,064 bytes**. The development application is **215,956 bytes**, 8,052 bytes larger than the preview. Those separate memory regions do not establish a CPU budget.
+The implementation reuses existing per-node state. Static RAM remains **78,384 bytes** and pool use **325,992 of 344,064 bytes**. The development application is **226,972 bytes**, 19,068 bytes larger than the preview. Those separate memory regions do not establish a CPU budget.
 
 See the [engine profile](../synthdef-engine/README.md#supported-profile) for rate/domain restrictions. In particular: Impulse phase is initial-rate only; filter coefficients, Dust density and decay times are initial/control rate; audio triggered-random outputs require an audio trigger. TExpRand audio behavior follows a version-specific SuperCollider 3.14.1 quirk documented there.
+
+Reverb memory is charged to the existing arena: FreeVerb 50,492 bytes, FreeVerb2 102,088 bytes, MiVerb 65,536 bytes per instance. Their implementation required dedicated memory admission and reference tests; physical CPU verification remains pending.
 
 The [verification record](VERIFICATION.md) covers reference comparisons, API checks, sanitizer mutations, two-voice instrument emulation and firmware compilation. The [Dust chimes example](../fm1-synth/examples/dust-chimes.scd) demonstrates the requested random-trigger/decay combination.
 
@@ -40,7 +43,7 @@ The Mac compiler expands `Mix`, `LinLin` and `PMOsc` into existing arithmetic an
 - `PlayBuf`/`BufRd`, granular buffers and sample storage need a buffer registry, upload/storage management and a RAM/streaming budget.
 - `FFT`/PV processing needs spectral buffers and transforms.
 - `LocalIn`/`LocalOut` need explicit graph feedback/block-delay semantics; they are not aliases for slot 0's immutable input.
-- `FreeVerb`, pitch shifting and look-ahead dynamics need separate memory/CPU budgeting.
+- Pitch shifting and look-ahead dynamics need separate memory/CPU budgeting.
 - More band-limited oscillators may be expensive. The original three-Saw patch demonstrated that admission alone cannot guarantee two-voice timing.
 
 ## Validation policy and sources

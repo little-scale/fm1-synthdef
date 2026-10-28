@@ -1,0 +1,257 @@
+{
+  "date": "2026-10-28",
+  "scope": "FreeVerb, FreeVerb2, MiVerb: emulation, compiler/editor and device build",
+  "ugen_types": 77,
+  "hardware_flashed": false,
+  "hardware_realtime_verified": false,
+  "hardware_blocker": "No FM-1 USB MIDI port detected",
+  "release_assets_changed": false,
+  "supercollider": "3.14.1",
+  "mi_ugens_commit": "10f6824f68ad63475f67dfe3fe5016e2d2634f84",
+  "reference_comparisons": {
+    "reference": {
+      "passed": 553,
+      "total": 553
+    },
+    "optimized-host": {
+      "passed": 553,
+      "total": 553
+    },
+    "device-math": {
+      "passed": 553,
+      "total": 553
+    }
+  },
+  "new_reverb_graphs": 37,
+  "engine_api_groups": 34,
+  "miverb_identical_input_oracle": [
+    {
+      "sample_rate": 8000,
+      "input_amplitude": 0.2,
+      "frames": 102400,
+      "peak_error": 0,
+      "rms_error": 0.0,
+      "passed": true
+    },
+    {
+      "sample_rate": 8000,
+      "input_amplitude": 4.0,
+      "frames": 102400,
+      "peak_error": 0,
+      "rms_error": 0.0,
+      "passed": true
+    },
+    {
+      "sample_rate": 44100,
+      "input_amplitude": 0.2,
+      "frames": 102400,
+      "peak_error": 0,
+      "rms_error": 0.0,
+      "passed": true
+    },
+    {
+      "sample_rate": 44100,
+      "input_amplitude": 4.0,
+      "frames": 102400,
+      "peak_error": 0,
+      "rms_error": 0.0,
+      "passed": true
+    },
+    {
+      "sample_rate": 48000,
+      "input_amplitude": 0.2,
+      "frames": 102400,
+      "peak_error": 0,
+      "rms_error": 0.0,
+      "passed": true
+    },
+    {
+      "sample_rate": 48000,
+      "input_amplitude": 4.0,
+      "frames": 102400,
+      "peak_error": 0,
+      "rms_error": 0.0,
+      "passed": true
+    },
+    {
+      "sample_rate": 192000,
+      "input_amplitude": 0.2,
+      "frames": 102400,
+      "peak_error": 0,
+      "rms_error": 0.0,
+      "passed": true
+    },
+    {
+      "sample_rate": 192000,
+      "input_amplitude": 4.0,
+      "frames": 102400,
+      "peak_error": 0,
+      "rms_error": 0.0,
+      "passed": true
+    }
+  ],
+  "sanitizer_cases": 440000,
+  "sanitizer_families": 22,
+  "instrument_core_and_sanitizers": "passed",
+  "bank_tests": 6,
+  "synth_journal_interruption_boundaries": 68,
+  "effect_journal_interruption_boundaries": 34,
+  "screen_and_transport": "passed",
+  "original_panel_assertions": 23,
+  "extension_panel_assertions": 31,
+  "reverb_panel": [
+    {
+      "effect": "freeverb",
+      "synth": "keys-master",
+      "assertions": 19,
+      "stereo_peaks": [
+        0.007720947265625,
+        0.007720947265625
+      ],
+      "tail_rms": 3.7198690958037895e-05,
+      "effect_memory_bytes": 50492
+    },
+    {
+      "effect": "freeverb",
+      "synth": "dust-chimes",
+      "assertions": 19,
+      "stereo_peaks": [
+        0.0255126953125,
+        0.0255126953125
+      ],
+      "tail_rms": 0.0003179608452212698,
+      "effect_memory_bytes": 50492
+    },
+    {
+      "effect": "freeverb2",
+      "synth": "keys-master",
+      "assertions": 19,
+      "stereo_peaks": [
+        0.017120361328125,
+        0.017913818359375
+      ],
+      "tail_rms": 0.00016717373635908355,
+      "effect_memory_bytes": 102088
+    },
+    {
+      "effect": "freeverb2",
+      "synth": "dust-chimes",
+      "assertions": 19,
+      "stereo_peaks": [
+        0.054718017578125,
+        0.0616455078125
+      ],
+      "tail_rms": 0.0006219844877119637,
+      "effect_memory_bytes": 102088
+    },
+    {
+      "effect": "miverb",
+      "synth": "keys-master",
+      "assertions": 19,
+      "stereo_peaks": [
+        0.016693115234375,
+        0.017974853515625
+      ],
+      "tail_rms": 0.0003257462149466236,
+      "effect_memory_bytes": 65536
+    },
+    {
+      "effect": "miverb",
+      "synth": "dust-chimes",
+      "assertions": 19,
+      "stereo_peaks": [
+        0.05426025390625,
+        0.0562744140625
+      ],
+      "tail_rms": 0.0006851024170959446,
+      "effect_memory_bytes": 65536
+    }
+  ],
+  "manager": {
+    "compiled": [
+      {
+        "effect": "freeverb",
+        "compiled": true,
+        "nodes": 16,
+        "memory_bytes": 50492,
+        "package_bytes": 1258
+      },
+      {
+        "effect": "freeverb2",
+        "compiled": true,
+        "nodes": 9,
+        "memory_bytes": 102088,
+        "package_bytes": 926
+      },
+      {
+        "effect": "miverb",
+        "compiled": true,
+        "nodes": 9,
+        "memory_bytes": 65536,
+        "package_bytes": 977
+      }
+    ],
+    "bank_unchanged": true,
+    "hardware_written": false
+  },
+  "memory_bytes_per_instance": {
+    "FreeVerb": 50492,
+    "FreeVerb2": 102088,
+    "MiVerb": 65536
+  },
+  "build": {
+    "identity": "FM-1_1200",
+    "bluetooth": false,
+    "image_bytes": 226972,
+    "static_ram_bytes": 78384,
+    "static_ram_capacity": 98304,
+    "pool_bytes": 325992,
+    "pool_capacity": 344064,
+    "soft_double_routines": false
+  },
+  "comparison_notes": [
+    "m7_MiVerb_saturation: peak < 2e-4, RMS < 2e-5; oscillator rounding enters quantized feedback. Identical-input DSP oracle remains strict.",
+    "m6_Impulse_ar_fm: equal pulse count/amplitude, maximum one-sample offset. Other graphs retain waveform thresholds."
+  ],
+  "source_sha256": {
+    "synthdef-engine/src/fm_bandlimited.inc": "28d80e96ae8b16f6c70aa5e34de2cba30de6b1d28b8633170ee5a354bb6250db",
+    "synthdef-engine/src/fm_delay.inc": "8d72f4919cba630d2570c2d7f829fe63cd5c6c3bf961bfe34f93f48757278e7c",
+    "synthdef-engine/src/fm_extensions.inc": "b2f376cffa371ec86cc9b86d1034272b3aa4ed1df3da3992addf5acadc85405a",
+    "synthdef-engine/src/fm_fast.inc": "634eb3d00b8722d0d9ee2fab515b5a85120bb514fbcd0ecc1d167c11b580b6c3",
+    "synthdef-engine/src/fm_filters.inc": "faf3b5145ca89c648075939e5e791094606e7318bebf4ddde9cf1cd2e1cc64c2",
+    "synthdef-engine/src/fm_freeverb.inc": "e444b0d55f9dc3111517752a714aa8cd6882251e9da6f92bc3ccbf1befb8c1cf",
+    "synthdef-engine/src/fm_load.c": "4c73f8927f84d62e5dca1ed0366a607f3d725ea4a9aeb6bfc44ebb46e95a7737",
+    "synthdef-engine/src/fm_miverb.inc": "5bfa3f30126d1bddb64874b04d63e1b4b08b81a44be006ece4ecde7ec6896ced",
+    "synthdef-engine/src/fm_noise.inc": "40f45b5a156ac9e1b64751f06a0dbdfacadf45347541f2dab3c588bef4a60b5d",
+    "synthdef-engine/src/fm_render.c": "a46b26bf7613a30b568a635c79402071c6f47409c91d9dbbbc1ea3fa7c348538",
+    "synthdef-engine/src/fm_reverb.inc": "f88f03fea2cade368388263a5e8883b12fd8636c5c7907478fd208d7439e417f",
+    "synthdef-engine/src/fm_synth.h": "609480b47bca3dfe65d94c55c1ba3fb7348c12c18b3104182ea99e6929ba8976",
+    "synthdef-engine/src/fm_tables.inc": "62e9c48491adaf0827426059d8fe7f5b06fcf02d5d2ae005ef111b4fb9214a10",
+    "fm1-synth/src/codeview.c": "e69ca3a2de228b21a33971e8d030258fbca49fd9fe133015a2b13373a7c40f0e",
+    "fm1-synth/src/codeview.h": "0ebde7b23711e9300f1f0889ef377a0a597f2f210d5ad29fdc420577082f7a9a",
+    "fm1-synth/src/performance.c": "ecf9fa41279a8bab4d4e1eafbeb7dd1c1d7a0a5278c28373566c2a5149700858",
+    "fm1-synth/src/performance.h": "ef7d2cc5cefdc6ed2bf9c7b747dc5b447393b1e983b07cf20339d32751a437d1",
+    "fm1-synth/src/protocol.c": "243fe5edbbc88235f3232b6cccb5dbb143eb0b7bc99ca29ae4c6775299c2abcb",
+    "fm1-synth/src/protocol.h": "38133b6dd4bc3d450c227497c8302a7cece6bf614011da329f41956ef3986f5a",
+    "fm1-synth/src/slots.c": "d34a4aca9add77407868b3d1ae2273b035a25fcd3bf2321c815694d0d9c03993",
+    "fm1-synth/src/slots.h": "064918c56f36cd6f605ed19dd07d59b5a3c8c8aa40c25f2b8abe35573e6561ed",
+    "fm1-synth/firmware/app.c": "89dba9ba3ed29ce5464c6b6586f36e7bd3f72a2cb990e9f15f3b35188d489a57",
+    "fm1-synth/firmware/codeview.c": "312d266baef693c4b69ebb3b28ff7ecdf8c1486c4b728eceeed86bc45cb0cd1a",
+    "fm1-synth/firmware/load.c": "66c1a765250504f51f857369473f043a7bdc3c08143e8e407c02f4b227b3dd32",
+    "fm1-synth/firmware/player.c": "a75929262a0b34377d79eef7ab055cfad524f4f6d0190d803267a3bbfb84432e",
+    "fm1-synth/firmware/protocol.c": "350f9e251313c654ab25d71f2dea559567c472990a56018e4b6e90a221dc4ff0",
+    "fm1-synth/firmware/render.c": "e1b3385fa4bd30b4ced4e85435e11610927d3cfa66db3805916444ad34b5be48",
+    "fm1-synth/firmware/runtime.c": "38f74a54b2c39b6633ff3feb7dca95b2ba9d26dbcfa0fb505813aea76fb6b133",
+    "fm1-synth/firmware/slots.c": "d418ece9029add14f22a9a64d8e8832416c7b8f3510b2879af66308c4ee8b8bc",
+    "fm1-synth/firmware/device_include/math.h": "d0e4990fc9fad5b07908fe38918066e2e6f3d9ac350f2e9f5ba3e28ad48b024d",
+    "synthdef-engine/profile.json": "6683f9792659ad47911b69e7b3c67b0cfd37a3105f83ac7cf2ead06c97876139",
+    "synthdef-engine/reference/fixtures.json": "cec312056d3d537cd181deec4b75c5694b2882cdba06727dfc900d0d5ae3fc61",
+    "synthdef-engine/reference/sources.json": "684691b89a42400551eb2a5996e2b7646f2cdeee66d40ecf2e5c338f00576611",
+    "synthdef-engine/reference/mi-ugens/sources.json": "22ed04a295b79d7bb0f825760299d6aeac976feabb8ce846e9ed5d26197fa039",
+    "synthdef-engine/reference/sc-headers/sources.json": "a10077a8b39373c7bf46630c6c1a9ceb355ee594759ce56cd2afdcaaaebf7dfd"
+  },
+  "build_sha256": {
+    "synthdef.bin": "99baf6991c8107d00886d5d016f832fcbef6cf19ad015e3f6ad15714420bcdfa",
+    "synthdef.fwsc": "a650f2963449ad70cf235ad1f2bf74e40f390fa57d8de2ae4832ec25ff5de362"
+  }
+}

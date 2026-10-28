@@ -6,6 +6,10 @@ FM1 SynthDef combines the following components. Original source headers and lice
 | --- | --- | --- |
 | New SynthDef engine, instrument, manager and release tooling | This project | GPL-3.0-or-later; root `LICENSE` and `synthdef-engine/LICENSE` |
 | Adapted DSP algorithms and reference material | SuperCollider 3.14.1; source credits include James McCartney and other named contributors | GPL-2.0-or-later sources, adaptations distributed under GPL-3.0-or-later; `synthdef-engine/reference/README.md`, original headers and source hash manifest |
+| FreeVerb / FreeVerb2 kernels | SuperCollider 3.14.1, blackrain | GPL-2.0-or-later original, GPL-3.0-or-later adaptation; pinned ReverbUGens.cpp and generated-kernel notice |
+| MiVerb wrapper and language class | Volker Böhm, mi-UGens commit `10f6824f68ad63475f67dfe3fe5016e2d2634f84` | GPL-3.0-or-later; original notices in `synthdef-engine/reference/mi-ugens/` |
+| MiVerb reverb, delay engine and cosine oscillator | Émilie Gillet / Mutable Instruments, same pinned source tree | MIT, full notices retained in original headers; C adaptation distributed with this GPL-3.0-or-later project |
+| SuperCollider plugin headers used only by tests | SuperCollider 3.14.1 | Original per-file notices and hashes in `synthdef-engine/reference/sc-headers/`; not linked into device firmware |
 | fm1-base | Charles Vestal and credited contributors, pinned snapshot | `fm1-base/LICENSE`, `LICENSING.md`, `CREDITS.md` and `LICENSES/` |
 | felucca-bsp | Hügelton Instruments and credited contributors, pinned snapshot | `fm1-base/bsp/LICENSE` and original headers |
 | Terminus and Barlow fonts | Dimitar Toshkov Zhekov; The Barlow Project Authors | SIL OFL 1.1 texts in `fm1-base/assets/fonts/` |

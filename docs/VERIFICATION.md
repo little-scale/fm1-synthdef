@@ -1,5 +1,19 @@
 # Verification record
 
+## Development reverbs — 28 October 2026
+
+FreeVerb, FreeVerb2 and MiVerb bring the development profile to **77 UGen types**. No FM-1 USB MIDI port was available, so these results cover emulation and compilation only; physical playback/timing is pending. The published preview firmware is unchanged.
+
+- **553/553 reference graphs** pass on ordinary host, optimized host and freestanding device-math backends. The 37 new graphs run for approximately four seconds each, covering wet/dry, stereo excitation, parameter clamps, noise bursts, live changes, diffusion, freeze and saturation.
+- An isolated MiVerb plugin is built from pinned upstream source and pinned SC headers. No installed user plugins are used by the reference renderer.
+- An additional identical-input comparison matches the unmodified upstream MiVerb DSP exactly for **819,200 stereo frames** across 8 kHz, 44.1 kHz, 48 kHz and 192 kHz, at ordinary and overdriven input levels, with freeze and parameter changes. The oscillator-driven saturation integration case has a separate peak 2e-4 / RMS 2e-5 tolerance because tiny upstream oscillator differences enter quantized feedback.
+- **34 API groups**, including reverb capacity, exact buffer guards, failed binding, missing memory, restart, preparation, scratch sharing and invalid rates/layouts.
+- **440,000 sanitizer mutation/truncation cases** across 22 graph families. Instrument journal/core sanitizer checks, six bank/package tests and screen/transport checks pass.
+- **114 reverb panel assertions** across six simulations (three reverbs × Keys/Dust chimes), with two voices, stealing, live knobs, release tails, effect browsing and panic. All produce nonzero stereo recordings and measurable post-release tails without numerical faults. The earlier 23 + 31 panel assertions also pass.
+- Firmware builds at **226,972 bytes**, with Bluetooth disabled, no software-double routines, unchanged static RAM **78,384/98,304 bytes**, and unchanged pool use **325,992/344,064 bytes**.
+
+Reverb storage is reserved from the existing arena only when used: FreeVerb 50,492 bytes; FreeVerb2 102,088 bytes; MiVerb 65,536 bytes. Memory admission does not prove realtime performance. The examples are available as source, compiled SynthDefs and slot packages; none was sent to a device. See `evidence/reverbs-emulation.json` and its companion comparison records.
+
 ## Development UGen expansion — 28 October 2026
 
 The 74-type development source adds 21 UGens and five unary conversions. These results are **emulation/build verification**, not new hardware acceptance. The connected FM-1 and v0.1.0-preview release binaries remain unchanged.

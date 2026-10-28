@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline comparison with pinned SuperCollider; no audio hardware is opened."""
 import array
+import importlib.util
 import hashlib
 import json
 import math
@@ -45,21 +46,29 @@ def impulse_timing(a,b):
     return dict(impulses=len(x),reference_impulses=len(y),timing_error_samples=timing,
                 amplitude_error=amplitude,timing_passed=bool(x) and len(x)==len(y) and timing<=1 and amplitude<5e-6 and clean)
 
+def fixture_blocks(name):
+    return 2756 if name.startswith("m7_") else 827 if name=="m5_addy" else 345
+
 def main():
     manifest=json.loads((ROOT/'reference/fixtures.json').read_text())
     actual={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/'fixtures').iterdir() if p.suffix in ('.scsyndef','.osc','.json')}
     fixtures=sorted((ROOT/'fixtures').glob('*.scsyndef'))
     if not fixtures or actual != manifest['sha256']:
         raise RuntimeError('Missing or changed fixtures; regenerate with tools/export-all.py')
+    if os.environ.get('FM_REFERENCE_FILTER'):
+        fixtures=[p for p in fixtures if p.stem.startswith(os.environ['FM_REFERENCE_FILTER'])]
+    spec=importlib.util.spec_from_file_location('miverb_reference',ROOT/'tools/build-miverb-reference.py');builder=importlib.util.module_from_spec(spec);spec.loader.exec_module(builder)
+    plugin_path=builder.build() if any(p.stem.startswith('m7_MiVerb') for p in fixtures) else None
     version=subprocess.check_output([str(SC), '-v'], text=True).strip()
     if 'scsynth 3.14.1' not in version:
         raise RuntimeError('Reference suite requires SuperCollider 3.14.1; found '+version)
     results = []
     for fixture in fixtures:
         name = fixture.stem
-        blocks = 827 if name == 'm5_addy' else 345
+        blocks = fixture_blocks(name)
         ref = ROOT/'build'/f'{name}-reference.wav'
-        cmd = [str(SC), '-U', str(SC.parent/'plugins'), '-N', str(fixture.with_suffix('.osc')), '_', str(ref), '44100', 'WAV', 'float', '-o', '2', '-i', '0', '-z', '64']
+        plugins=str(SC.parent/'plugins')+(os.pathsep+str(plugin_path) if name.startswith('m7_MiVerb') else '')
+        cmd = [str(SC), '-U', plugins, '-N', str(fixture.with_suffix('.osc')), '_', str(ref), '44100', 'WAV', 'float', '-o', '2', '-i', '0', '-z', '64']
         run = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if run.returncode or 'FAILURE' in run.stdout or 'ERROR' in run.stdout + run.stderr:
             results.append(dict(name=name, passed=False, error=f'Reference renderer exited {run.returncode}: '+run.stdout+run.stderr)); continue
@@ -82,12 +91,15 @@ def main():
         signal = math.sqrt(sum(b[i]**2 for i in range(length))/length)
         peak_limit = 0.001 if name == 'pan_audio' else 0.0001
         rms_limit = 0.00003
-        if name.startswith(('m2_', 'm3_', 'm4_', 'm5_')):
+        if name.startswith(('m2_', 'm3_', 'm4_', 'm5_', 'm7_')):
             peak_limit, rms_limit = 0.000005, 0.000001
             if name.startswith('m2_LagUD_ar'):
                 peak_limit, rms_limit = 0.00002, 0.000008
         if name.startswith(('curve', 'env_')) or name in ('adsr','forced','loop','retrigger','control_env'):
             peak_limit, rms_limit = 0.000005, 0.000001
+        # Quantized nonlinear feedback amplifies tiny upstream oscillator differences.
+        # The separate identical-input MiVerb oracle retains strict waveform limits.
+        if name=='m7_MiVerb_saturation':peak_limit,rms_limit=0.0002,0.00002
         timing=impulse_timing(a,b[:length]) if name=='m6_Impulse_ar_fm' else {}
         passed=timing.get('timing_passed',peak<peak_limit and rms<rms_limit)
         results.append(dict(**timing,name=name, peak_error=peak, rms_error=rms, peak_limit=peak_limit, rms_limit=rms_limit, reference_rms=signal, passed=passed))

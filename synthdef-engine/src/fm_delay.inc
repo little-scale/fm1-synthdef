@@ -3,6 +3,11 @@
  * Caller-owned bounded rings. No heap allocation, including at note start.
  */
 static uint32_t delay_length(const fm_graph *g,const fm_node *n,float sr) {
+ /* State and exact-size rings, in float-sized allocation units. MiVerb's
+  * packed 16-bit ring is accessed through memcpy, without type aliasing. */
+ if(n->type==FM_FreeVerb)return 12623;
+ if(n->type==FM_FreeVerb2)return 25522;
+ if(n->type==FM_MiVerb)return 16384;
  float x=g->constant[g->ref[n->input+1].output]*(n->rate==2?sr:sr/FM_BLOCK)+1;
  uint32_t want,length=1;
  if(!isfinite(x) || x>FM_DELAY_LIMIT-FM_BLOCK || x<1)return UINT32_MAX;
@@ -13,7 +18,7 @@ static uint32_t delay_length(const fm_graph *g,const fm_node *n,float sr) {
 uint32_t fm_delay_required(const fm_graph *g,float sr) {
  uint32_t total=0;unsigned i;
  if(g->valid!=FM_VALID || !isfinite(sr) || sr<8000 || sr>192000)return UINT32_MAX;
- for(i=0;i<g->nodes;i++)if(fm_is_delay(g->node[i].type)) {
+ for(i=0;i<g->nodes;i++)if(fm_uses_memory(g->node[i].type)) {
   uint32_t n=delay_length(g,&g->node[i],sr);
   if(n>FM_DELAY_LIMIT-total)return UINT32_MAX;
   total+=n;
@@ -25,7 +30,7 @@ int fm_bind_delay(fm_voice *v,const fm_graph *g,float *memory,uint32_t capacity)
  if(v->prepared || v->blocks || !v->active || need==UINT32_MAX || need>capacity || (need && !memory))return 0;
  v->delay_memory=memory;v->delay_capacity=need;
  if(need)memset(memory,0,need*sizeof(float));
- for(i=0;i<g->nodes;i++)if(fm_is_delay(g->node[i].type)) {
+ for(i=0;i<g->nodes;i++)if(fm_uses_memory(g->node[i].type)) {
   fm_state *s=&v->state[i];s->phase_offset=offset;s->total=delay_length(g,&g->node[i],v->sample_rate);offset+=s->total;
  }
  return 1;

@@ -1,0 +1,41 @@
+wait 600
+expect loaded 1
+expect effect 1
+wav reverb-voices.wav
+key 7 down 90
+key 11 down 80
+wait 1200
+expect active 2
+expect faults 0
+turn K3 50
+turn K4 50
+wait 1500
+expect active 2
+expect effect 1
+expect faults 0
+turn PRESET -1
+wait 80
+expect view 8
+expect slot 0
+expect active 2
+key 15 down 95
+wait 100
+expect active 2
+key 7 up
+wait 100
+expect active 2
+key 11 up
+key 15 up
+wait 1400
+expect active 0
+expect effect 1
+expect faults 0
+wait 1200
+wavstop
+expect peak_db_min -45
+shot reverb.png
+tap HOME
+wait 100
+expect active 0
+expect effect 1
+expect faults 0

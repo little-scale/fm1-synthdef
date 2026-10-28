@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #define FM_VALID 0x464d5331u
-static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In","SampleRate","SampleDur","ControlRate","ControlDur","BlockSize","RadiansPerSample","Delay1","Delay2","OnePole","OneZero","LPZ1","HPZ1","Latch","Gate","TRand","TExpRand","Dust","Dust2","Impulse","Decay","Decay2"};
+static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In","SampleRate","SampleDur","ControlRate","ControlDur","BlockSize","RadiansPerSample","Delay1","Delay2","OnePole","OneZero","LPZ1","HPZ1","Latch","Gate","TRand","TExpRand","Dust","Dust2","Impulse","Decay","Decay2","FreeVerb","FreeVerb2","MiVerb"};
 const char *fm_type_name(unsigned type) { return type < FM_TYPES ? types[type] : "unknown"; }
 typedef struct { const uint8_t *p; size_t left; int failed; } reader;
 static uint32_t rd(reader *r, unsigned n) {
@@ -92,9 +92,12 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
    for(j=1;j<u->inputs;j++) { fm_ref *ref=&g->ref[u->input+j]; if(ref->node<0 || g->node[ref->node].rate!=2) BAD("Out requires audio-rate input"); }
   } else {
    unsigned expected=1;
-   if(u->type==FM_Pan2) expected=2;
+   if(u->type==FM_Pan2 || u->type==FM_FreeVerb2 || u->type==FM_MiVerb) expected=2;
    if(u->outputs!=expected) BAD("Invalid output count");
    switch(u->type) {
+    case FM_FreeVerb: n=4; break;
+    case FM_FreeVerb2: n=5; break;
+    case FM_MiVerb: n=u->inputs; if(n!=7 && n!=8) BAD("MiVerb requires mono or stereo input"); break;
     case FM_SampleRate: case FM_SampleDur: case FM_ControlRate: case FM_ControlDur: case FM_BlockSize: case FM_RadiansPerSample: n=0; break;
     case FM_Delay1: case FM_OnePole: case FM_OneZero: case FM_Latch: case FM_Gate: case FM_Impulse: case FM_Decay: n=2; break;
     case FM_TRand: case FM_TExpRand: case FM_Decay2: n=3; break;
@@ -119,6 +122,14 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
     default: n=1;
    }
    if(u->inputs!=n) BAD("Wrong input count");
+   if(fm_is_reverb(u->type)) {
+    if(u->rate!=2) BAD("Reverbs require audio rate");
+    for(j=0;j<u->inputs;j++) {
+     int audio=u->type==FM_MiVerb?j>=6:j<(u->type==FM_FreeVerb2?2:1);
+     fm_ref *ref=&g->ref[u->input+j];unsigned rate=ref->node<0?0:g->node[ref->node].rate;
+     if((audio && rate!=2)||(!audio && rate>1)) BAD("Reverbs require audio input and initial/control parameters");
+    }
+   }
    if(fm_is_delay(u->type)) {
     if(!literal(g,u,1,&v) || v<0) BAD("Delay maxdelaytime must be a nonnegative literal");
     if(u->inputs==4) {fm_ref *ref=&g->ref[u->input+3];if(ref->node>=0 && g->node[ref->node].rate==2) BAD("Delay decaytime requires initial/control rate");}

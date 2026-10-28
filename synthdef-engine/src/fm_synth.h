@@ -22,9 +22,11 @@ typedef enum {
  FM_LagControl, FM_TrigControl, FM_LFSaw, FM_LFTri, FM_LFPulse, FM_Lag, FM_LagUD, FM_LPF, FM_HPF, FM_RLPF, FM_BPF, FM_LeakDC, FM_Select, FM_Clip,
  FM_WhiteNoise, FM_PinkNoise, FM_LFNoise0, FM_LFNoise1, FM_LFNoise2, FM_RandSeed, FM_Saw, FM_Pulse,
  FM_DelayN, FM_DelayL, FM_DelayC, FM_CombN, FM_CombL, FM_CombC, FM_AllpassN, FM_AllpassL, FM_AllpassC,
- FM_Rand, FM_ExpRand, FM_In, FM_SampleRate, FM_SampleDur, FM_ControlRate, FM_ControlDur, FM_BlockSize, FM_RadiansPerSample, FM_Delay1, FM_Delay2, FM_OnePole, FM_OneZero, FM_LPZ1, FM_HPZ1, FM_Latch, FM_Gate, FM_TRand, FM_TExpRand, FM_Dust, FM_Dust2, FM_Impulse, FM_Decay, FM_Decay2, FM_TYPES
+ FM_Rand, FM_ExpRand, FM_In, FM_SampleRate, FM_SampleDur, FM_ControlRate, FM_ControlDur, FM_BlockSize, FM_RadiansPerSample, FM_Delay1, FM_Delay2, FM_OnePole, FM_OneZero, FM_LPZ1, FM_HPZ1, FM_Latch, FM_Gate, FM_TRand, FM_TExpRand, FM_Dust, FM_Dust2, FM_Impulse, FM_Decay, FM_Decay2, FM_FreeVerb, FM_FreeVerb2, FM_MiVerb, FM_TYPES
 } fm_type;
 static inline int fm_is_delay(unsigned type){return type>=FM_DelayN && type<=FM_AllpassC;}
+static inline int fm_is_reverb(unsigned type){return type>=FM_FreeVerb && type<=FM_MiVerb;}
+static inline int fm_uses_memory(unsigned type){return fm_is_delay(type)||fm_is_reverb(type);}
 typedef struct { int16_t node; uint16_t output; } fm_ref;
 typedef struct {
  uint16_t input, inputs, output, outputs, partial, partials;
