@@ -8,8 +8,8 @@ from pathlib import Path
 from bank import ROOT,compile_source,preview,pack
 out=ROOT/'build/mix-splay';out.mkdir(parents=True,exist_ok=True)
 results=[]
-def pcm(binary):
- data,_=preview(binary)
+def pcm(binary,knobs=None):
+ data,_=preview(binary,knobs=knobs)
  with wave.open(io.BytesIO(data)) as w:return array.array('h',w.readframes(w.getnframes()))
 def compare(name,helper,explicit):
  a,info=compile_source('SynthDef(\\test,{Out.ar(0,'+helper+');})')
@@ -31,14 +31,20 @@ for n,spread,center,comp in [(1,1,0,True),(2,1,0,True),(5,1,0,True),(5,0,0,True)
 source=(ROOT/'examples/dusty.scd').read_text();binary,info=compile_source(source)
 (ROOT/'examples/dusty.scsyndef').write_bytes(binary);(ROOT/'examples/dusty.fmslot').write_bytes(pack('Dusty',source,binary))
 original,_=compile_source(r"""SynthDef(\dusty, {
- arg freq=440, amp=0.5, knob1=0, knob2=0, gate=1;
- var env=EnvGen.ar(Env.perc(0.01,3),doneAction:2);
- var sig=SinOsc.ar(freq)*SinOsc.ar(freq)*Decay2.ar(Dust.ar(10!5))*env*amp;
+ arg freq=440, amp=0.5, knob1=0.2, knob2=0.5, gate=1;
+ var env=EnvGen.ar(Env.perc(0.01,5),doneAction:2);
+ var sig=SinOsc.ar(freq)*SinOsc.ar(freq)*Decay2.ar(Dust.ar((knob2*10)!5),0.01,knob1)*env*amp;
  Out.ar(0,Splay.ar(sig));
 })""")
-x,y=pcm(original),pcm(binary)
-factoring_difference=max(abs(a-b) for a,b in zip(x,y))
-assert len(x)==len(y) and factoring_difference<=1,factoring_difference
+factoring_difference=0
+for k1,k2 in [(0,0),(.2,.5),(1,1),(0,1),(.01,1),(.5,.1)]:
+ x,y=pcm(original,[k1,k2,.5,.5]),pcm(binary,[k1,k2,.5,.5])
+ difference=max(abs(a-b) for a,b in zip(x,y))
+ assert len(x)==len(y) and difference<=1,(k1,k2,difference)
+ if k2==0:assert not any(y),'Zero density must be silent'
+ factoring_difference=max(factoring_difference,difference)
+assert pcm(binary,[.2,.5,.5,.5])!=pcm(binary,[.8,.5,.5,.5]),'Decay knob has no effect'
+assert pcm(binary,[.2,.5,.5,.5])!=pcm(binary,[.2,1,.5,.5]),'Density knob has no effect'
 data,meters=preview(binary);(out/'dusty.wav').write_bytes(data)
 with wave.open(io.BytesIO(data)) as w:samples=array.array('h',w.readframes(w.getnframes()))
 peaks=[max(abs(x) for x in samples[c::2])/32768 for c in (0,1)]

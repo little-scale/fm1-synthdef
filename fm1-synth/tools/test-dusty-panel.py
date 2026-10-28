@@ -7,11 +7,11 @@ workspace=ROOT.parent
 env=dict(os.environ,PATH=str(workspace/'.venv/bin')+os.pathsep+os.environ['PATH'],PYTHON='python3',X0X_FONTSET='terminus')
 subprocess.run([str(workspace/'.venv/bin/python3'),str(workspace/'fm1-base/tools/build.py'),str(ROOT/'firmware'),'--host','--no-ble'],env=env,check=True)
 out=ROOT/'build/dusty-panel';out.mkdir(exist_ok=True)
-lines=['wait 600','turn PRESET 4','wait 120','expect slot 4','expect loaded 1','turn ALGO -1','wait 150','wav dusty-effects.wav']
+lines=['wait 600','turn PRESET 4','wait 120','expect slot 4','expect loaded 1','expect knob1 20','turn ALGO -1','wait 150','wav dusty-effects.wav']
 for fx in range(5):
  if fx:lines+=['turn ALGO 1','wait 150']
- lines += [f'expect fx_choice {fx}',f'expect effect {int(fx!=0)}','key 7 down 64','key 11 down 64','wait 500','expect active 2','expect faults 0','key 7 up','key 11 up','wait 150','expect active 2','wait 2700','expect active 0','expect faults 0']
-lines+=['key 7 down 64','key 11 down 64','wait 150','key 15 down 64','wait 150','expect active 2','key 7 up','wait 150','expect active 2','key 11 up','key 15 up','wait 3100','expect active 0','expect faults 0','shot dusty.png','wavstop','expect peak_db_min -40']
+ lines += [f'expect fx_choice {fx}',f'expect effect {int(fx!=0)}','key 7 down 64','key 11 down 64','wait 500','expect active 2','expect faults 0','turn K1 1','turn K2 1','wait 150','expect knob1 22','expect active 2','expect faults 0','turn K1 -1','turn K2 -1','wait 150','expect knob1 20','expect active 2','expect faults 0','key 7 up','key 11 up','wait 150','expect active 2','wait 4700','expect active 0','expect faults 0']
+lines+=['key 7 down 64','key 11 down 64','wait 150','key 15 down 64','wait 150','expect active 2','key 7 up','wait 150','expect active 2','key 11 up','key 15 up','wait 5100','expect active 0','expect faults 0','shot dusty.png','wavstop','expect peak_db_min -40']
 with tempfile.TemporaryDirectory(prefix='fm1-dusty-') as temp:
  bank=Bank(Path(temp)/'bank.flash')
  for i,name in [(4,'dusty'),(8,'master-echo'),(9,'master-freeverb'),(10,'master-freeverb2'),(11,'master-miverb')]:bank.put(i,(ROOT/'examples'/(name+'.fmslot')).read_bytes(),bank.get(i)[1])

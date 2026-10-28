@@ -1,0 +1,169 @@
+{
+  "date": "2026-10-29",
+  "feature": "Dusty live burst decay/density and five-second envelope",
+  "slot": 5,
+  "local_and_device_verified": true,
+  "firmware_changed": false,
+  "firmware_evidence": "dusty.json",
+  "knobs": {
+    "knob1": {
+      "range_seconds": [
+        0,
+        1
+      ],
+      "default": 0.2
+    },
+    "knob2": {
+      "density_per_stream": [
+        0,
+        10
+      ],
+      "default": 5,
+      "normalized_default": 0.5
+    }
+  },
+  "envelope_seconds": 5.01,
+  "helpers": {
+    "helper_cases": [
+      {
+        "name": "Mix.ar 1",
+        "nodes": 4,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Mix.ar 2",
+        "nodes": 6,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Mix.ar 3",
+        "nodes": 9,
+        "peak_pcm_difference": 1
+      },
+      {
+        "name": "Mix.ar 4",
+        "nodes": 11,
+        "peak_pcm_difference": 1
+      },
+      {
+        "name": "Mix.ar 5",
+        "nodes": 13,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Mix.ar 9",
+        "nodes": 23,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Mix.ar scalar",
+        "nodes": 3,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Mix.ar control",
+        "nodes": 7,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Mix.ar stereo arrays",
+        "nodes": 9,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Splay.ar n=1 spread=1 center=0 levelComp=True",
+        "nodes": 9,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Splay.ar n=2 spread=1 center=0 levelComp=True",
+        "nodes": 11,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Splay.ar n=5 spread=1 center=0 levelComp=True",
+        "nodes": 22,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Splay.ar n=5 spread=0 center=0 levelComp=True",
+        "nodes": 22,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Splay.ar n=5 spread=0.6 center=0.2 levelComp=False",
+        "nodes": 22,
+        "peak_pcm_difference": 1
+      },
+      {
+        "name": "Splay.ar n=5 spread=0.6 center=-0.2 levelComp=True",
+        "nodes": 22,
+        "peak_pcm_difference": 1
+      }
+    ],
+    "dusty": {
+      "info": {
+        "name": "dusty",
+        "nodes": 31,
+        "controls": {
+          "freq": 440.0,
+          "amp": 0.5,
+          "knob1": 0.20000000298023224,
+          "knob2": 0.5,
+          "gate": 1.0
+        },
+        "delay_bytes": 0,
+        "role": "synth"
+      },
+      "stereo_peaks": [
+        0.16778564453125,
+        0.151397705078125
+      ],
+      "bytes": 1984
+    },
+    "factoring_max_pcm_difference": 1,
+    "helpers_require_new_node_types": false
+  },
+  "knob_equivalence_cases": 6,
+  "panel": {
+    "assertions": 73,
+    "voices": 2,
+    "effects": 4,
+    "bypass": true,
+    "stereo_peaks": [
+      0.066192626953125,
+      0.10699462890625
+    ]
+  },
+  "hardware": {
+    "checks": 28,
+    "voices": 2,
+    "effects": 4,
+    "bypass": true,
+    "stereo_peaks": [
+      0.07720947265625,
+      0.07769775390625
+    ],
+    "overloads_at_baseline": 1,
+    "new_overloads": 0,
+    "new_xruns": 0,
+    "faults": 0,
+    "sampled_render_max_us": 4788,
+    "preserved_slots": 12,
+    "patch_sha256": "e6f8639345dd5a4ec43db0764c674ef30b0ec149937a950fdec03776c55ff550"
+  },
+  "sha256": {
+    "fm1-synth/examples/dusty.scd": "a16019296e1425489095d9bbb017c443e5b3f0ba81679bf3f4b5a666e4e89741",
+    "fm1-synth/examples/dusty.scsyndef": "19be36daf8e1fcbec298f75c3bbe9a74b5f730c8ed334ffe456cce00d6c277e8",
+    "fm1-synth/examples/dusty.fmslot": "e6f8639345dd5a4ec43db0764c674ef30b0ec149937a950fdec03776c55ff550",
+    "fm1-synth/tools/test-mix-splay.py": "861bfe9d9ff8223cbeecbdb5a993161dab98f9000f5d6a1c632a56750648e8e8",
+    "fm1-synth/tools/test-dusty-panel.py": "1c350e1a3c309abe9bf0c3e2e01bee47a48a7d5ebe48d6cf187adbc0fdf67b13",
+    "fm1-synth/tools/test-dusty-device.py": "fc8f70f71ce2d4ae41a84d173b20387824b7e77b76c39e2f1d79b4b92ce6f1e8"
+  },
+  "notes": [
+    "First hardware attempt stopped when an encoder command was not acknowledged; driver now retries from actual readback.",
+    "Passing run checks two voices, minimum/default/maximum live controls, four effects and bypass, stealing and automatic retirement.",
+    "No new overloads; one historical overload remained in baseline counter.",
+    "All twelve saved slot payloads remained unchanged during tests; only slot 5 was updated before testing."
+  ]
+}

@@ -64,7 +64,7 @@ Download the complete **0.1.0-preview** archive from the repository's Releases p
 | 2 | Addy, five harmonics | No knob arguments |
 | 3 | Triple saw | 1: attack/release; 2: detune; 3: vibrato; 4: cutoff |
 | 4 | Two-op FM | 1: frequency ratio; 2: FM depth |
-| 5 | Dusty | Five Dust/Decay2 channels spread with Splay; knobs currently unused |
+| 5 | Dusty | 1: burst decay; 2: dust density; five channels spread with Splay |
 | 6–8 | Available | Defined by your patch |
 
 **PRESET** selects synths 1–8. **ALGORITHM** selects bypass or FX1–FX4. Press **FX** once to latch effect control: its LED stays on, the screen shows effect code, and the four knobs send `knob5`–`knob8`. Press again to return to synth code and `knob1`–`knob4`. Toggling preserves both sets of values and held notes. Synth changes preserve the effect and its tail; effect changes briefly fade the output, replace the effect, and fade back in while keeping synth voices alive. The old effect tail ends when it is replaced.

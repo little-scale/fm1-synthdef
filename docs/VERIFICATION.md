@@ -1,5 +1,14 @@
 # Verification record
 
+## Dusty decay and density controls — 29 October 2026
+
+Dusty in slot 5 now maps knob 1 to each burst's Decay2 decay (0–1 second, default 0.2), and knob 2 to Dust density (0–10 triggers/second per stream, default 5). All five streams remain independent. The global envelope has a 10 ms attack and five-second decay, with done action 2 retained for automatic cleanup. Its shared carrier/envelope optimization is retained; the graph has 31 nodes and the package is 1,984 bytes. No firmware changes or flash were needed.
+
+The 15 Mix/Splay helper comparisons pass. Comparisons against the unfactored requested graph at six knob settings remain within one 16-bit PCM step, including zero density and minimum/maximum decay. Separate comparisons establish that each knob changes the output. The actual host adapter passes 73 checks, including live encoder changes, two voices, all four effects, bypass, voice stealing and automatic five-second retirement.
+
+The installed patch passed **28 hardware checkpoints** with two voices, all four effects and bypass, live minimum/maximum controls, stealing and envelope cleanup. There were no new overloads, overruns or numerical faults; sampled render time reached 4,788 microseconds. All twelve saved slot payloads were preserved during testing, and the Mac/device slot 5 readbacks match. An initial run stopped on an unacknowledged encoder command; the passing driver retries from actual readback. Default controls (0.2 / 0.5) and physical MASTER were restored. Exact package hashes and results are recorded in [Dusty control evidence](../evidence/dusty-controls.json). The earlier three-second Dusty results below are historical.
+
+
 ## Dusty, Mix and Splay — 29 October 2026
 
 The SynthDef firmware was reinstalled after another firmware had changed the synth bank. Keys, Addy, Triple saw and Two-op FM were restored from saved packages with user approval; Dusty occupies synth slot 5. The four effect presets were retained.
