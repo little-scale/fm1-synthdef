@@ -1,0 +1,13 @@
+name = "SYNTHDEF"
+id_prefix = "FM-1_12"
+usb_manufacturer = "fm1-base"
+usb_product = "SynthDef FM-1"
+ble = false
+ble_central = false
+o2 = ["load.c", "render.c", "player.c", "slots.c", "codeview.c", "protocol.c", "runtime.c"]
+include = ["../../synthdef-engine/src", "../src"]
+words = "words.tsv"
+tagline = "eight SynthDef slots"
+licence = "GPL-3.0-or-later"
+
+device_include = ["device_include"]

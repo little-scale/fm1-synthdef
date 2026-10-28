@@ -1,0 +1,26 @@
+{
+  "fm1-base": {
+    "url": "https://github.com/charlesvestal/fm1-base.git",
+    "commit": "bbfd4615e344028c90375bbdd79968e1b6ba2cd9"
+  },
+  "felucca-bsp": {
+    "url": "https://github.com/hugelton/felucca-bsp",
+    "commit": "33cac693903e753e8783baeed05c19cadfb04812"
+  },
+  "sdk": {
+    "url": "https://gitee.com/Jieli-Tech/fw-AC79_AIoT_SDK.git",
+    "commit": "d179b4484759423312073f5fbb232501aa491047",
+    "tag": "AC79NN_SDK_V1.2.1_2023-12-13",
+    "scope": "Sparse checkout: LICENSE, README.md, .gitignore and the three package data files; no radio libraries"
+  },
+  "toolchain": {
+    "url": "https://pkgman.jieliapp.com/s/linux-toolchain",
+    "distribution": "jieli-linux-toolchains-20260730.1",
+    "compiler_version": "clang 4.0.1",
+    "archive": "dependencies/jieli-linux-toolchain.tar.xz",
+    "sha256": "a1545cddbc451a06bac43eb5cd96d831470c42a97c5c0b1f98879a20fc7647bd"
+  },
+  "docker_image": "debian:bookworm-slim@sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587",
+  "supercollider": "3.14.1",
+  "python_tested": "3.14.7"
+}

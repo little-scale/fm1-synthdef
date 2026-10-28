@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-28",
+  "release": "0.1.0-preview",
+  "clean_tree": true,
+  "engine_api_tests": 26,
+  "instrument_python_tests": 6,
+  "screen_and_transport_tests": "passed",
+  "panel_assertions": 23,
+  "engine_sanitizer_cases": 220000,
+  "instrument_sanitizer": "passed",
+  "device_rebuild": "package and application SHA-256 identical to accepted firmware",
+  "manager_smoke": [
+    "unauthenticated requests rejected",
+    "nine empty slots on clean bank",
+    "five supplied patches imported",
+    "FM source compiled",
+    "preview rendered through master effect"
+  ],
+  "example_packages": "all six existing packages validate and match sibling source/binary files; two legacy packages retain their original compatible metadata",
+  "reference_suite": "326 host and target comparisons from accepted build; not repeated during packaging",
+  "hardware": "existing accepted hardware evidence; no release-preparation flash"
+}

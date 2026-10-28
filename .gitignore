@@ -1,0 +1,13 @@
+.DS_Store
+.venv/
+__pycache__/
+*.pyc
+*.dSYM/
+**/build/
+fm1-synth/data/
+logs/
+releases/
+dependencies/jieli/
+dependencies/*.tar.xz
+firmware/*.fwsc
+SHA256SUMS

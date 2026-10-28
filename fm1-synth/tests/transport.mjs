@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {frame,parse,pack7,unpack7,crc32} from '../web/transport.js';
+const data=Uint8Array.from({length:192},(_,i)=>i*47&255);
+assert.deepEqual(unpack7(pack7(data)),data);
+assert.equal(crc32(new TextEncoder().encode('123456789')),0xcbf43926);
+const encoded=frame(3,459,data),decoded=parse(encoded);assert.equal(decoded.id,459);assert.equal(decoded.command,3);assert.deepEqual(decoded.payload,data);
+assert(encoded.slice(1,-1).every(x=>x<128));
+encoded[15]^=1;assert.throws(()=>parse(encoded));assert.equal(parse(new Uint8Array([0xf0,1,2,0xf7])),null);
+assert.throws(()=>unpack7([127,1]));assert.throws(()=>unpack7([0]));
+console.log('USB framing: binary/7-bit roundtrip, namespace, CRC, malformed frames passed');

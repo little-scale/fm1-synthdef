@@ -1,0 +1,21 @@
+{
+  "repository": "https://github.com/supercollider/supercollider",
+  "tag": "Version-3.14.1",
+  "sha256": {
+    "BinaryOpUGens.cpp": "7e859cce1e7204e58335dcc142f856c98ef7647c47be686b652cb26adf417d07",
+    "FilterUGens.cpp": "14f778e73fa08bf33335dacb8188c31069bd5a088724e08658ac8fa44b071951",
+    "IOUGens.cpp": "3370b162ff4917e82cdd3dbb8b56f227316a7f9893b16b055a54c2a8957316b1",
+    "LFUGens.cpp": "944f857de30644e3a4f630729df44cd836d2bb5ba7946edc85cd38dc2bcdaf00",
+    "MulAddUGens.cpp": "31b5fbf2ddf525feb94636b3e16452784d338908cfc69fc2507cf9929ea32593",
+    "NoiseUGens.cpp": "fc4adf0b8621fc691780e4082d5a5af8ff1bc4062ba5988641dbdc7c5486482d",
+    "OscUGens.cpp": "e681815cfc60875068af90b4f1e1949284f2526031d8857a298389f5609a88c1",
+    "PanUGens.cpp": "4224d173616c361406cf27420476c2b0dade72ab16051aad34d5d69ebce8cc53",
+    "SC_World.cpp": "febaf963fe587c2b1cb01a97aeacae14f16f3e7ef8e0a74ae706f9286618668c",
+    "Samp.cpp": "d9856cbabbf1aba262301b33437f9f2c3e27dfa9a3c102ddd3194ad00bcc1e7f",
+    "Hash.h": "c12b9895895241f8eda206e58c116e909ec1d13f7cde637bece1b5ab0ade6fa3",
+    "SC_RGen.h": "19c68e1b6c34dcde7515fe5df70e5d0c9d89c07474513526a4e55b0cc390f3fc",
+    "../LICENSE": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+    "DelayUGens.cpp": "688a76b94948d120f6ff6ddcebca9ea353a157d638ad73bdbd2d5bb4e51b455f",
+    "SC_InlineUnaryOp.h": "ae9b928de6681008b73a3db9a449dda52635b11b10b406d3df5dbccc8f3652b2"
+  }
+}

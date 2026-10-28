@@ -1,0 +1,10 @@
+{
+  "checks": 13,
+  "stereo_peaks": [
+    0.008148193359375,
+    0.008148193359375
+  ],
+  "new_overloads": 0,
+  "new_xruns": 0,
+  "sampled_render_max_us": 1910
+}

@@ -1,0 +1,66 @@
+wait 600
+expect loaded 1
+expect slot 0
+shot code.png
+key 7 down 90
+wait 80
+expect held 1
+wav voice.wav
+key 11 down 80
+wait 80
+expect held 2
+turn PRESET -1
+wait 80
+expect slot 0
+expect view 8
+expect held 2
+shot effect-code.png
+turn SELECT 1
+wait 40
+turn PRESET 1
+wait 80
+expect slot 0
+expect view 0
+expect held 2
+wait 100
+turn K1 15
+wait 80
+expect knob1 80
+shot knob.png
+key 11 up
+wait 40
+expect held 1
+tap OCT+
+wait 40
+expect octave 1
+key 7 up
+wait 40
+expect held 0
+key 7 down 80
+wait 80
+expect held 1
+tap HOME
+wait 80
+expect held 0
+key 7 up
+wait 40
+wavstop
+expect peak_db_min -40
+turn SELECT 4
+wait 80
+expect scroll 4
+shot scrolled.png
+turn PRESET 1
+wait 80
+expect slot 1
+expect loaded 0
+shot empty.png
+turn PRESET -1
+wait 80
+expect loaded 1
+midi 90 45 64
+wait 80
+expect held 1
+tap HOME
+wait 80
+expect held 0

@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {tokens,wrap} from '../web/screen.js';
+const source='arg freq=440; var x=0.125; SinOsc.ar(freq); // 123 arg\n"var SinOsc 7"; /* outer /* nested */ 42 */';
+const ts=tokens(source);
+assert.equal(ts.map(t=>t.text).join(''),source);
+assert.deepEqual(ts.filter(t=>t.kind==='keyword').map(t=>t.text),['arg','var']);
+assert.deepEqual(ts.filter(t=>t.kind==='class').map(t=>t.text),['SinOsc']);
+assert.deepEqual(ts.filter(t=>t.kind==='number').map(t=>t.text),['440','0.125']);
+assert.equal(wrap('abcdef',3).map(line=>line.map(c=>c.char).join('')).join('|'),'abc|def');
+assert.equal(wrap('a\tb',8)[0].map(c=>c.char).join(''),'a   b');
+assert.equal(tokens('x1 1e-3 .5 16rFF 0xFF').filter(t=>t.kind==='number').length,4);
+console.log('Screen: keyword/class/number colours, strings, nested comments, wrapping and tabs passed');
