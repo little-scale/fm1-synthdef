@@ -16,6 +16,31 @@ The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and exec
 - Oscillators, filters, noise, envelopes, resonators, delay/comb/allpass filters and initial random values.
 - USB audio and MIDI. Bluetooth is disabled.
 
+## Supported UGens
+
+The current firmware supports these **53 compiled UGen types**. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
+
+| Category | UGen types |
+| --- | --- |
+| Oscillators | `SinOsc`, `Saw`, `Pulse`, `LFSaw`, `LFTri`, `LFPulse` |
+| Noise | `WhiteNoise`, `PinkNoise`, `LFNoise0`, `LFNoise1`, `LFNoise2` |
+| Random values and seed | `Rand`, `ExpRand`, `RandSeed` |
+| Envelopes and ramps | `EnvGen`, `Line`, `XLine` |
+| Filters and DC removal | `LPF`, `HPF`, `RLPF`, `BPF`, `LeakDC` |
+| Resonators and oscillator banks | `Resonz`, `Ringz`, `Klang`, `Klank` |
+| Delay and feedback filters | `DelayN`, `DelayL`, `DelayC`, `CombN`, `CombL`, `CombC`, `AllpassN`, `AllpassL`, `AllpassC` |
+| Controls and smoothing | `Control`, `LagControl`, `TrigControl`, `Lag`, `LagUD` |
+| Routing, selection and panning | `In`, `Out`, `Select`, `Pan2` |
+| Constants, rate conversion and bounds | `DC`, `K2A`, `A2K`, `Clip` |
+| Arithmetic | `UnaryOpUGen`, `BinaryOpUGen`, `MulAdd`, `Sum3`, `Sum4` |
+
+- `In.ar(0, 1/2)` is available only in the permanent effect slot. `Out.ar` writes stereo bus 0.
+- `UnaryOpUGen` and `BinaryOpUGen` accept only the [documented selectors](synthdef-engine/README.md#supported-profile). For example, signal `.midiratio` and general `pow` are not currently supported.
+- `Env.perc`, `Env.adsr`, `Env.asr` and other Env constructors are source-language helpers compiled into `EnvGen` data. All nine EnvGen curve types are implemented, with done actions 0/2 and the documented segment limits.
+- `Mix`, `LinLin` and `PMOsc` can compile into existing supported nodes; they are not additional runtime types. Simple examples were compiled and host-rendered during the compatibility review. `DynKlang`/`DynKlank` likewise expand into supported oscillator/resonator graphs within the documented limits. This does not guarantee every argument/rate combination or CPU load.
+
+See [possible additions and implementation analysis](docs/UGEN-ROADMAP.md) for candidates. Those candidates are **not implemented** in this release.
+
 ## Start here
 
 Download the complete **0.1.0-preview** archive from the repository's Releases page. It contains source, pinned platform sources, the firmware, example patches, licences and checksums. A Git clone also contains everything except the generated release firmware and SDK/compiler downloads.

@@ -71,7 +71,8 @@ def main():
     for dirname in ('fm1-synth', 'synthdef-engine', 'evidence', 'tools'):
         copy_tree(ROOT / dirname, dest / dirname)
     for filename in ('QUICKSTART.md', 'PATCHES.md', 'COMPATIBILITY.md',
-                     'DEVELOPMENT.md', 'VERIFICATION.md', 'DEMO.md', 'RELEASE-NOTES.md'):
+                     'DEVELOPMENT.md', 'VERIFICATION.md', 'DEMO.md', 'RELEASE-NOTES.md',
+                     'UGEN-ROADMAP.md'):
         target = dest / 'docs' / filename
         target.parent.mkdir(exist_ok=True)
         shutil.copy2(ROOT / 'docs' / filename, target)
