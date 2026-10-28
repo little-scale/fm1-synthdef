@@ -158,3 +158,9 @@ The polyphony update adds a 25th API test group verifying idempotent early prepa
 ## Stereo input and permanent effects
 
 `In.ar(0, 1)` reads the left channel and `In.ar(0, 2)` reads both channels from the immutable stereo input passed to `fm_render_input`. Missing input is silence. Nonzero buses fault the voice. The instrument admits this UGen only in its dedicated effect slot; ordinary note SynthDefs keep using `Out.ar(0, ...)`. Effect output replaces the instrument mix before final gain/metering; it is not recursively fed into the same input bus. The 26th API test group verifies channel mapping, silence and bus/rate rejection. The full 553-graph SuperCollider suite also passes on host and device-math backends.
+
+### Mix and stereo Splay helpers
+
+`Mix.ar` and `Splay.ar` work through the stock SuperCollider compiler. Mix expands into additions/Sum3/Sum4 (plus K2A or DC for control/scalar input); Splay expands into Pan2, summation and level multiplication. Fifteen helper comparisons cover mono/stereo arrays, 1/2/3/4/5/9-channel sums, scalar/control rate conversion, 1/2/5-channel spreading, center/width changes and compensation on/off. The compiled-node count remains 77. Dynamic numeric `levelComp` may emit unsupported `pow`; `SplayAz`/PanAz are not supported.
+
+Dust/Decay/Decay2 use dedicated block loops to avoid repeated graph-reference decoding and per-sample type dispatch. Unchanged decay times reuse coefficients; the state keeps a compensation word and retains changed-time interpolation. Zero-input samples use a cheaper compensated addition; 21 long runs (6.3 million samples) remain within 5.95e-8 normalized error of a double-precision recurrence. No state or delay allocation is added.

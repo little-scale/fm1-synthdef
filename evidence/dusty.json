@@ -1,0 +1,277 @@
+{
+  "date": "2026-10-29",
+  "feature": "Mix/Splay helper verification, Dusty slot 5 and sparse-decay performance",
+  "installed": true,
+  "application_bytes": 229012,
+  "static_ram_bytes": 78480,
+  "pool_bytes": 326008,
+  "sha256": {
+    "synthdef.bin": "bfa16d8281407560a7882c4d8e1c2879d80250766a3c998ede3bffa7ef3381f4",
+    "synthdef.fwsc": "59a64665e0cb75083244778ff5ef4b62e4b7adc474f5ed60465512b59c1e7ea6"
+  },
+  "source_sha256": {
+    "synthdef-engine/src/fm_extensions.inc": "ea06d3036253b97993f9702959f8cfb806c4724b6948cee768d9981ff9eb0132",
+    "synthdef-engine/src/fm_render.c": "5b6e133b7251bca54bb3065c7fd96edbacc91b7bec79336c452e48c0978ad3bd",
+    "synthdef-engine/tests/decay_sparse.c": "91cf411943523edaae67743688ce368299db9e8ece6aa9301cf3a8b0d0b97eef",
+    "fm1-synth/examples/dusty.scd": "125923af99e182cec1fd4c4d94cc9757400f2c5c1a7419eb2e4c456cb8b9020a",
+    "fm1-synth/examples/dusty.fmslot": "770c9bd961d1c589f96e586871ee03a22e6514457f76aac01eb71b8fad7a1588",
+    "fm1-synth/tools/test-mix-splay.py": "e5a080290f5ac248ecf90e259c634a91fdabc792314fa53c3d36d413edd24548",
+    "fm1-synth/tools/test-dusty-panel.py": "c93424a5440b0663646a0d2039f60ebe5bd92cf28163cafe63301b5977b0faf9",
+    "fm1-synth/tools/test-dusty-device.py": "9ddc703604aae54bed19d93126d9819ab6960931f04653b054010f0e99d8058e"
+  },
+  "helpers": {
+    "helper_cases": [
+      {
+        "name": "Mix.ar 1",
+        "nodes": 4,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Mix.ar 2",
+        "nodes": 6,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Mix.ar 3",
+        "nodes": 9,
+        "peak_pcm_difference": 1
+      },
+      {
+        "name": "Mix.ar 4",
+        "nodes": 11,
+        "peak_pcm_difference": 1
+      },
+      {
+        "name": "Mix.ar 5",
+        "nodes": 13,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Mix.ar 9",
+        "nodes": 23,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Mix.ar scalar",
+        "nodes": 3,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Mix.ar control",
+        "nodes": 7,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Mix.ar stereo arrays",
+        "nodes": 9,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Splay.ar n=1 spread=1 center=0 levelComp=True",
+        "nodes": 9,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Splay.ar n=2 spread=1 center=0 levelComp=True",
+        "nodes": 11,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Splay.ar n=5 spread=1 center=0 levelComp=True",
+        "nodes": 22,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Splay.ar n=5 spread=0 center=0 levelComp=True",
+        "nodes": 22,
+        "peak_pcm_difference": 0
+      },
+      {
+        "name": "Splay.ar n=5 spread=0.6 center=0.2 levelComp=False",
+        "nodes": 22,
+        "peak_pcm_difference": 1
+      },
+      {
+        "name": "Splay.ar n=5 spread=0.6 center=-0.2 levelComp=True",
+        "nodes": 22,
+        "peak_pcm_difference": 1
+      }
+    ],
+    "dusty": {
+      "info": {
+        "name": "dusty",
+        "nodes": 30,
+        "controls": {
+          "freq": 440.0,
+          "amp": 0.5,
+          "knob1": 0.0,
+          "knob2": 0.0,
+          "gate": 1.0
+        },
+        "delay_bytes": 0,
+        "role": "synth"
+      },
+      "stereo_peaks": [
+        0.402435302734375,
+        0.589874267578125
+      ],
+      "bytes": 1924
+    },
+    "factoring_max_pcm_difference": 1,
+    "helpers_require_new_node_types": false
+  },
+  "panel": {
+    "assertions": 42,
+    "voices": 2,
+    "effects": 4,
+    "bypass": true,
+    "stereo_peaks": [
+      0.254730224609375,
+      0.275848388671875
+    ]
+  },
+  "hardware": {
+    "checks": 18,
+    "voices": 2,
+    "effects": 4,
+    "bypass": true,
+    "stereo_peaks": [
+      0.12445068359375,
+      0.131988525390625
+    ],
+    "overloads_at_baseline": 1,
+    "new_overloads": 0,
+    "new_xruns": 0,
+    "faults": 0,
+    "sampled_render_max_us": 4781,
+    "preserved_slots": 12,
+    "patch_sha256": "770c9bd961d1c589f96e586871ee03a22e6514457f76aac01eb71b8fad7a1588"
+  },
+  "restoration": {
+    "restored_synth_slots": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "dusty_slot": 5,
+    "effects_preserved": 4,
+    "local_and_device": true
+  },
+  "regression": {
+    "reference_graphs_per_backend": 553,
+    "backends": [
+      "ordinary host",
+      "optimized host",
+      "freestanding device math"
+    ],
+    "api_groups": 34,
+    "miverb_identical_input_cases": 8,
+    "sanitizer_cases": 440000,
+    "sparse_decay_samples": 6300000,
+    "sparse_decay_max_normalized_error": 5.94923935e-08,
+    "scope": "All three backend references passed after sparse-loop changes; target references and API/precision tests repeated after final local-state caching. Sanitizers passed before that arithmetic-equivalent local-state caching change."
+  },
+  "limitations": [
+    "Final-build physical listening and power-cycle confirmation outstanding.",
+    "Original 42-node Dusty overloaded two voices with reverb; installed equivalent 30-node version passed the recorded scenarios.",
+    "Earlier overload remains in baseline counter; no new overloads in acceptance run.",
+    "Arbitrary pitches, control settings and synth/FX combinations are not certified; earlier Addy + FreeVerb limitation remains."
+  ],
+  "final_bank": {
+    "slots": [
+      {
+        "index": 0,
+        "name": "keys",
+        "sha256": "2e386db12c5d0989208df2fcf67da2c9ea143e19bc0562fbc1275ada05407cdf"
+      },
+      {
+        "index": 1,
+        "name": "addy",
+        "sha256": "accc95e20badfaac1c37878cf31370539409fe3a86c99a9e3c023917c6be2c7a"
+      },
+      {
+        "index": 2,
+        "name": "Triple saw",
+        "sha256": "5711a73832595bcec94bd99bb7025e1e3d6d7dd566c5771c8a36398dabe938f6"
+      },
+      {
+        "index": 3,
+        "name": "Two-op FM",
+        "sha256": "909effffe757024ac78a58b9d86b4ecbdfd6acf7d8cebb71f1a4434584cc2f51"
+      },
+      {
+        "index": 4,
+        "name": "Dusty",
+        "sha256": "770c9bd961d1c589f96e586871ee03a22e6514457f76aac01eb71b8fad7a1588"
+      },
+      {
+        "index": 5,
+        "name": "Empty",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "index": 6,
+        "name": "Empty",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "index": 7,
+        "name": "Empty",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "index": 8,
+        "name": "masterEcho",
+        "sha256": "03e13f01c3d74e23ba099443c043e09a80bfb0f318d7c31ed6c1fed5c6191531"
+      },
+      {
+        "index": 9,
+        "name": "masterFreeVerb",
+        "sha256": "d9c0369d10d4fc5d8e60e4d5d9bc7b1a2ac5a40b76b7a3ebb70c2b30a77d7437"
+      },
+      {
+        "index": 10,
+        "name": "masterFreeVerb2",
+        "sha256": "293ca2a52451e56d445ef9bb50bd824561a1a9bed3257db58f72fb0a18d81e97"
+      },
+      {
+        "index": 11,
+        "name": "masterMiVerb",
+        "sha256": "47dbbd7a861f4819993efe4978442c1aa952fd0679b959d250ed1ea4f38e31e7"
+      }
+    ],
+    "stats": {
+      "slot_index": 4,
+      "loaded": 1,
+      "cpu_percent": 10,
+      "xruns": 0,
+      "faults": 0,
+      "overloads": 1,
+      "active_voices": 0,
+      "notes_started": 13,
+      "render_peak_us": 5492,
+      "render_last_us": 657,
+      "start_peak_us": 4312,
+      "steady_peak_us": 5492,
+      "view_slot_index": 4,
+      "effect_active": 1
+    },
+    "panel": {
+      "fx_mode": 0,
+      "fx_choice": 1,
+      "switching": 0,
+      "knobs": [
+        0,
+        0,
+        50,
+        50,
+        25,
+        50,
+        50,
+        50
+      ],
+      "gain": 1000
+    }
+  }
+}

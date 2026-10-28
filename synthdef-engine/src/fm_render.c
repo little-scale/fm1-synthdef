@@ -252,6 +252,8 @@ static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *ster
   if(n->type==FM_SinOsc){fast_sine(g,v,b,n,s,count,sr,initializing);continue;}
   if(n->type==FM_Pan2 && input_rate(g,n,1)!=2){fast_pan(g,v,b,n,s,count);continue;}
   if(n->type==FM_Saw || n->type==FM_Pulse){bandlimited(g,v,b,n,s,count,sr,initializing);continue;}
+  if(n->type==FM_Decay || n->type==FM_Decay2){fast_decay(g,v,b,n,s,count,sr,initializing);continue;}
+  if(n->type==FM_Dust || n->type==FM_Dust2){fast_dust(g,v,b,n,s,count,sr);continue;}
   if(n->type>=FM_OnePole && n->type<=FM_Decay2){extensions(g,v,b,n,s,count,sr,initializing);continue;}
   if(fm_is_reverb(n->type)){reverb_render(g,v,b,n,s,count,initializing);continue;}
   if(fm_is_delay(n->type)){delay_render(g,v,b,n,s,count,sr,initializing);continue;}

@@ -10,6 +10,8 @@ build/fm-render: $(SRC) src/fm_synth.h src/fm_filters.inc src/fm_noise.inc src/f
 build/libfmsynth.dylib: $(SRC) src/fm_synth.h src/fm_filters.inc src/fm_noise.inc src/fm_bandlimited.inc src/fm_tables.inc src/fm_delay.inc src/fm_fast.inc $(wildcard src/*.inc) | build
 	$(CC) $(CFLAGS) -fPIC -shared -Isrc $(SRC) -lm -o $@
 test: all
+	$(CC) $(CFLAGS) -Isrc src/fm_load.c tests/decay_sparse.c -lm -o build/decay-sparse-test
+	build/decay-sparse-test
 	python3 tests/test_engine.py
 	python3 tests/test_miverb_oracle.py
 clean:
@@ -18,6 +20,8 @@ clean:
 build/fm-inspect: src/fm_load.c src/fm_synth.h tools/inspect.c | build
 	$(CC) $(CFLAGS) -Isrc src/fm_load.c tools/inspect.c -lm -o $@
 reference-test: all
+	$(CC) $(CFLAGS) -Isrc src/fm_load.c tests/decay_sparse.c -lm -o build/decay-sparse-test
+	build/decay-sparse-test
 	python3 tests/compare_reference.py
 sanitize: | build
 	$(CC) -std=c99 -O1 -g -ffp-contract=off -fsanitize=undefined,bounds,float-cast-overflow -fno-sanitize-recover=all -Isrc $(SRC) tests/fuzz.c -lm -o build/fuzz-ubsan

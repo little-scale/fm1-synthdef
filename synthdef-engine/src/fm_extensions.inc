@@ -15,25 +15,68 @@ static float impulse_wrap(fm_state *s,float inc) {
  * near-one float pole otherwise accumulates audible error on long decays. */
 static float decay_grow(float seconds,float sr){return seconds==0?-1:expm1f(-6.907755278982137f/(seconds*sr));}
 static float decay_tick(float *hi,float *lo,float x,float grow){
+ /* Between impulses, compensated accumulation is sufficient: the small
+  * grow*hi product does not need a full software two-product expansion.
+  * |grow| <= 1 permits FastTwoSum; retain the residual in the low word. */
+ if(x==0){
+  float p=grow*(*hi),sum=*hi+p;
+  float low=((*hi-sum)+p)+(*lo+grow*(*lo));
+  *hi=sum+low;*lo=low-(*hi-sum);return *hi;
+ }
  float p=grow*(*hi),pl=product_error(grow,*hi,p)+grow*(*lo);
  float d=x+p,back=d-x,dl=(x-(d-back))+(p-back)+pl;
  float sum=*hi+d;back=sum-*hi;
  float low=(*hi-(sum-back))+(d-back)+*lo+dl;
  *hi=sum+low;*lo=low-(*hi-sum);return *hi;
 }
+/* Bind inputs and invariant coefficients once per block. Keep the compensated
+ * recurrence in local state; commit it once after the sample loop. */
+static __attribute__((noinline)) void fast_decay(const fm_graph *g,fm_voice *v,fm_scratch *b,const fm_node *n,fm_state *s,unsigned count,float sr,int initializing){
+ fm_bound_input in=bind_input(g,b,n,0,0);unsigned j;float *out=b->signal[n->output];
+ int two=n->type==FM_Decay2;float attack=input(g,b,n,1,0),decay=two?input(g,b,n,2,0):attack;
+ float old=s->b1,old2=s->b2,target,target2;
+ float y1=s->y1,y2=s->y2,lo1=s->previous[0],lo2=s->previous[1];
+ if(attack<0 || decay<0){v->fault=1;return;}
+ if(!s->initialized || attack!=s->a0 || decay!=s->freq){
+  target=decay_grow(decay,sr);target2=two?decay_grow(attack,sr):-1;
+ }else{target=old;target2=old2;}
+ if(!s->initialized){old=two?target:-1;old2=target2;}
+ if(old==target && old2==target2){
+  if(two)for(j=0;j<count;j++){
+   float a=in.p[in.rate==2?j:0];
+   decay_tick(&y1,&lo1,a,target);
+   decay_tick(&y2,&lo2,a,target2);
+   checked_signal(v,out+j,y1-y2);
+  }else for(j=0;j<count;j++){
+   decay_tick(&y1,&lo1,in.p[in.rate==2?j:0],target);
+   checked_signal(v,out+j,y1);
+  }
+ }else for(j=0;j<count;j++){
+  float a=in.p[in.rate==2?j:0],t=(float)j/count;
+  decay_tick(&y1,&lo1,a,old+(target-old)*t);
+  if(two)decay_tick(&y2,&lo2,a,old2+(target2-old2)*t);
+  checked_signal(v,out+j,two?y1-y2:y1);
+ }
+ s->y1=y1;s->y2=y2;s->previous[0]=lo1;s->previous[1]=lo2;
+ s->a0=attack;s->freq=decay;s->b1=target;s->b2=target2;s->initialized=1;
+ if(initializing)s->y1=s->y2=s->last=s->previous[0]=s->previous[1]=0;
+}
+static __attribute__((noinline)) void fast_dust(const fm_graph *g,fm_voice *v,fm_scratch *b,const fm_node *n,fm_state *s,unsigned count,float sr){
+ unsigned j;float *out=b->signal[n->output],threshold=input(g,b,n,0,0)*(1.0f/sr);
+ float scale=threshold>0?(n->type==FM_Dust?1.0f:2.0f)/threshold:0,offset=n->type==FM_Dust?0:1;
+ for(j=0;j<count;j++){
+  float r=random_uniform(v),z=r<threshold?r*scale-offset:0;
+  checked_signal(v,out+j,z);
+ }
+ s->initialized=1;
+}
 static __attribute__((noinline)) void extensions(const fm_graph *g,fm_voice *v,fm_scratch *b,const fm_node *n,fm_state *s,unsigned count,float sr,int initializing) {
  unsigned j;float *out=b->signal[n->output],x=input(g,b,n,0,0);
- float param=n->inputs>1?input(g,b,n,1,0):0,third=n->inputs>2?input(g,b,n,2,0):0;
- float old=s->b1,target=old,old2=s->b2,target2=old2,previous_inc,block_trigger=s->last;
+ float param=n->inputs>1?input(g,b,n,1,0):0;
+ float old=s->b1,target=old,previous_inc,block_trigger=s->last;
  if(n->type==FM_OnePole || n->type==FM_OneZero){
   if(fabsf(param)>1){v->fault=1;return;}
   target=param;if(!s->initialized){old=param;s->y1=n->type==FM_OneZero?x:0;}
- }
- if(n->type==FM_Decay || n->type==FM_Decay2){
-  if(param<0 || (n->type==FM_Decay2 && third<0)){v->fault=1;return;}
-  target=decay_grow(n->type==FM_Decay?param:third,sr);
-  target2=n->type==FM_Decay2?decay_grow(param,sr):-1;
-  if(!s->initialized){old=n->type==FM_Decay?-1:target;old2=target2;}
  }
  if(!s->initialized){
   if(n->type==FM_LPZ1 || n->type==FM_HPZ1)s->y1=x;
@@ -67,11 +110,6 @@ static __attribute__((noinline)) void extensions(const fm_graph *g,fm_voice *v,f
    }
    s->last=trig;z=s->y1;break;
   }
-  case FM_Dust:case FM_Dust2:{
-   float threshold=x*(1.0f/sr),r=random_uniform(v);
-   if(r<threshold)z=r*((n->type==FM_Dust?1.0f:2.0f)/threshold)-(n->type==FM_Dust?0.0f:1.0f);
-   break;
-  }
   case FM_Impulse:{
    float inc;
    z=impulse_wrap(s,previous_inc);
@@ -80,18 +118,14 @@ static __attribute__((noinline)) void extensions(const fm_graph *g,fm_voice *v,f
    else inc=s->freq;
    lf_advance(s,inc);previous_inc=inc;break;
   }
-  case FM_Decay:case FM_Decay2:
-   decay_tick(&s->y1,&s->previous[0],a,old+(target-old)*t);
-   decay_tick(&s->y2,&s->previous[1],a,old2+(target2-old2)*t);
-   z=n->type==FM_Decay?s->y1:s->y1-s->y2;break;
   default:break;
   }
   checked_signal(v,&out[j],z);s->initialized=1;
  }
- s->b1=target;s->b2=target2;
+ s->b1=target;
  if(n->type==FM_Impulse){
   s->freq=input(g,b,n,0,count-1)*(1.0f/sr);
   if(initializing){s->phase=param-floorf(param);s->last=0;if(s->phase==0 && s->freq>=0)s->phase=1;}
  }
- if(initializing && (n->type==FM_Latch || n->type==FM_Gate || n->type==FM_Decay || n->type==FM_Decay2)){s->y1=s->y2=s->last=s->previous[0]=s->previous[1]=0;}
+ if(initializing && (n->type==FM_Latch || n->type==FM_Gate)){s->y1=s->y2=s->last=s->previous[0]=s->previous[1]=0;}
 }

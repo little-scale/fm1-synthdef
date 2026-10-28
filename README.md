@@ -39,7 +39,7 @@ The development source supports these **77 compiled UGen types**, verified in em
 - `In.ar(0, 1/2)` is available only in the permanent effect slot. `Out.ar` writes stereo bus 0.
 - `UnaryOpUGen` and `BinaryOpUGen` accept only the [documented selectors](synthdef-engine/README.md#supported-profile). Pitch/gain conversions `.cpsmidi`, `.midiratio`, `.ratiomidi`, `.dbamp` and `.ampdb` are now supported. General `pow` remains unsupported.
 - `Env.perc`, `Env.adsr`, `Env.asr` and other Env constructors are source-language helpers compiled into `EnvGen` data. All nine EnvGen curve types are implemented, with done actions 0/2 and the documented segment limits.
-- `Mix`, `LinLin` and `PMOsc` can compile into existing supported nodes; they are not additional runtime types. Simple examples were compiled and host-rendered during the compatibility review. `DynKlang`/`DynKlank` likewise expand into supported oscillator/resonator graphs within the documented limits. This does not guarantee every argument/rate combination or CPU load.
+- `Mix.ar`, `Mix`, `Splay.ar`, `LinLin` and `PMOsc` can compile into existing supported nodes; they are not additional runtime types. Mix/Splay now have 15 compiled comparisons against explicit sums, stereo panners and rate converters. `DynKlang`/`DynKlank` likewise expand into supported oscillator/resonator graphs within the documented limits. This does not guarantee every argument/rate combination or CPU load.
 
 The development firmware adds a three-bar battery indicator and USB-power symbol in the top-right corner, including the FX code view.
 
@@ -64,7 +64,8 @@ Download the complete **0.1.0-preview** archive from the repository's Releases p
 | 2 | Addy, five harmonics | No knob arguments |
 | 3 | Triple saw | 1: attack/release; 2: detune; 3: vibrato; 4: cutoff |
 | 4 | Two-op FM | 1: frequency ratio; 2: FM depth |
-| 5–8 | Available | Defined by your patch |
+| 5 | Dusty | Five Dust/Decay2 channels spread with Splay; knobs currently unused |
+| 6–8 | Available | Defined by your patch |
 
 **PRESET** selects synths 1–8. **ALGORITHM** selects bypass or FX1–FX4. Press **FX** once to latch effect control: its LED stays on, the screen shows effect code, and the four knobs send `knob5`–`knob8`. Press again to return to synth code and `knob1`–`knob4`. Toggling preserves both sets of values and held notes. Synth changes preserve the effect and its tail; effect changes briefly fade the output, replace the effect, and fade back in while keeping synth voices alive. The old effect tail ends when it is replaced.
 

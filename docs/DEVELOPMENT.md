@@ -17,6 +17,8 @@ python3 fm1-synth/tools/test-extensions-panel.py
 python3 fm1-synth/tools/test-reverbs-panel.py
 python3 fm1-synth/tools/test-fx-banks-panel.py
 python3 fm1-synth/tools/test-battery-panel.py
+python3 fm1-synth/tools/test-mix-splay.py
+python3 fm1-synth/tools/test-dusty-panel.py
 ```
 
 The screen/protocol tests need Node.js. The simulator needs the pinned font dependencies and a working Pillow RAQM installation (`brew install fribidi` if needed). No connected FM-1 is required for these checks. Sanitizers use undefined-behaviour, bounds and float-cast checks; ASan is not claimed because its runtime hung before main on the test Mac.

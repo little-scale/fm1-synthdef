@@ -1,5 +1,18 @@
 # Verification record
 
+## Dusty, Mix and Splay — 29 October 2026
+
+The SynthDef firmware was reinstalled after another firmware had changed the synth bank. Keys, Addy, Triple saw and Two-op FM were restored from saved packages with user approval; Dusty occupies synth slot 5. The four effect presets were retained.
+
+`Mix.ar` and `Splay.ar` already expand into supported nodes. **15 helper comparisons** cover summation, scalar/control conversion, stereo arrays, spreading, centering and compensation. Dusty's five independent Dust/Decay2 streams are retained. Sharing its squared-sine carrier and factoring the common envelope after the stereo sum reduces 42 nodes to **30**, with at most one 16-bit PCM step difference over the two-second comparison. Automatic envelope completion frees voices after 3.01 seconds; the supplied knob and gate arguments remain unused.
+
+Dust/Decay kernels now bind inputs once per block, cache unchanged coefficients and keep recurrence state local to the loop. Sparse zero-input decay uses compensated addition. **6.3 million samples** across 21 long-decay cases stay within **5.95e-8 normalized error** of a double-precision recurrence. All **553 reference graphs** passed on three backends after the sparse-loop changes; the final local-state change also passed all target reference cases and 34 API groups. The eight MiVerb oracle cases pass. **440,000 sanitizer cases** passed before the final arithmetic-equivalent local-state caching change. Instrument core/bank checks pass.
+
+The actual host adapter passed **42 Dusty assertions**. The installed **229,012-byte** build passed **18 hardware checkpoints**, playing two Dusty voices through bypass, echo, FreeVerb, FreeVerb2 and MiVerb, with release, automatic cleanup and voice stealing. USB capture contained nonzero stereo audio. No new overloads, overruns or numerical faults occurred; sampled render time reached **4,781 microseconds**. All 12 saved slots matched before/after testing. Static RAM remains **78,480 bytes**, pool use **326,008 bytes**, and Bluetooth is disabled.
+
+The original 42-node patch overloaded the device; even after renderer optimization it exceeded budget with reverb. The accepted run uses the equivalent 30-node graph and begins with that earlier overload already counted. This is scoped acceptance, not a guarantee for every pitch/control setting or arbitrary synth/FX combination. The previous Addy/FreeVerb limitation remains. Physical listening and a final-build power cycle remain user checks. Exact hashes and results are in [Dusty evidence](../evidence/dusty.json). The published preview binary is unchanged.
+
+
 
 ## Independent synth / FX controls — 28 October 2026
 

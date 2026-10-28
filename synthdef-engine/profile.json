@@ -263,17 +263,17 @@
   "output_bus_parameter": "literal zero or initial/control expression resolving to zero; nonzero runtime bus faults and silences the voice",
   "target": {
     "identity": "FM-1_1200",
-    "status": "installed; selected reverb scenarios passed; two Addy voices through FreeVerb overload",
+    "status": "installed; two-voice Dusty through four effects passed; earlier Addy + FreeVerb limitation remains",
     "voices": 2,
     "hardware_block_frames": 256,
     "engine_block_frames": 64,
     "knob_increment": 0.02,
-    "image_bytes": 227828,
+    "image_bytes": 229012,
     "static_ram_bytes": 78480,
     "pool_bytes": 326008,
     "pool_capacity_bytes": 344064,
     "note_preparation_frames": 128,
-    "verification": "../evidence/fx-banks.json",
+    "verification": "../evidence/dusty.json",
     "effect_slot": 0,
     "synth_slots": 8,
     "slot_count": 12,
@@ -335,5 +335,9 @@
     "MiVerb_source": "v7b1/mi-UGens at 10f6824f68ad63475f67dfe3fe5016e2d2634f84",
     "MiVerb_storage": "packed signed 16-bit delay samples; float computation; upstream output soft clipping including dry signal",
     "hardware_status": "Keys, triple saw, two-op FM and Dust chimes passed with two voices through each reverb; two Addy voices through FreeVerb overload"
-  }
+  },
+  "source_helpers": [
+    "Mix.ar",
+    "Splay.ar (constant levelComp)"
+  ]
 }
