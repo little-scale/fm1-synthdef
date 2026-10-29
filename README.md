@@ -43,7 +43,7 @@ The development source supports these **118 compiled UGen types**, verified in e
 | Arithmetic | `UnaryOpUGen`, `BinaryOpUGen`, `MulAdd`, `Sum3`, `Sum4` |
 
 - `In.ar(0, 1/2)` is available only in the permanent effect slot. `Out.ar` writes stereo bus 0.
-- `UnaryOpUGen` and `BinaryOpUGen` accept only the [documented selectors](synthdef-engine/README.md#supported-profile). This includes `.abs`, `.squared`, `.cubed`, signed `.pow` / `**`, `.tanh`, octave/pitch/gain conversions, ring modulation, rounding and bounds. The complete selector list and remaining omissions are documented there.
+- `UnaryOpUGen` and `BinaryOpUGen` accept the [operators listed below](#supported-operators), including `.abs`, `.squared`, `.cubed`, signed `.pow` / `**`, `.tanh`, pitch/gain conversions, ring modulation, rounding and bounds.
 - `Scale` and `Tuning` presets/custom objects run at compilation. `Scale.as(LocalBuf)` plus `DegreeToKey.ar/kr` supports a changing degree during playback, including microtonal pitch values. Tables are read-only and limited to 128 entries; this does not add general sample buffers or automatic Event-scale behaviour.
 - `Env.perc`, `Env.adsr`, `Env.asr` and other Env constructors are source-language helpers compiled into `EnvGen` data. All nine EnvGen curve types are implemented, with done actions 0/2 and the documented segment limits.
 - `Mix.ar`, `Mix`, `Splay.ar`, `LinLin` and `PMOsc` can compile into existing supported nodes; they are not additional runtime types. Mix/Splay now have 15 compiled comparisons against explicit sums, stereo panners and rate converters. `DynKlang`/`DynKlank` likewise expand into supported oscillator/resonator graphs within the documented limits. This does not guarantee every argument/rate combination or CPU load.
@@ -51,6 +51,50 @@ The development source supports these **118 compiled UGen types**, verified in e
 The development firmware adds a three-bar battery indicator and USB-power symbol in the top-right corner, including the FX code view.
 
 See [implementation status and remaining additions](docs/UGEN-ROADMAP.md). Three [slot-0 reverb examples](docs/PATCHES.md#development-reverb-alternatives) are included, with knob 5 for wet/dry and knob 6 for room size or decay. Try the new [Dust chimes source](fm1-synth/examples/dust-chimes.scd) in the development host preview: knob 1 controls event density and knob 2 decay time. It is not installed into the example bank automatically.
+
+## Supported operators
+
+The development engine supports **33 unary operators** (one input) and **40 binary operators** (two inputs), listed below. These run through `UnaryOpUGen` and `BinaryOpUGen` at initial, control or audio rate, according to the compiled graph. The published 0.1.0-preview firmware has an earlier subset; use the development build for this complete list.
+
+### Unary operators
+
+| Category | Operators |
+| --- | --- |
+| Sign and magnitude | `.neg`, `.abs`, `.sign` |
+| Rounding and fraction | `.ceil`, `.floor`, `.frac` |
+| Powers and exponential | `.squared`, `.cubed`, `.sqrt`, `.exp`, `.reciprocal` |
+| Logarithms | `.log`, `.log2`, `.log10` |
+| Pitch and frequency | `.midicps`, `.cpsmidi`, `.midiratio`, `.ratiomidi`, `.octcps`, `.cpsoct` |
+| Gain | `.dbamp`, `.ampdb` |
+| Trigonometry | `.sin`, `.cos`, `.tan`, `.asin`, `.acos`, `.atan` |
+| Hyperbolic functions | `.sinh`, `.cosh`, `.tanh` |
+| Waveshaping | `.distort`, `.softclip` |
+
+For example: `sig.abs`, `sig.squared` or `sig.tanh`.
+
+### Binary operators
+
+| Category | Operators |
+| --- | --- |
+| Arithmetic | `+`, `-`, `*`, `/`, `.div`, `.mod`, `.pow` |
+| Comparison | `==`, `!=`, `<`, `>`, `<=`, `>=` |
+| Minimum and maximum | `.min`, `.max` |
+| Integer relationships | `.lcm`, `.gcd` |
+| Quantization | `.round`, `.roundUp`, `.trunc` |
+| Angles and distances | `.atan2`, `.hypot`, `.hypotApx` |
+| Ring modulation | `.ring1`, `.ring2`, `.ring3`, `.ring4` |
+| Sums and differences | `.difsqr`, `.sumsqr`, `.sqrsum`, `.sqrdif`, `.absdif` |
+| Thresholds and shaping | `.thresh`, `.amclip`, `.scaleneg` |
+| Bounds | `.clip2`, `.excess`, `.fold2`, `.wrap2` |
+| First operand | `.firstArg` |
+
+For example: `sig * amp`, `sig.pow(0.5)` or `sig.clip2(0.8)`. `%` is the modulo spelling and `**` is the power spelling.
+
+**Signal comparisons:** `==` and `!=` in the table identify the compiled equality/inequality selectors. Ordinary `==` / `!=` on UGen objects are language-level comparisons during compilation. Use `a |==| b` for signal equality, or `BinaryOpUGen('!=', a, b)` for the signal inequality selector.
+
+**Limits and semantics:** `.div` uses floor division; `.trunc` uses floor quantization. `.sqrt` and `.pow` retain SuperCollider's signed-input behaviour. `.gcd` / `.lcm` truncate their inputs to integers and require absolute inputs no greater than 2²⁴. Nonfinite results or signal magnitudes above 1e12 retire the affected voice. Mixed audio/control arithmetic interpolates control inputs across each block.
+
+Bitwise/shift selectors, random arithmetic selectors such as `.rand` / `.rrand`, demand-rate operators and selectors absent from these tables remain unsupported. `Rand`, `ExpRand`, `TRand`, `TExpRand` and noise UGens are available separately. See the [engine profile](synthdef-engine/README.md#supported-profile) for detailed domains and the documented SuperCollider 3.14.1 edge differences.
 
 ## Start here
 
