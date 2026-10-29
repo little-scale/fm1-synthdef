@@ -18,6 +18,7 @@
     "DelayUGens.cpp": "688a76b94948d120f6ff6ddcebca9ea353a157d638ad73bdbd2d5bb4e51b455f",
     "SC_InlineUnaryOp.h": "ae9b928de6681008b73a3db9a449dda52635b11b10b406d3df5dbccc8f3652b2",
     "TriggerUGens.cpp": "929960745bb2aebf7a7ca76d2472498fa5c54deb0ed2a70ffb9bcc86c4e5fddc",
-    "ReverbUGens.cpp": "c3cebdf729874c7a8bfc3d449238c87dc23aa02cfe2a9fffefcd1c6a49362fe4"
+    "ReverbUGens.cpp": "c3cebdf729874c7a8bfc3d449238c87dc23aa02cfe2a9fffefcd1c6a49362fe4",
+    "DynNoiseUGens.cpp": "160d9c1a3bcf68e719a651c9d6f667fc2336c6c38f71cf2766e5f84895b7eb55"
   }
 }

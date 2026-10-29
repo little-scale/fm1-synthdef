@@ -1,6 +1,6 @@
 # FM1 SynthDef engine
 
-A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 77 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
+A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 109 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
 
 ## Try it
 
@@ -15,7 +15,7 @@ build/fm-inspect fixtures/fm1_voice.scsyndef
 python3 tools/render-wav.py fixtures/fm1_voice.scsyndef build/fm1-voice.wav
 ```
 
-`make test` needs C99 and C++17 compilers and Python 3, with no Python packages. `make reference-test` additionally uses the installed SuperCollider **3.14.1** offline server, without opening audio hardware. Override `SCSYNTH` to change its location. The recorded fixtures are sufficient to run these tests; regeneration uses `python3 tools/export-all.py` with the installed `sclang` 3.14.1. It runs all seven export scripts with timeouts and refreshes the fixture integrity manifest. The Makefile currently targets macOS shared libraries.
+`make test` needs C99 and C++17 compilers and Python 3, with no Python packages. `make reference-test` additionally uses the installed SuperCollider **3.14.1** offline server, without opening audio hardware. Override `SCSYNTH` to change its location. The recorded fixtures are sufficient to run these tests; regeneration uses `python3 tools/export-all.py` with the installed `sclang` 3.14.1. It runs all nine export scripts with timeouts and refreshes the fixture integrity manifest. The Makefile currently targets macOS shared libraries.
 
 The example in `examples/subtractive.scd` combines Saw, Pulse, a modulated RLPF, envelopes and panning. `build/subtractive-voice.wav` is its host-rendered companion test voice.
 
@@ -36,6 +36,22 @@ The simpler example in `examples/voice.scd` exports a playable gated sine voice 
 | RandSeed (additional) | initial, control, audio | Rising-edge reseeding; seed must be a literal integer within ±2²⁴ |
 | FreeVerb, FreeVerb2 | audio | Audio signal input(s), initial/control mix/room/damp, parameters clipped to 0–1; caller-owned memory |
 | MiVerb | audio | One/two audio inputs, stereo output; six initial/control parameters, pinned upstream limits; caller-owned memory |
+| MiMu | audio | Mono input/output per instance; audio or initial/control gain; initial/control bypass; language-level array expansion gives stereo; no delay memory |
+| Fold, Wrap | audio, control | Bounds may be audio rate; control bounds interpolate at audio rate; ordered bounds required, equal bounds return that bound |
+| BrownNoise, ClipNoise | audio, control | Seeded per-voice random stream and reference constructor draws |
+| Trig, Trig1 | audio, control | Initial/control duration; nonnegative representable sample count; held triggers do not retrigger |
+| PulseDivider | audio, control | Initial/control division and initial start; audio output requires audio trigger; integer values bounded to ±8,388,607 |
+| PulseCount, SetResetFF, ToggleFF | audio, control | Rising-edge behavior; reset takes precedence; PulseCount/SetResetFF audio outputs require audio trigger |
+| Stepper | audio, control | Initial/control inclusive integer bounds, step and reset value; ordered bounds and values within ±8,388,607; audio output requires audio trigger |
+| XFade2, LinXFade2, Balance2 | audio, control | Two input channels; audio outputs require audio inputs; position may be audio rate; level initial/control rate |
+| LinExp | audio, control | Initial/control source and destination bounds; nonzero source span; destination endpoints nonzero and same sign; extrapolates |
+| Slew, Lag2, Lag3 | audio, control | Nonnegative initial/control rate limits or lag times; constructor state and lag coefficient interpolation |
+| VarSaw, LFCub, LFPar | audio, control | Frequency 0 to half calculation rate, may be audio rate; initial-rate phase; VarSaw width initial/control, clipped to 0.001–0.999 and latched per cycle |
+| SyncSaw | audio, control | Both frequencies may be audio rate; 0 to half calculation rate; reference constructor phase advance |
+| LFDNoise0, LFDNoise1, LFDNoise3 | audio, control | Frequency may be audio rate; supported domain 0 to four times calculation rate; negative frequency faults; cubic version retains upstream 0.8 scaling |
+| RHPF, BRF | audio, control | Initial/control cutoff and resonance/bandwidth; SC coefficient interpolation in a stable difference-state realization |
+| Amplitude | audio, control | Also supports audio input with control output; nonnegative initial/control attack/release; pinned SC rate semantics |
+| BPeakEQ, BLowShelf, BHiShelf | audio | Initial/control frequency, reciprocal Q/slope and gain; frequency strictly inside (0, Nyquist), positive Q/slope, gain ±120 dB; invalid coefficient domains fault |
 | SampleRate, SampleDur, ControlRate, ControlDur, BlockSize, RadiansPerSample | initial | Information for this voice; control rate uses engine block size 64 |
 | Delay1, Delay2 | audio, control | One/two calculation-sample delay; explicit initial values are initial/control inputs |
 | OnePole, OneZero | audio, control | Initial/control coefficient in [-1,1], interpolated across audio blocks |
@@ -70,7 +86,7 @@ Unary selectors: neg (0), abs (5), ceil (8), floor (9), frac (10), sign (11), sq
 
 Mixed audio/control arithmetic interpolates control operands across the block, including optimizer-generated MulAdd/Sum3/Sum4 nodes. A separate constructor pass initializes upstream outputs before the first audio block.
 
-Binary selectors: add (0), subtract (1), multiply (2), divide (4), equal (6), unequal (7), less (8), greater (9), less-or-equal (10), greater-or-equal (11), min (12), max (13). Other selectors are rejected. Supporting the arithmetic UGen names does not imply support for every SuperCollider operator.
+Binary selectors: add (0), subtract (1), multiply (2), divide (4), equal (6), unequal (7), less (8), greater (9), less-or-equal (10), greater-or-equal (11), min (12), max (13), modulo (5), round (19), roundUp (20), trunc (21; floor quantization), clip2 (42), fold2 (44), wrap2 (45). Other selectors are rejected. Supporting the arithmetic UGen names does not imply support for every SuperCollider operator.
 
 ### Reverbs
 
@@ -164,3 +180,11 @@ The polyphony update adds a 25th API test group verifying idempotent early prepa
 `Mix.ar` and `Splay.ar` work through the stock SuperCollider compiler. Mix expands into additions/Sum3/Sum4 (plus K2A or DC for control/scalar input); Splay expands into Pan2, summation and level multiplication. Fifteen helper comparisons cover mono/stereo arrays, 1/2/3/4/5/9-channel sums, scalar/control rate conversion, 1/2/5-channel spreading, center/width changes and compensation on/off. The compiled-node count remains 77. Dynamic numeric `levelComp` may emit unsupported `pow`; `SplayAz`/PanAz are not supported.
 
 Dust/Decay/Decay2 use dedicated block loops to avoid repeated graph-reference decoding and per-sample type dispatch. Unchanged decay times reuse coefficients; the state keeps a compensation word and retains changed-time interpolation. Zero-input samples use a cheaper compensated addition; 21 long runs (6.3 million samples) remain within 5.95e-8 normalized error of a double-precision recurrence. No state or delay allocation is added.
+
+## Expansion verification and MiRings feasibility
+
+The October 30 expansion reuses existing node state: no additional per-voice or global DSP RAM. New kernels have separate constructor/rate, live-control, malformed-input and numerical-fault coverage. MiMu is checked with identical input against the unmodified upstream implementation, including audio-rate gain and bypass. Full emulation and build results are in [the verification record](../docs/VERIFICATION.md); hardware checks for these additions are pending.
+
+`SelectX.ar/kr` now compiles and renders through supported selectors and crossfade nodes. As with Mix and Splay, it is a source helper rather than an additional runtime type.
+
+MiRings is deliberately absent from the supported types. The pinned upstream implementation passed a host smoke probe for six models and six alternate-mode effect settings, but its approximately 180,048-byte host instance (including 65,536 bytes of reverb) exceeds this firmware's 131,072-byte shared arena and 65,536-byte per-voice budget. A reduced modal-only implementation or a separate memory layout needs further work and must not be presented as full MiRings compatibility.

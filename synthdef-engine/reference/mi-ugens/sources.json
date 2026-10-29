@@ -9,6 +9,9 @@
     "sc/HelpSource/Classes/MiVerb.schelp": "4a771e0c65631a9f4e0e28003684b659cc2d272bd554bf0479c6ce462d218301",
     "eurorack/stmlib/dsp/cosine_oscillator.h": "a7f6429e8bca85aa19ce91e3f1908fd7fb1fdf378a61fe2c87717a94d6f30a97",
     "eurorack/stmlib/dsp/dsp.h": "98b42900c4accbe9fbb2cfe2ec6fada024b57ec9a1becff008b0f35bd4fd8ddb",
-    "eurorack/stmlib/stmlib.h": "3afc8589a951e882d9eea16b3eda8623dd6fb0079dd11dfbce817e65be6cfba9"
+    "eurorack/stmlib/stmlib.h": "3afc8589a951e882d9eea16b3eda8623dd6fb0079dd11dfbce817e65be6cfba9",
+    "projects/MiMu/MiMu.cpp": "6c48fc2be6caf065209efc77d292383e4aa23c698c9019d5a0342f4b85cc0dc1",
+    "sc/Classes/MiMu.sc": "7e470b14a7e6ba59fde8dfa81c59672b9c5ee56d06274ff405558bcb67966da4",
+    "sc/HelpSource/Classes/MiMu.schelp": "0bc5a77bc51915307a6a5f679288655c0cff7a7f10b119c0244c81e5bfd54299"
   }
 }

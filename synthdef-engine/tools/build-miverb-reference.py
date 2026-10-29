@@ -14,5 +14,8 @@ def build():
     subprocess.run(['c++','-std=c++17','-DTEST','-O2','-fno-fast-math','-ffp-contract=off','-fPIC','-bundle','-undefined','dynamic_lookup',
         '-I'+str(sc/'plugin_interface'),'-I'+str(sc/'common'),'-I'+str(mi/'projects/MiVerb/include'),'-I'+str(mi/'eurorack'),
         str(mi/'projects/MiVerb/MiVerb.cpp'),'-o',str(out/'MiVerb.scx')],check=True)
+    subprocess.run(['c++','-std=c++17','-DTEST','-O2','-fno-fast-math','-ffp-contract=off','-fPIC','-bundle','-undefined','dynamic_lookup',
+        '-I'+str(sc/'plugin_interface'),'-I'+str(sc/'common'),'-I'+str(mi/'eurorack'),
+        str(mi/'projects/MiMu/MiMu.cpp'),'-o',str(out/'MiMu.scx')],check=True)
     return out
 if __name__=='__main__':print(build())

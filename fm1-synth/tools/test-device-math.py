@@ -12,7 +12,7 @@ results=[]
 if set(limits)!={p.stem for p in (ENGINE/'fixtures').glob('*.scsyndef')}:
  raise RuntimeError('Run the complete engine reference suite before backend comparisons.')
 for p in sorted((ENGINE/'fixtures').glob('*.scsyndef')):
- name=p.stem;blocks=ref.fixture_blocks(name);dest=OUT/'device-math.f32'
+ name=p.stem;blocks=ref.fixture_blocks(name);dest=OUT/('host-fast.f32' if host else 'device-math.f32')
  events=ref.EVENTS.get(name,[(0.25,0)] if name.startswith('env_') else [])
  if p.with_suffix('.events.json').exists():events=json.loads(p.with_suffix('.events.json').read_text())
  args=[str(exe),str(p),str(dest),str(blocks)]

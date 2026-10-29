@@ -1,5 +1,21 @@
 # Verification record
 
+## UGen expansion — 30 October 2026
+
+The development engine now implements **109 UGen types**, adding the 32 types listed in [the roadmap](UGEN-ROADMAP.md), seven binary selectors and SelectX helper compatibility. **Hardware checks and installation are deferred at the user's request.** The existing preview release and user slot banks are unchanged.
+
+- **805/805 reference graphs pass on ordinary host, optimized host and freestanding device-math backends.** They cover all existing behavior plus 252 new fixtures: initial/control/audio rates, constructor state, changing controls, reset priority, held triggers, seeded noise, frequency changes, panning, filter coefficient changes, quantization and bypass.
+- **1,048,576 identical-input MiMu samples** match the pinned upstream implementation bit for bit, with control/audio gain, both input signs, saturation and changing bypass. The eight existing MiVerb oracle cases still pass.
+- **40 engine API groups**, **640,000 hostile graph mutations**, the long-decay regression and instrument core/bank/input/screen/transport tests pass.
+- Five two-voice synth/effect scenarios cover all eight knobs at 0, 0.25, 0.5, 0.75 and 1, changes during playback, stealing and note-off. Each runs 140,800 frames. All produced nonzero stereo audio, no numerical faults and silence after release; peak was below 0.69. These are emulation checks, not realtime device measurements.
+- An isolated local editor successfully compiled, saved and previewed the new synth through MiMu using a temporary bank. The user's bank and running editor were left untouched. Restart the existing editor to load the updated native engine.
+
+The new filters use a difference-state realization to avoid low-cutoff cancellation. MiMu's PCM conversion and control-rate SinOsc frequency increments retain reference precision without software double helpers. The target image is **246,560 bytes**, with **78,480/98,304 bytes static RAM** and **326,008/344,064 bytes pool use**. The package remains 610,136 bytes, Bluetooth disabled. A successful build establishes fit, not realtime CPU capacity.
+
+The MiRings upstream host probe produced valid audio for six models and six alternate-mode settings, but measured approximately **180,048 bytes per complete instance**, excluding wrapper overhead. Full MiRings remains unsupported because that exceeds the current shared arena and per-voice budgets. See [the feasibility result](../evidence/mirings-feasibility-2026-10-30.json).
+
+Recorded results and source/package hashes: [expansion evidence](../evidence/ugen-expansion-2026-10-30.json). Physical acceptance still needs slot readback, two voices through the chosen master effect, live knobs, voice stealing, release, CPU/overrun checks and a power cycle.
+
 ## Dusty decay and density controls — 29 October 2026
 
 Dusty in slot 5 now maps knob 1 to each burst's Decay2 decay (0–1 second, default 0.2), and knob 2 to Dust density (0–10 triggers/second per stream, default 5). All five streams remain independent. The global envelope has a 10 ms attack and five-second decay, with done action 2 retained for automatic cleanup. Its shared carrier/envelope optimization is retained; the graph has 31 nodes and the package is 1,984 bytes. No firmware changes or flash were needed.

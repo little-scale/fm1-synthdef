@@ -41,6 +41,16 @@ static __attribute__((noinline)) void fast_arithmetic(const fm_graph *g,fm_voice
   goto arithmetic_done;
  }
  general_arithmetic:
+ if(n->type==FM_BinaryOpUGen && (op==5 || (op>=19 && op<=21) || op==42 || op==44 || op==45)){
+  /* SC accumulates control ramps; discontinuous operators must retain the
+     exact accumulated endpoint rather than recomputing a mathematically
+     equivalent interpolation, which can cross quantization boundaries. */
+  float av=x[0].rate==1 && count>1?x[0].previous:x[0].p[0];
+  float bv=x[1].rate==1 && count>1?x[1].previous:x[1].p[0];
+  float da=x[0].rate==1 && count>1?x[0].delta*scale:0,db=x[1].rate==1 && count>1?x[1].delta*scale:0;
+  for(j=0;j<count;j++){checked_signal(v,out+j,binary(op,x[0].rate==2?x[0].p[j]:av,x[1].rate==2?x[1].p[j]:bv));av+=da;bv+=db;}
+  s->previous[0]=x[0].rate==1 && count>1?av:x[0].p[0];s->previous[1]=x[1].rate==1 && count>1?bv:x[1].p[0];s->initialized=1;return;
+ }
  #define A(k) bound_value(&x[k],j,scale)
  #define RUN(expr) for(j=0;j<count;j++)checked_signal(v,out+j,(expr))
  switch(op){
@@ -58,11 +68,24 @@ static __attribute__((noinline)) void fast_arithmetic(const fm_graph *g,fm_voice
  arithmetic_done:
  for(k=0;k<n->inputs;k++)s->previous[k]=x[k].p[0];s->initialized=1;
 }
+/* Exact truncated phase ratio without software double helpers. The device
+   has a single-precision FPU. Mantissas and a bounded binary division reproduce
+   SC's double control-frequency increment, including integer boundaries. */
+static uint32_t sine_control_step(float frequency,float sr){
+ float f=fmodf(frequency,sr);uint32_t a,b,rem,q;int shift,i,negative=f<0;
+ f=fabsf(f);memcpy(&a,&f,4);memcpy(&b,&sr,4);
+ if(!f || (a>>23)==0)return 0;
+ shift=(int)(a>>23)-(int)(b>>23)+29;if(shift<0)return 0;
+ a=(a&0x7fffffu)|0x800000u;b=(b&0x7fffffu)|0x800000u;
+ q=a/b;rem=a%b;
+ for(i=0;i<shift;i++){rem*=2;q*=2;if(rem>=b){rem-=b;q++;}}
+ return negative?0u-q:q;
+}
 static __attribute__((noinline)) void fast_sine(const fm_graph *g,fm_voice *v,fm_scratch *b,const fm_node *n,fm_state *s,unsigned count,float sr,int initializing){
  fm_bound_input f=bind_input(g,b,n,0,0),p=bind_input(g,b,n,1,s->last);
  unsigned j;uint32_t step=0,offset=0;int fixed_phase=p.rate!=2 && (p.rate==0 || p.p[0]==s->last);
  if(!s->initialized){s->last=p.p[0];p.previous=s->last;p.delta=0;fixed_phase=p.rate!=2;}
- if(f.rate!=2)step=(uint32_t)(int32_t)(fmodf(f.p[0],sr)*(536870912.0f/sr));
+ if(f.rate!=2)step=sine_control_step(f.p[0],sr);
  if(fixed_phase)offset=phase_word(p.p[0]);
  if(fixed_phase && f.rate!=2){
   uint32_t phase=s->phase_acc;

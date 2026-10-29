@@ -32,3 +32,9 @@ The m6 extension fixtures cover 21 additional types and five pitch/gain selector
 `tools/build-miverb-reference.py` verifies those manifests and builds an isolated plugin with C++17, `TEST` (portable saturation), no fast-math and no floating-point contraction. Reverb reference invocations admit only stock plugins plus this build. The bundled class is compiled alongside stock SC classes with user extensions excluded. No user/system plugin or language configuration is modified.
 
 `export-reverbs.scd` adds 37 approximately four-second comparisons covering mono/stereo impulses, wet/dry, parameter clamps, noise bursts, live changes, freeze, diffusion and overdrive. `tests/test_miverb_oracle.py` additionally feeds identical float input to the C port and unmodified upstream C++ DSP, isolating reverb accuracy from upstream oscillator differences. See the engine README for limits and the overdrive integration tolerance.
+
+## October 30 utility and modulation references
+
+`export-utilities.scd` and `export-modulation.scd` add 252 fixtures for 32 UGen types, seven binary selectors and SelectX. `DynNoiseUGens.cpp` is pinned to SuperCollider 3.14.1 and included in the main source manifest. The MiMu source/class/help are pinned alongside MiVerb; the isolated plugin builder builds both plugins. `tests/test_mimu_oracle.py` checks 1,048,576 identical-input samples bit for bit, covering control/audio gain and changing bypass.
+
+`tools/probe-mirings.py --upstream PATH --output RESULT.json` builds a host-only feasibility probe from a separately checked-out mi-UGens commit `10f6824f68ad63475f67dfe3fe5016e2d2634f84`. `mirings-probe-sources.json` verifies its upstream Rings/stmlib sources. The probe does not provide MiRings support in the engine and cannot establish hardware timing.

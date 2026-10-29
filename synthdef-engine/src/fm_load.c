@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #define FM_VALID 0x464d5331u
-static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In","SampleRate","SampleDur","ControlRate","ControlDur","BlockSize","RadiansPerSample","Delay1","Delay2","OnePole","OneZero","LPZ1","HPZ1","Latch","Gate","TRand","TExpRand","Dust","Dust2","Impulse","Decay","Decay2","FreeVerb","FreeVerb2","MiVerb"};
+static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In","SampleRate","SampleDur","ControlRate","ControlDur","BlockSize","RadiansPerSample","Delay1","Delay2","OnePole","OneZero","LPZ1","HPZ1","Latch","Gate","TRand","TExpRand","Dust","Dust2","Impulse","Decay","Decay2","FreeVerb","FreeVerb2","MiVerb","Fold","Wrap","BrownNoise","ClipNoise","Trig","Trig1","PulseDivider","PulseCount","ToggleFF","SetResetFF","Stepper","XFade2","LinXFade2","Balance2","LinExp","Slew","Lag2","Lag3","MiMu","RHPF","BRF","VarSaw","SyncSaw","LFCub","LFPar","LFDNoise0","LFDNoise1","LFDNoise3","Amplitude","BPeakEQ","BLowShelf","BHiShelf"};
 const char *fm_type_name(unsigned type) { return type < FM_TYPES ? types[type] : "unknown"; }
 typedef struct { const uint8_t *p; size_t left; int failed; } reader;
 static uint32_t rd(reader *r, unsigned n) {
@@ -92,9 +92,18 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
    for(j=1;j<u->inputs;j++) { fm_ref *ref=&g->ref[u->input+j]; if(ref->node<0 || g->node[ref->node].rate!=2) BAD("Out requires audio-rate input"); }
   } else {
    unsigned expected=1;
-   if(u->type==FM_Pan2 || u->type==FM_FreeVerb2 || u->type==FM_MiVerb) expected=2;
+   if(u->type==FM_Pan2 || u->type==FM_FreeVerb2 || u->type==FM_MiVerb || u->type==FM_Balance2) expected=2;
    if(u->outputs!=expected) BAD("Invalid output count");
    switch(u->type) {
+    case FM_VarSaw: case FM_Amplitude: case FM_RHPF: case FM_BRF: n=3; break;
+    case FM_SyncSaw: case FM_LFCub: case FM_LFPar: n=2; break;
+    case FM_BPeakEQ: case FM_BLowShelf: case FM_BHiShelf: n=4; break;
+    case FM_Fold: case FM_Wrap: case FM_PulseDivider: case FM_LinXFade2: case FM_Slew: case FM_MiMu: n=3; break;
+    case FM_Trig: case FM_Trig1: case FM_PulseCount: case FM_SetResetFF: case FM_Lag2: case FM_Lag3: n=2; break;
+    case FM_Stepper: n=6; break;
+    case FM_LinExp: n=5; break;
+    case FM_XFade2: case FM_Balance2: n=4; break;
+    case FM_BrownNoise: case FM_ClipNoise: n=0; break;
     case FM_FreeVerb: n=4; break;
     case FM_FreeVerb2: n=5; break;
     case FM_MiVerb: n=u->inputs; if(n!=7 && n!=8) BAD("MiVerb requires mono or stereo input"); break;
@@ -122,6 +131,26 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
     default: n=1;
    }
    if(u->inputs!=n) BAD("Wrong input count");
+   if(u->type>=FM_Fold && u->type<=FM_MiMu) {
+    int control_begin=-1;
+    if(u->type==FM_Trig || u->type==FM_Trig1 || u->type==FM_PulseDivider || u->type==FM_LinExp || u->type==FM_Slew || u->type==FM_Lag2 || u->type==FM_Lag3)control_begin=1;
+    if(u->type==FM_Stepper)control_begin=2;
+    if(u->type==FM_XFade2 || u->type==FM_Balance2)control_begin=3;
+    if(u->type==FM_MiMu){control_begin=2;if(u->rate!=2)BAD("MiMu requires audio rate");}
+    if(control_begin>=0)for(j=control_begin;j<u->inputs;j++){fm_ref *ref=&g->ref[u->input+j];if(ref->node>=0 && g->node[ref->node].rate>1)BAD("Parameter requires initial/control rate");}
+    if(u->rate==2 && (u->type==FM_MiMu || u->type==FM_XFade2 || u->type==FM_LinXFade2 || u->type==FM_Balance2 || u->type==FM_PulseDivider || u->type==FM_PulseCount || u->type==FM_SetResetFF || u->type==FM_Stepper)) {
+     int signals=(u->type==FM_XFade2 || u->type==FM_LinXFade2 || u->type==FM_Balance2)?2:1;
+     for(j=0;j<signals;j++){fm_ref *ref=&g->ref[u->input+j];if(ref->node<0 || g->node[ref->node].rate!=2)BAD("Audio input required; use K2A or DC");}
+    }
+   }
+   if(u->type>=FM_RHPF){
+    int begin=-1;
+    if(u->type==FM_RHPF || u->type==FM_BRF || u->type==FM_Amplitude || u->type>=FM_BPeakEQ)begin=1;
+    if(u->type==FM_VarSaw)begin=2;
+    if(begin>=0)for(j=begin;j<u->inputs;j++){fm_ref *ref=&g->ref[u->input+j];if(ref->node>=0 && g->node[ref->node].rate>1)BAD("Filter/envelope/duty parameters require initial/control rate");}
+    if(u->type==FM_VarSaw || u->type==FM_LFCub || u->type==FM_LFPar){fm_ref *ref=&g->ref[u->input+1];if(ref->node>=0 && g->node[ref->node].rate!=0)BAD("Oscillator phase requires initial rate");}
+    if(u->type>=FM_BPeakEQ && u->rate!=2)BAD("B equalizers require audio rate");
+   }
    if(fm_is_reverb(u->type)) {
     if(u->rate!=2) BAD("Reverbs require audio rate");
     for(j=0;j<u->inputs;j++) {
@@ -134,7 +163,7 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
     if(!literal(g,u,1,&v) || v<0) BAD("Delay maxdelaytime must be a nonnegative literal");
     if(u->inputs==4) {fm_ref *ref=&g->ref[u->input+3];if(ref->node>=0 && g->node[ref->node].rate==2) BAD("Delay decaytime requires initial/control rate");}
    }
-   if(u->type==FM_BinaryOpUGen && !(u->special==0 || u->special==1 || u->special==2 || u->special==4 || (u->special>=6 && u->special<=13))) BAD("Unsupported binary operator selector");
+   if(u->type==FM_BinaryOpUGen && !(u->special==0 || u->special==1 || u->special==2 || u->special==4 || u->special==5 || (u->special>=19 && u->special<=21) || u->special==42 || u->special==44 || u->special==45 || (u->special>=6 && u->special<=13))) BAD("Unsupported binary operator selector");
    if(u->type==FM_UnaryOpUGen && !(u->special==0 || u->special==5 || (u->special>=8 && u->special<=22) || (u->special>=25 && u->special<=31) || u->special==42 || u->special==43)) BAD("Unsupported unary operator selector");
    if(u->type==FM_EnvGen) {
     for(j=1;j<u->inputs;j++) {fm_ref *ref=&g->ref[u->input+j];if(ref->node>=0 && g->node[ref->node].rate==2) BAD("Only the EnvGen gate may be audio rate in this profile");}
@@ -184,7 +213,7 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
    for(j=0;j<u->inputs;j++) {
     fm_ref *ref=&g->ref[u->input+j]; int rate=ref->node<0?0:g->node[ref->node].rate;
     if(u->type==FM_Rand || u->type==FM_ExpRand){if(rate>1) BAD("Rand/ExpRand bounds require initial/control rate");}
-    else if(u->type!=FM_A2K && rate>u->rate) BAD("Input rate exceeds calculation rate");
+    else if(u->type!=FM_A2K && !(u->type==FM_Amplitude && j==0) && rate>u->rate) BAD("Input rate exceeds calculation rate");
    }
   }
  }

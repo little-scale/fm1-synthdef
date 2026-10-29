@@ -1,0 +1,21 @@
+{
+  "results": [
+    {
+      "name": "mimu-drive",
+      "slot": 8,
+      "compiled": true,
+      "saved": true,
+      "nodes": 10
+    },
+    {
+      "name": "modulation-lab",
+      "slot": 0,
+      "compiled": true,
+      "saved": true,
+      "nodes": 17
+    }
+  ],
+  "stereo_preview": true,
+  "user_bank_unchanged": true,
+  "existing_editor_untouched": true
+}

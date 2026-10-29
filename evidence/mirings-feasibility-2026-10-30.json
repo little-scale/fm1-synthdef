@@ -1,0 +1,107 @@
+{
+  "part_bytes": 110888,
+  "string_synth_bytes": 2168,
+  "strummer_bytes": 908,
+  "minimum_instance_bytes": 180048,
+  "runs": [
+    {
+      "model": 0,
+      "easter_egg": false,
+      "frames": 131072,
+      "peak": 0.58263689,
+      "rms": 0.04508656,
+      "passed": true
+    },
+    {
+      "model": 1,
+      "easter_egg": false,
+      "frames": 131072,
+      "peak": 0.6046443,
+      "rms": 0.21160499,
+      "passed": true
+    },
+    {
+      "model": 2,
+      "easter_egg": false,
+      "frames": 131072,
+      "peak": 0.45873344,
+      "rms": 0.03006203,
+      "passed": true
+    },
+    {
+      "model": 3,
+      "easter_egg": false,
+      "frames": 131072,
+      "peak": 0.68759108,
+      "rms": 0.12917066,
+      "passed": true
+    },
+    {
+      "model": 4,
+      "easter_egg": false,
+      "frames": 131072,
+      "peak": 0.38825968,
+      "rms": 0.033420452,
+      "passed": true
+    },
+    {
+      "model": 5,
+      "easter_egg": false,
+      "frames": 131072,
+      "peak": 0.39069244,
+      "rms": 0.033295455,
+      "passed": true
+    },
+    {
+      "model": 0,
+      "easter_egg": true,
+      "frames": 131072,
+      "peak": 0.49545744,
+      "rms": 0.08428197,
+      "passed": true
+    },
+    {
+      "model": 1,
+      "easter_egg": true,
+      "frames": 131072,
+      "peak": 0.31920403,
+      "rms": 0.051962463,
+      "passed": true
+    },
+    {
+      "model": 2,
+      "easter_egg": true,
+      "frames": 131072,
+      "peak": 0.32256544,
+      "rms": 0.051498254,
+      "passed": true
+    },
+    {
+      "model": 3,
+      "easter_egg": true,
+      "frames": 131072,
+      "peak": 0.56254756,
+      "rms": 0.098035793,
+      "passed": true
+    },
+    {
+      "model": 4,
+      "easter_egg": true,
+      "frames": 131072,
+      "peak": 0.30865079,
+      "rms": 0.050025733,
+      "passed": true
+    },
+    {
+      "model": 5,
+      "easter_egg": true,
+      "frames": 131072,
+      "peak": 0.32289302,
+      "rms": 0.051121583,
+      "passed": true
+    }
+  ],
+  "commit": "10f6824f68ad63475f67dfe3fe5016e2d2634f84",
+  "platform": "host; size and audio smoke test only",
+  "hardware_tested": false
+}

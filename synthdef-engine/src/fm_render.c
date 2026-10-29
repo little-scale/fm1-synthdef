@@ -36,8 +36,18 @@ static float unary(int op,float a) {
  default:return 0;
  }
 }
+static float bounded_wrap(float x,float lo,float hi);
+static float bounded_fold(float x,float lo,float hi);
 static float binary(int op,float a,float b) {
- switch(op) {case 0:return a+b;case 1:return a-b;case 2:return a*b;case 4:return a/b;
+ switch(op) {
+ case 5:return b==0?0:a-b*floorf(a/b);
+ case 19:return b==0?a:floorf(a/b+.5f)*b;
+ case 20:return b==0?a:ceilf(a/b)*b;
+ case 21:return b==0?a:floorf(a/b)*b;
+ case 42:return fminf(b,fmaxf(-b,a));
+ case 44:return bounded_fold(a,-b,b);
+ case 45:return bounded_wrap(a,-b,b);
+ case 0:return a+b;case 1:return a-b;case 2:return a*b;case 4:return a/b;
  case 6:return a==b;case 7:return a!=b;case 8:return a<b;case 9:return a>b;
  case 10:return a<=b;case 11:return a>=b;case 12:return fminf(a,b);case 13:return fmaxf(a,b);default:return 0;}
 }
@@ -194,6 +204,8 @@ static __attribute__((noinline)) void fast_envelope(const fm_graph *g,fm_voice *
 }
 
 #include "fm_extensions.inc"
+#include "fm_utilities.inc"
+#include "fm_modulation.inc"
 #include "fm_reverb.inc"
 
 static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *stereo,int initializing,const float *input_stereo) {
@@ -255,6 +267,8 @@ static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *ster
   if(n->type==FM_Decay || n->type==FM_Decay2){fast_decay(g,v,b,n,s,count,sr,initializing);continue;}
   if(n->type==FM_Dust || n->type==FM_Dust2){fast_dust(g,v,b,n,s,count,sr);continue;}
   if(n->type>=FM_OnePole && n->type<=FM_Decay2){extensions(g,v,b,n,s,count,sr,initializing);continue;}
+  if(n->type>=FM_VarSaw){modulation(g,v,b,n,s,count,sr,initializing);continue;}
+  if(n->type>=FM_Fold && n->type<=FM_MiMu){utilities(g,v,b,n,s,count,sr,initializing);continue;}
   if(fm_is_reverb(n->type)){reverb_render(g,v,b,n,s,count,initializing);continue;}
   if(fm_is_delay(n->type)){delay_render(g,v,b,n,s,count,sr,initializing);continue;}
   if(!s->initialized && (n->type==FM_Klang || n->type==FM_Klank)) {
@@ -366,7 +380,7 @@ static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *ster
     if(!initializing && e->remaining>0) {e->elapsed++;float t=(float)e->elapsed/e->duration;e->level=n->type==FM_Line?precise_lerp(e->start,e->end,(float)e->elapsed,e->duration):e->start*powf(e->end/e->start,t);e->remaining--;}
     if(!initializing && !e->remaining){e->level=e->end;if(IN(3)==2)free_voice=1;}
    }break;
-   case FM_LPF:case FM_HPF:case FM_RLPF:case FM_BPF:case FM_Resonz:case FM_Ringz: {
+   case FM_RHPF:case FM_BRF:case FM_LPF:case FM_HPF:case FM_RLPF:case FM_BPF:case FM_Resonz:case FM_Ringz: {
     float t=count==1?(n->type==FM_Resonz || n->type==FM_Ringz?0:1):(float)(j/3)/(count/3);
     out=filter_tick(n->type,s,a,old0+(target0-old0)*t,old1+(target1-old1)*t,old2+(target2-old2)*t);
     if(initializing && n->type==FM_Resonz)out=0;

@@ -13,7 +13,9 @@ test: all
 	$(CC) $(CFLAGS) -Isrc src/fm_load.c tests/decay_sparse.c -lm -o build/decay-sparse-test
 	build/decay-sparse-test
 	python3 tests/test_engine.py
+	python3 tests/test_expansion.py
 	python3 tests/test_miverb_oracle.py
+	python3 tests/test_mimu_oracle.py
 clean:
 	rm -f build/fm-render build/libfmsynth.dylib
 
@@ -48,3 +50,15 @@ sanitize: | build
 	build/fuzz-ubsan fixtures/m7_FreeVerb_noise.scsyndef
 	build/fuzz-ubsan fixtures/m7_FreeVerb2_noise.scsyndef
 	build/fuzz-ubsan fixtures/m7_MiVerb_freeze.scsyndef
+
+# Exercise hostile mutations through each new state family.
+	build/fuzz-ubsan fixtures/m8_Fold_ar_1.scsyndef
+	build/fuzz-ubsan fixtures/m8_Trig_ar_0.scsyndef
+	build/fuzz-ubsan fixtures/m8_Stepper_ar_2.scsyndef
+	build/fuzz-ubsan fixtures/m8_XFade2_ar_1.scsyndef
+	build/fuzz-ubsan fixtures/m8_LinExp_ar_0.scsyndef
+	build/fuzz-ubsan fixtures/m8_MiMu_dc3.scsyndef
+	build/fuzz-ubsan fixtures/m9_LFDNoise3_ar_1.scsyndef
+	build/fuzz-ubsan fixtures/m9_SyncSaw_ar_1.scsyndef
+	build/fuzz-ubsan fixtures/m9_Amplitude_kr_ar_0.scsyndef
+	build/fuzz-ubsan fixtures/m9_BLowShelf_2_2.scsyndef

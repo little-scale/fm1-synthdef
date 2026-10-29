@@ -1,53 +1,53 @@
-# UGen additions: implementation status
+# UGen roadmap
 
-Updated 28 October 2026. The development source now implements **77 UGen types**, up from 53 in the published **v0.1.0-preview** firmware. The additions below passed emulation and firmware build checks; physical FM-1 playback and timing remain to be checked. Release assets have not changed.
+Updated 30 October 2026. The development engine contains **109 UGen types**. The 32 additions below are implemented; hardware installation and realtime checks are deferred at the user's request. The existing published preview remains unchanged.
 
-## Implemented from the initial analysis
+## Completed expansion
 
-| Addition | Rates | Main compatibility work |
-| --- | --- | --- |
-| `SampleRate`, `SampleDur`, `ControlRate`, `ControlDur`, `BlockSize`, `RadiansPerSample` | Initial | Zero-input admission; constructor caching; control rate uses engine block 64 |
-| `Delay1`, `Delay2` | Audio/control | Explicit initial values, different rate defaults, block boundaries and restart |
-| `OnePole`, `OneZero`, `LPZ1`, `HPZ1` | Audio/control | Constructor state, signed coefficients and control interpolation |
-| `Latch`, `Gate` | Audio/control | Startup, held triggers, edge capture versus tracking, mixed rates |
-| `TRand`, `TExpRand` | Audio/control | Seeded draw order, changing bounds, exponential domains, pinned upstream audio-trigger behavior |
-| `Dust`, `Dust2` | Audio/control | Seeded streams, density scaling, zero/negative/high density, live density changes |
-| `Impulse` | Audio/control | Startup, zero/negative frequency, phase offsets, block changes and audio frequency modulation |
-| `Decay`, `Decay2` | Audio/control | Accurate long tails, changing times, repeated triggers, zero/equal/near-equal/very short times |
-| `FreeVerb`, `FreeVerb2`, `MiVerb` | Audio | Exact-size caller-owned state, constructor behavior, stereo routing, freeze, parameter clamps, pinned upstream oracles |
-| `.cpsmidi`, `.midiratio`, `.ratiomidi`, `.dbamp`, `.ampdb` | Initial/control/audio operators | Domain checks and host/device-math comparison |
+| Group | Added types |
+| --- | --- |
+| Bounds and mappings | Fold, Wrap, LinExp |
+| Noise | BrownNoise, ClipNoise, LFDNoise0, LFDNoise1, LFDNoise3 |
+| Triggers and counters | Trig, Trig1, PulseDivider, PulseCount, ToggleFF, SetResetFF, Stepper |
+| Mixing and panning | XFade2, LinXFade2, Balance2 |
+| Smoothing and tracking | Slew, Lag2, Lag3, Amplitude |
+| Oscillators | VarSaw, SyncSaw, LFCub, LFPar |
+| Filters and EQ | RHPF, BRF, BPeakEQ, BLowShelf, BHiShelf |
+| Distortion | MiMu |
 
-The implementation reuses existing per-node state. The current battery-display build uses **78,432 bytes** of static RAM and pool use **325,992 of 344,064 bytes**. The development application is **226,104 bytes**, 18,200 bytes larger than the preview. Those separate memory regions do not establish a CPU budget.
+Modulo, round, roundUp, trunc, clip2, fold2 and wrap2 binary selectors were added too. SelectX now compiles and renders at audio/control rate; it is a source helper, not a separate runtime UGen. The [full profile](../synthdef-engine/README.md#supported-profile) states rate and domain restrictions. In particular, the new EQ coefficients are initial/control rate, oscillator frequencies are bounded, and MiMu is audio-only.
 
-See the [engine profile](../synthdef-engine/README.md#supported-profile) for rate/domain restrictions. In particular: Impulse phase is initial-rate only; filter coefficients, Dust density and decay times are initial/control rate; audio triggered-random outputs require an audio trigger. TExpRand audio behavior follows a version-specific SuperCollider 3.14.1 quirk documented there.
+New types reuse existing per-node state and allocate no delay buffers. Static RAM and the instrument pool remain unchanged. A stable difference-state form avoids cancellation in low-cutoff high-pass/notch/EQ filters. Control-frequency SinOsc increments and MiMu's float-to-PCM conversion match the reference without software double routines on the single-precision device.
 
-Reverb memory is charged to the existing arena: FreeVerb 50,492 bytes, FreeVerb2 102,088 bytes, MiVerb 65,536 bytes per instance. Their implementation required dedicated memory admission and reference tests; physical CPU results and graph-specific limits are recorded in [VERIFICATION.md](VERIFICATION.md).
+[MiMu drive](../fm1-synth/examples/mimu-drive.scd) is a stereo master-effect example; [modulation lab](../fm1-synth/examples/modulation-lab.scd) exercises VarSaw, LFDNoise1, LinExp and Lag3 with live knobs. Neither example replaces a saved user slot.
 
-The [verification record](VERIFICATION.md) covers reference comparisons, API checks, sanitizer mutations, two-voice instrument emulation and firmware compilation. The [Dust chimes example](../fm1-synth/examples/dust-chimes.scd) demonstrates the requested random-trigger/decay combination.
+## MiRings feasibility result
 
-## Next moderate candidates
+The complete pinned upstream implementation was built and run on the Mac. All six resonator models and all six alternate-mode effect settings produced finite, nonzero audio over 131,072 frames each. This is a host smoke test, not a hardware port or performance measurement.
 
-- **LinExp:** useful exponential knob mappings. A bounded initial/control-bound implementation can reuse existing math, but needs source-range degeneracy, destination-sign and target-accuracy coverage.
-- **XFade2 / LinXFade2:** morphing and wet/dry control. Existing pan math helps; constructor behavior, rates and level interpolation still need reference tests.
-- **Rounding, wrapping and folding operators:** useful independently and needed by the installed `SelectX` helper. Adding crossfade UGens alone does not make SelectX work.
-- **General pow:** needs separate signed-base semantics. The current device helper rejects negative bases; its existence does not establish SuperCollider operator compatibility.
+The host probe measured:
 
-These candidates are **not implemented**. The present batch covers both the easy additions and the moderate trigger/decay group; it does not claim all prospective UGens are cheap or complete.
+| Storage | Bytes |
+| --- | ---: |
+| Rings Part | 110,888 |
+| Alternate string synth | 2,168 |
+| Strummer | 908 |
+| Reverb buffer | 65,536 |
+| Performance/patch state and 64-frame input/silence buffers | 548 |
+| Total, excluding wrapper overhead | **180,048** |
 
-## Helpers already usable
+Target pointer/alignment differences do not remove the large gap to the current **131,072-byte shared DSP arena**, or the **65,536-byte per-synth-voice admission limit**. The current pool has approximately 18 KiB free. Full MiRings therefore remains unsupported in this firmware; it is rejected at import rather than approximated under the same name.
 
-The Mac compiler expands `Mix`, `LinLin` and `PMOsc` into existing arithmetic and oscillator nodes. Simple examples passed compilation/import/rendering during the initial review. `DynKlang` and `DynKlank` similarly expand into supported nodes within graph limits. These helpers are not additional runtime UGen types, and smoke checks do not certify arbitrary arguments or CPU load.
+Possible next approaches are a deliberately named modal-only engine, splitting model-specific storage, or a dedicated lower-polyphony firmware/memory layout. These require design, audio-reference and realtime work. Existing Ringz/Klank can make useful resonant patches but are not claimed to sound identical to Rings.
 
-## Larger work
+Reproduce the host probe with `synthdef-engine/tools/probe-mirings.py --upstream PATH --output RESULT.json`, using mi-UGens commit `10f6824f68ad63475f67dfe3fe5016e2d2634f84` including its eurorack sources. The probe verifies source hashes before building. See [probe evidence](../evidence/mirings-feasibility-2026-10-30.json).
 
-- `PlayBuf`/`BufRd`, granular buffers and sample storage need a buffer registry, upload/storage management and a RAM/streaming budget.
-- `FFT`/PV processing needs spectral buffers and transforms.
-- `LocalIn`/`LocalOut` need explicit graph feedback/block-delay semantics; they are not aliases for slot 0's immutable input.
-- Pitch shifting and look-ahead dynamics need separate memory/CPU budgeting.
-- More band-limited oscillators may be expensive. The original three-Saw patch demonstrated that admission alone cannot guarantee two-voice timing.
+## Remaining work
 
-## Validation policy and sources
+- Install the new image, preserve/read back all slots, and check two voices through the chosen master effect with live knobs. Emulation cannot certify realtime load.
+- General signed-base `pow` remains unsupported and needs its own reference/domain work.
+- PlayBuf/BufRd and granular processing require sample storage, a buffer registry and memory/streaming budgets.
+- FFT/PV processing requires spectral buffers and transforms.
+- LocalIn/LocalOut require explicit graph feedback semantics.
 
-An implementation must validate graph layout/rates, match constructor/render behavior against pinned SuperCollider 3.14.1, cover malformed inputs and numerical faults, compare host/device math and rebuild firmware. Emulation support and physical-device acceptance are recorded separately. Hardware acceptance additionally needs two voices, slot 0 and live controls on the FM-1.
-
-Primary references are the pinned sources and hash manifest in `synthdef-engine/reference/`, especially `FilterUGens.cpp`, `NoiseUGens.cpp`, `TriggerUGens.cpp` and `LFUGens.cpp`, plus the installed 3.14.1 class library. Official help provides usage context: [Dust](https://doc.sccode.org/Classes/Dust.html), [Decay](https://doc.sccode.org/Classes/Decay.html), [Decay2](https://doc.sccode.org/Classes/Decay2.html), [Impulse](https://doc.sccode.org/Classes/Impulse.html). Exact version-specific behavior follows the pinned implementation.
+The earlier finding still applies: two Addy voices through FreeVerb exceeded the device budget. More supported types do not imply every graph is affordable. See [verification](VERIFICATION.md) for measured results and the distinction between emulation, builds and physical hardware checks.

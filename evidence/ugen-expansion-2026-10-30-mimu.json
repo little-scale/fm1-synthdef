@@ -1,0 +1,14 @@
+[
+  {
+    "audio_gain": false,
+    "frames": 524288,
+    "peak_error": 0,
+    "passed": true
+  },
+  {
+    "audio_gain": true,
+    "frames": 524288,
+    "peak_error": 0,
+    "passed": true
+  }
+]

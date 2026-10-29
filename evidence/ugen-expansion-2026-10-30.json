@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-30",
+  "implemented_types": 109,
+  "added_types": 32,
+  "reference_graphs": 805,
+  "backends": [
+    "ordinary host",
+    "optimized instrument host",
+    "freestanding device math (host emulation)"
+  ],
+  "all_reference_cases_passed": true,
+  "engine_api_groups": 40,
+  "instrument_python_groups": 7,
+  "sanitizer_mutations_passed": 640000,
+  "mimu_identical_input_samples": 1048576,
+  "mimu_bit_exact": true,
+  "miverb_oracle_cases_passed": 8,
+  "new_examples_two_voice_scenarios": 5,
+  "hardware_tested": false,
+  "hardware_status": "User requested emulation only; installation, timing and physical acceptance deferred",
+  "user_slots_changed": false,
+  "editor_status": "Isolated compile/save/preview passed; existing editor needs restart to load the new library",
+  "target": {
+    "application_bytes": 246560,
+    "package_bytes": 610136,
+    "static_ram_bytes": 78480,
+    "static_ram_capacity": 98304,
+    "pool_bytes": 326008,
+    "pool_capacity": 344064,
+    "ble": false,
+    "identity": "FM-1_1200"
+  },
+  "sha256": {
+    "synthdef.bin": "a49c2e9cf3257b26495b49051e15cc9f9fb862774a1fd449831c0929cf32bd28",
+    "synthdef.fwsc": "46c07892630a67bc7e5b08e26d27f8729400bba5fdfa3356fe62d0983aba111d"
+  },
+  "source_sha256": {
+    "synthdef-engine/src/fm_synth.h": "16fbd7cc01ea3100fb51b4423744b9c774161e6d8b96e324771401fb7a738621",
+    "synthdef-engine/src/fm_load.c": "86620ca1bc310f2ca071465f6da74424f5b5f0772edece852da72fc963253965",
+    "synthdef-engine/src/fm_render.c": "de464726d780f4bb55b62340becd8da6f5d2ebcfd5b739123d9ac53103ccfae5",
+    "synthdef-engine/src/fm_fast.inc": "3b8ae29ecf5a16875a9c1c3dad0c76ff2bc9035dafc9baffee3fddef3f59bf99",
+    "synthdef-engine/src/fm_filters.inc": "9f52af685a2002640d98c21169ab82c594bc151bb4996f4f4be7151a5634f895",
+    "synthdef-engine/src/fm_utilities.inc": "aaf9269d310c8d540a22a7216ed33187a5464dc8effe185e8eb746aab7a15b41",
+    "synthdef-engine/src/fm_modulation.inc": "a2806ae947db03f33ee1246a0bf55679394ca6c27527d4d474b4a505a98008f7",
+    "fm1-synth/firmware/device_include/math.h": "d0e4990fc9fad5b07908fe38918066e2e6f3d9ac350f2e9f5ba3e28ad48b024d"
+  },
+  "comparisons": [
+    "ugen-expansion-2026-10-30-reference.json",
+    "ugen-expansion-2026-10-30-optimized-host.json",
+    "ugen-expansion-2026-10-30-device-math.json",
+    "ugen-expansion-2026-10-30-mimu.json",
+    "ugen-expansion-2026-10-30-examples.json",
+    "ugen-expansion-2026-10-30-editor.json",
+    "mirings-feasibility-2026-10-30.json"
+  ]
+}

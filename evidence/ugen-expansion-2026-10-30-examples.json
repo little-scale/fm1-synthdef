@@ -1,0 +1,57 @@
+[
+  {
+    "initial_knobs": 0,
+    "live_knobs": 1,
+    "frames": 140800,
+    "peaks": [
+      0.6862562894821167,
+      0.6862562894821167
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "initial_knobs": 0.25,
+    "live_knobs": 0.75,
+    "frames": 140800,
+    "peaks": [
+      0.5460981130599976,
+      0.5460981130599976
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "initial_knobs": 0.5,
+    "live_knobs": 0.5,
+    "frames": 140800,
+    "peaks": [
+      0.365336149930954,
+      0.365336149930954
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "initial_knobs": 0.75,
+    "live_knobs": 0.25,
+    "frames": 140800,
+    "peaks": [
+      0.5446497797966003,
+      0.5446497797966003
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "initial_knobs": 1,
+    "live_knobs": 0,
+    "frames": 140800,
+    "peaks": [
+      0.6862562894821167,
+      0.6862562894821167
+    ],
+    "faults": 0,
+    "release_silent": true
+  }
+]

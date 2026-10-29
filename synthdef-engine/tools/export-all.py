@@ -11,7 +11,7 @@ ROOT=Path(__file__).resolve().parents[1]
 SCLANG=os.environ.get('SCLANG','/Applications/SuperCollider.app/Contents/MacOS/sclang')
 version=subprocess.check_output([SCLANG,'-v'],text=True,timeout=10)
 if '3.14.1' not in version:raise SystemExit('Fixture export requires SuperCollider 3.14.1')
-for script in ('export-fixtures.scd','export-stage2.scd','export-stage3.scd','export-delays.scd','export-random.scd','export-extensions.scd','export-reverbs.scd'):
+for script in ('export-fixtures.scd','export-stage2.scd','export-stage3.scd','export-delays.scd','export-random.scd','export-extensions.scd','export-reverbs.scd','export-utilities.scd','export-modulation.scd'):
     with tempfile.TemporaryDirectory(prefix='fm1-sc-export-') as tmp:
         run=subprocess.run(language_command(SCLANG,ROOT/'tools'/script,tmp),capture_output=True,text=True,timeout=45)
     if run.returncode or 'ERROR:' in run.stdout+run.stderr or 'fixtures exported' not in run.stdout:
