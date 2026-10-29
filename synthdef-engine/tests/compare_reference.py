@@ -97,7 +97,7 @@ def main():
             args += [str(int(t*44100)//64), str(value)]
         run = subprocess.run(args, capture_output=True, text=True)
         if run.returncode:
-            results.append(dict(name=name, passed=False, error=run.stderr)); continue
+            results.append(dict(name=name, passed=False, error=run.stderr or run.stdout or f"Engine renderer exited {run.returncode}")); continue
         a, b = samples(ours), samples(ref)
         length = blocks*64*2
         if len(a)!=length or len(b)<length or not all(math.isfinite(x) for x in a) or not all(math.isfinite(x) for x in b[:length]):

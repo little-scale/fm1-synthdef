@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-30",
+  "implemented_types": 114,
+  "added_types": [
+    "Formant",
+    "Formlet"
+  ],
+  "rates": {
+    "Formant": [
+      "audio"
+    ],
+    "Formlet": [
+      "audio",
+      "control"
+    ]
+  },
+  "extra_node_state_bytes": 0,
+  "extra_arena_bytes": 0,
+  "reference_cases_per_backend": 981,
+  "waveform_or_timing_cases_per_backend": 953,
+  "stochastic_summary_cases_per_backend": 28,
+  "new_waveform_cases_per_backend": 95,
+  "formant_bit_exact_ordinary_host_cases": 15,
+  "maximum_new_ordinary_host_peak_error": 1.1704862117767334e-05,
+  "all_reference_cases_passed": true,
+  "engine_api_groups": 50,
+  "instrument_python_groups": 7,
+  "ubsan_mutations": 740000,
+  "long_render_frames": 2097152,
+  "example_scenarios": 10,
+  "example_frames_each": 307200,
+  "maximum_example_peak": 0.1948319524526596,
+  "hardware_tested": false,
+  "hardware_status": "User deferred installation, listening and realtime timing checks",
+  "user_slots_changed": false,
+  "running_editor_changed": false,
+  "editor_action": "Restart the editor to load the updated native engine",
+  "target": {
+    "application_bytes": 258984,
+    "package_bytes": 610136,
+    "static_ram_bytes": 78480,
+    "static_ram_capacity": 98304,
+    "pool_bytes": 326008,
+    "pool_capacity": 344064,
+    "ble": false,
+    "identity": "FM-1_1200",
+    "software_double_helpers": false,
+    "multiply_load_hazards": false
+  },
+  "sha256": {
+    "synthdef.bin": "49cdfa747b797b2dcd36bb268337ba4e9f6e8a3cca47e0de2f23dd0dfbad7ca6",
+    "synthdef.fwsc": "67ae21ffcacd6e81bea79860526d442084ef86c0c6eb633cf932f86c1918786a"
+  },
+  "source_sha256": {
+    "synthdef-engine/src/fm_synth.h": "111b6c4943fafbfa1f4d5eae8988a2f77c94b0044326205a268bf8a20204e4f1",
+    "synthdef-engine/src/fm_load.c": "b6e99fb07778b02674d3b310e9f7135aca9d9f71f4a5a5a30f8e0d574bea87e6",
+    "synthdef-engine/src/fm_render.c": "448115f7c4371206c1c18a863ca0a94a66cd3f52e5055a0632617e8c54abba12",
+    "synthdef-engine/src/fm_formants.inc": "538d80f62c08effde38deba4d278ffe11e8c02440625f0013537613a81e146e2"
+  },
+  "results": [
+    "formants-2026-10-30-reference.json",
+    "formants-2026-10-30-optimized-host.json",
+    "formants-2026-10-30-device-math.json",
+    "formants-2026-10-30-examples.json"
+  ]
+}

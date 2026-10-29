@@ -1,6 +1,6 @@
 {
-  "id": "host-10",
-  "status": "development: 112 types verified in emulation; hardware checks deferred",
+  "id": "host-11",
+  "status": "development: 114 types verified in emulation; hardware checks deferred",
   "implemented_types": [
     "Control",
     "SinOsc",
@@ -113,7 +113,9 @@
     "BHiShelf",
     "Gendy1",
     "Gendy2",
-    "Gendy3"
+    "Gendy3",
+    "Formant",
+    "Formlet"
   ],
   "planned_remaining_types": [
     "MiRings (full port exceeds current memory budget)"
@@ -501,5 +503,29 @@
     ],
     "hardware_tested": false,
     "known_numerical_difference": "Gendy2 chaotic trajectory drift; Gendy3 integer interpolation boundaries; not bit-identical desktop waveforms"
+  },
+  "formants": {
+    "Formant": {
+      "rates": [
+        "audio"
+      ],
+      "frequency_inputs": "initial/control, finite 0..Nyquist",
+      "audio_parameter_inputs": false
+    },
+    "Formlet": {
+      "rates": [
+        "audio",
+        "control"
+      ],
+      "audio_input_required_for_ar": true,
+      "frequency": "initial/control, finite 0..Nyquist at UGen rate",
+      "attack_decay": "initial/control, finite 0..1000000 seconds",
+      "equal_times": "cancel",
+      "attack_greater_than_decay": "inverted response"
+    },
+    "extra_state_bytes": 0,
+    "extra_arena_bytes": 0,
+    "reference_fixtures": 95,
+    "hardware_tested": false
   }
 }

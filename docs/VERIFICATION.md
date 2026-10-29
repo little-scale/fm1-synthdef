@@ -1,6 +1,22 @@
 # Verification record
 
 
+## Formant / Formlet — 30 October 2026
+
+The development engine now implements **114 UGen types**, adding `Formant.ar` and `Formlet.ar/kr`. All frequency, bandwidth and resonance-time parameters are initial/control rate, with documented finite-domain bounds. Neither type allocates DSP arena storage or enlarges node state. Hardware checks remain deferred at the user's request.
+
+- **981/981 reference cases pass** on ordinary host, optimized host and firmware-math host emulation: 953 waveform/timing cases and the existing 28 explicitly labeled Gendy stochastic-summary cases. The **95 new Formant/Formlet cases all use waveform comparison**. All 15 Formant cases are bit-identical to the pinned SuperCollider 3.14.1 output on the ordinary host.
+- Formlet checks cover audio/control rates, impulse/sine/seeded-noise excitation, DC and Nyquist resonances, zero/equal/reversed attack and decay times, parameter steps and repeated frequency changes across the low/high calculation boundary. Ordinary-host maximum peak error across the new cases is below 1.18e-5; the declared limits are peak 1e-4 / RMS 3e-5. Firmware-math limits are peak 1e-3 / RMS 1e-4.
+- **50 engine API test groups** pass, including five new groups for parameter/rate rejection, cancellation and inversion identities, no-arena memory requirements, restart/shared-scratch isolation and **2,097,152 long-render frames** at four sample rates. The existing instrument tests, seven Python groups and Gendy/MiMu/MiVerb oracles also pass.
+- **740,000 malformed/truncated graph mutations** pass the UBSan/bounds/float-cast-overflow suite. The previously documented macOS AddressSanitizer startup issue remains; no new ASan pass is claimed.
+- **10 two-voice example scenarios**, each 307,200 frames through master echo, cover five knob settings, live changes, stealing and release. All produce finite nonzero audio without faults, with peak below 0.195 and silence after the release/echo tail. Source, compiled graph and `.fmslot` files are included for both examples. Saved slots and the running local editor are unchanged.
+- The application is **258,984 bytes**, with static RAM **78,480 / 98,304 bytes** and pool **326,008 / 344,064 bytes**. Package size is 610,136 bytes, Bluetooth disabled. Build checks find no software-double routines or 64-bit multiply/load hazard. Fit and emulation do not establish realtime device capacity.
+
+Formant preserves upstream's wrapped 32-bit phase-reset arithmetic. Formlet uses compensated difference states, with alternating-sign modulation near Nyquist to avoid cancellation at either band edge. Live frequency changes convert existing state and interpolated coefficients when the representation changes. A reference-runner diagnostic was also fixed so a failed render with empty stderr reports its stdout/exit status instead of obscuring the failure with a formatting exception.
+
+Reproduce with the existing engine/reference/backend/instrument test commands and `fm1-synth/tools/test-formants.py`. See [Formant/Formlet evidence](../evidence/formants-2026-10-30.json) for results and hashes. Restart the local editor to load the new engine. Device installation, listening and realtime checks remain for when the FM-1 is available.
+
+
 ## Gendy1 / Gendy2 / Gendy3 — 30 October 2026
 
 The development engine now has **112 UGen types**. All three Gendy types support audio/control rates and all seven distributions, with a literal initial allocation of 1–64 breakpoints and live control parameters. Hardware installation and listening/timing checks remain deferred at the user's request; saved slots and the running editor were not changed.

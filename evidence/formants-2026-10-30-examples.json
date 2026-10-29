@@ -1,0 +1,122 @@
+[
+  {
+    "patch": "formant",
+    "initial_knobs": 0,
+    "live_knobs": 1,
+    "frames": 307200,
+    "peaks": [
+      0.17983193695545197,
+      0.17983193695545197
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "formant",
+    "initial_knobs": 0.25,
+    "live_knobs": 0.75,
+    "frames": 307200,
+    "peaks": [
+      0.12656551599502563,
+      0.12656551599502563
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "formant",
+    "initial_knobs": 0.5,
+    "live_knobs": 0.5,
+    "frames": 307200,
+    "peaks": [
+      0.1399310976266861,
+      0.1399310976266861
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "formant",
+    "initial_knobs": 0.75,
+    "live_knobs": 0.25,
+    "frames": 307200,
+    "peaks": [
+      0.15729622542858124,
+      0.15729622542858124
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "formant",
+    "initial_knobs": 1,
+    "live_knobs": 0,
+    "frames": 307200,
+    "peaks": [
+      0.14509563148021698,
+      0.14509563148021698
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "formlet",
+    "initial_knobs": 0,
+    "live_knobs": 1,
+    "frames": 307200,
+    "peaks": [
+      0.1948319524526596,
+      0.1948319524526596
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "formlet",
+    "initial_knobs": 0.25,
+    "live_knobs": 0.75,
+    "frames": 307200,
+    "peaks": [
+      0.08611684292554855,
+      0.08611684292554855
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "formlet",
+    "initial_knobs": 0.5,
+    "live_knobs": 0.5,
+    "frames": 307200,
+    "peaks": [
+      0.06112835556268692,
+      0.06112835556268692
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "formlet",
+    "initial_knobs": 0.75,
+    "live_knobs": 0.25,
+    "frames": 307200,
+    "peaks": [
+      0.05524401739239693,
+      0.05524401739239693
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "formlet",
+    "initial_knobs": 1,
+    "live_knobs": 0,
+    "frames": 307200,
+    "peaks": [
+      0.15428009629249573,
+      0.15428009629249573
+    ],
+    "faults": 0,
+    "release_silent": true
+  }
+]

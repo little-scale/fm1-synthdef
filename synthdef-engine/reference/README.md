@@ -4,10 +4,10 @@ Reference implementation: [SuperCollider 3.14.1](https://github.com/supercollide
 
 - `server/plugins/GendynUGens.cpp`: Gendy1/2/3 stochastic oscillators, Nick Collins (GPL-2.0-or-later).
 - `server/plugins/LFUGens.cpp`: envelope and Line/XLine definitions.
-- `server/plugins/FilterUGens.cpp`: filter, decay and resonator recurrences.
+- `server/plugins/FilterUGens.cpp`: filter, decay and resonator recurrences, including Formlet.
 - `server/plugins/TriggerUGens.cpp`: Latch/Gate trigger and constructor behavior.
 - `server/plugins/DelayUGens.cpp`, `include/plugin_interface/SC_InlineUnaryOp.h`: Delay, Comb and Allpass families and signed decay/feedback semantics.
-- `server/plugins/OscUGens.cpp`: oscillator phase and Klang/Klank recurrences.
+- `server/plugins/OscUGens.cpp`: oscillator phase (including Formant) and Klang/Klank recurrences.
 - `server/plugins/PanUGens.cpp`: Pan2 table quantization and interpolation.
 - `server/plugins/IOUGens.cpp`: LagControl/TrigControl initialization and processing.
 - `server/plugins/NoiseUGens.cpp`, `include/plugin_interface/SC_RGen.h`, `include/plugin_interface/Hash.h`: noise kernels, taus88 generator and integer seed hash.
@@ -41,3 +41,5 @@ The m6 extension fixtures cover 21 additional types and five pitch/gain selector
 `tools/probe-mirings.py --upstream PATH --output RESULT.json` builds a host-only feasibility probe from a separately checked-out mi-UGens commit `10f6824f68ad63475f67dfe3fe5016e2d2634f84`. `mirings-probe-sources.json` verifies its upstream Rings/stmlib sources. The probe does not provide MiRings support in the engine and cannot establish hardware timing.
 
 `export-gendy.scd` supplies 81 Gendy graphs. `tests/gendy_oracle.cpp` compiles the unmodified pinned source and compares distribution values, constructor arrays, RNG consumption and identical-state one-sample transitions against both C math backends. This isolates chaotic drift from implementation errors. Long NRT comparisons are explicitly labeled waveform or stochastic-summary; neither is a hardware timing measurement.
+
+`export-formants.scd` supplies 95 Formant/Formlet waveform fixtures using the already-pinned OscUGens.cpp and FilterUGens.cpp sources. The C port retains Formant’s wrapped integer phase resets and uses a compensated, frequency-shifted difference-state realization for Formlet.

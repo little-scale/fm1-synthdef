@@ -207,6 +207,7 @@ static __attribute__((noinline)) void fast_envelope(const fm_graph *g,fm_voice *
 #include "fm_utilities.inc"
 #include "fm_modulation.inc"
 #include "fm_gendy.inc"
+#include "fm_formants.inc"
 #include "fm_reverb.inc"
 
 static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *stereo,int initializing,const float *input_stereo) {
@@ -268,6 +269,8 @@ static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *ster
   if(n->type==FM_Decay || n->type==FM_Decay2){fast_decay(g,v,b,n,s,count,sr,initializing);continue;}
   if(n->type==FM_Dust || n->type==FM_Dust2){fast_dust(g,v,b,n,s,count,sr);continue;}
   if(n->type>=FM_OnePole && n->type<=FM_Decay2){extensions(g,v,b,n,s,count,sr,initializing);continue;}
+  if(n->type==FM_Formant){formant_render(g,v,b,n,s,count,sr,initializing);continue;}
+  if(n->type==FM_Formlet){formlet_render(g,v,b,n,s,count,sr,initializing);continue;}
   if(fm_is_gendy(n->type)){gendy_render(g,v,b,n,s,count,sr,initializing);continue;}
   if(n->type>=FM_VarSaw && n->type<=FM_BHiShelf){modulation(g,v,b,n,s,count,sr,initializing);continue;}
   if(n->type>=FM_Fold && n->type<=FM_MiMu){utilities(g,v,b,n,s,count,sr,initializing);continue;}

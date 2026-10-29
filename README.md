@@ -4,7 +4,7 @@
 
 FM1 SynthDef is an experimental embedded SynthDef runtime and programmable instrument. Write a patch in the local browser editor, compile it with SuperCollider on your Mac, send it over USB, and play it on the FM-1.
 
-The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and executes that graph using a bounded set of 112 supported UGen types in the development source. This is not the full SuperCollider language, scsynth server or plugin ecosystem.
+The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and executes that graph using a bounded set of 114 supported UGen types in the development source. This is not the full SuperCollider language, scsynth server or plugin ecosystem.
 
 ## What it does
 
@@ -20,11 +20,11 @@ The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and exec
 
 The latest expansion adds 32 types, including **MiMu.ar**. [MiMu drive](fm1-synth/examples/mimu-drive.scd) and [modulation lab](fm1-synth/examples/modulation-lab.scd) are ready to compile and preview. Full **MiRings is not supported**: its upstream host probe works, but its roughly 176 KiB instance exceeds our 128 KiB shared DSP arena. See the [roadmap](docs/UGEN-ROADMAP.md).
 
-The development source supports these **112 compiled UGen types**, verified in emulation. The published **v0.1.0-preview firmware contains 53 types**; the additions below require a development build; the previous 77-type build has passed selected hardware tests. The latest 35 additions are awaiting hardware checks. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
+The development source supports these **114 compiled UGen types**, verified in emulation. The published **v0.1.0-preview firmware contains 53 types**; the additions below require a development build; the previous 77-type build has passed selected hardware tests. The latest 37 additions are awaiting hardware checks. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
 
 | Category | UGen types |
 | --- | --- |
-| Oscillators | `SinOsc`, `Saw`, `Pulse`, `LFSaw`, `LFTri`, `LFPulse`, `Impulse`, `VarSaw`, `SyncSaw`, `LFCub`, `LFPar` |
+| Oscillators | `SinOsc`, `Saw`, `Pulse`, `LFSaw`, `LFTri`, `LFPulse`, `Impulse`, `VarSaw`, `SyncSaw`, `LFCub`, `LFPar`, `Formant` |
 | Stochastic oscillators | `Gendy1`, `Gendy2`, `Gendy3` (audio/control; 1–64 literal initial breakpoints) |
 | Noise | `WhiteNoise`, `PinkNoise`, `LFNoise0`, `LFNoise1`, `LFNoise2`, `Dust`, `Dust2`, `BrownNoise`, `ClipNoise`, `LFDNoise0`, `LFDNoise1`, `LFDNoise3` |
 | Random values and seed | `Rand`, `ExpRand`, `RandSeed`, `TRand`, `TExpRand` |
@@ -32,7 +32,7 @@ The development source supports these **112 compiled UGen types**, verified in e
 | Filters and DC removal | `LPF`, `HPF`, `RLPF`, `BPF`, `LeakDC`, `OnePole`, `OneZero`, `LPZ1`, `HPZ1`, `RHPF`, `BRF`, `BPeakEQ`, `BLowShelf`, `BHiShelf` |
 | Distortion | `MiMu` |
 | Reverbs | `FreeVerb`, `FreeVerb2`, `MiVerb` |
-| Resonators and oscillator banks | `Resonz`, `Ringz`, `Klang`, `Klank` |
+| Resonators and oscillator banks | `Resonz`, `Ringz`, `Formlet`, `Klang`, `Klank` |
 | Delay and feedback filters | `Delay1`, `Delay2`, `DelayN`, `DelayL`, `DelayC`, `CombN`, `CombL`, `CombC`, `AllpassN`, `AllpassL`, `AllpassC` |
 | Controls and smoothing | `Control`, `LagControl`, `TrigControl`, `Lag`, `LagUD`, `Latch`, `Gate`, `Slew`, `Lag2`, `Lag3`, `Amplitude` |
 | Routing, selection and panning | `In`, `Out`, `Select`, `Pan2`, `XFade2`, `LinXFade2`, `Balance2` |
@@ -61,6 +61,8 @@ Download the complete **0.1.0-preview** archive from the repository's Releases p
 
 Three additional [Gendy examples](fm1-synth/examples/gendy3.scd) use knobs 1–4 for amplitude movement, duration movement, active breakpoints and cutoff. They are provided as `.scd`, `.scsyndef` and `.fmslot` files alongside the other examples; importing them is optional and does not alter the example bank.
 
+[Formant](fm1-synth/examples/formant.scd) and [Formlet](fm1-synth/examples/formlet.scd) examples are also supplied with four live knob controls, compiled graphs and importable `.fmslot` files.
+
 ## Example bank
 
 | Slot | Patch | Knobs |
@@ -80,7 +82,7 @@ SELECT scrolls the focused code, OCT± transposes subsequent keyboard notes, and
 
 ## Status
 
-The development engine passes 886 reference cases on three rendering backends: 858 waveform checks and 28 stochastic-summary checks, with separate identical-state Gendy oracles. It also passes 45 API test groups and 700,000 sanitizer mutation/truncation cases. The instrument simulator covers the Gendy examples with two voices and master echo. Gendy2’s chaotic feedback and Gendy3’s quantized interpolation can produce different long waveforms across floating-point implementations; these are algorithm-compatible ports, not bit-identical desktop output. The earlier 77-type build passed 189 hardware checks of the three reverbs with four lighter two-voice synths; two Addy voices through FreeVerb exceed the processing budget. The earlier 53-type preview was tested on one FM-1 and an Apple silicon Mac; its recorded hardware checks cover two voices, stealing, release, live knobs, persistent effects and code browsing. See [verification and limitations](docs/VERIFICATION.md).
+The development engine passes 981 reference cases on three rendering backends: 953 waveform checks and 28 stochastic-summary checks, with separate identical-state Gendy oracles. It also passes 50 API test groups and 740,000 sanitizer mutation/truncation cases. The instrument simulator covers the Gendy, Formant and Formlet examples with two voices and master echo. Gendy2’s chaotic feedback and Gendy3’s quantized interpolation can produce different long waveforms across floating-point implementations; these are algorithm-compatible ports, not bit-identical desktop output. The earlier 77-type build passed 189 hardware checks of the three reverbs with four lighter two-voice synths; two Addy voices through FreeVerb exceed the processing budget. The earlier 53-type preview was tested on one FM-1 and an Apple silicon Mac; its recorded hardware checks cover two voices, stealing, release, live knobs, persistent effects and code browsing. See [verification and limitations](docs/VERIFICATION.md).
 
 Passing the graph and memory checks does **not** guarantee that an arbitrary patch fits the audio processing budget. The overload guard stops notes and disables effects when the device is over budget. Final-release power-cycle persistence and recovery are not yet part of the acceptance record. This is an independent project, not an official M-VAVE or SuperCollider product.
 

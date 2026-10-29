@@ -15,6 +15,7 @@ test: all
 	python3 tests/test_engine.py
 	python3 tests/test_expansion.py
 	python3 tests/test_gendy.py
+	python3 tests/test_formants.py
 	python3 tests/test_gendy_oracle.py
 	python3 tests/test_gendy_oracle.py --device
 	python3 tests/test_miverb_oracle.py
@@ -69,3 +70,6 @@ sanitize: | build
 	build/fuzz-ubsan fixtures/m10_Gendy1_ar_cp64.scsyndef
 	build/fuzz-ubsan fixtures/m10_Gendy2_ar_cp64.scsyndef
 	build/fuzz-ubsan fixtures/m10_Gendy3_ar_cp64.scsyndef
+
+	build/fuzz-ubsan fixtures/m11_Formant_0.scsyndef
+	build/fuzz-ubsan fixtures/m11_Formlet_ar_2_9.scsyndef

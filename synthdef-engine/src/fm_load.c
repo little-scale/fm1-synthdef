@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #define FM_VALID 0x464d5331u
-static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In","SampleRate","SampleDur","ControlRate","ControlDur","BlockSize","RadiansPerSample","Delay1","Delay2","OnePole","OneZero","LPZ1","HPZ1","Latch","Gate","TRand","TExpRand","Dust","Dust2","Impulse","Decay","Decay2","FreeVerb","FreeVerb2","MiVerb","Fold","Wrap","BrownNoise","ClipNoise","Trig","Trig1","PulseDivider","PulseCount","ToggleFF","SetResetFF","Stepper","XFade2","LinXFade2","Balance2","LinExp","Slew","Lag2","Lag3","MiMu","RHPF","BRF","VarSaw","SyncSaw","LFCub","LFPar","LFDNoise0","LFDNoise1","LFDNoise3","Amplitude","BPeakEQ","BLowShelf","BHiShelf","Gendy1","Gendy2","Gendy3"};
+static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In","SampleRate","SampleDur","ControlRate","ControlDur","BlockSize","RadiansPerSample","Delay1","Delay2","OnePole","OneZero","LPZ1","HPZ1","Latch","Gate","TRand","TExpRand","Dust","Dust2","Impulse","Decay","Decay2","FreeVerb","FreeVerb2","MiVerb","Fold","Wrap","BrownNoise","ClipNoise","Trig","Trig1","PulseDivider","PulseCount","ToggleFF","SetResetFF","Stepper","XFade2","LinXFade2","Balance2","LinExp","Slew","Lag2","Lag3","MiMu","RHPF","BRF","VarSaw","SyncSaw","LFCub","LFPar","LFDNoise0","LFDNoise1","LFDNoise3","Amplitude","BPeakEQ","BLowShelf","BHiShelf","Gendy1","Gendy2","Gendy3","Formant","Formlet"};
 const char *fm_type_name(unsigned type) { return type < FM_TYPES ? types[type] : "unknown"; }
 typedef struct { const uint8_t *p; size_t left; int failed; } reader;
 static uint32_t rd(reader *r, unsigned n) {
@@ -95,6 +95,8 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
    if(u->type==FM_Pan2 || u->type==FM_FreeVerb2 || u->type==FM_MiVerb || u->type==FM_Balance2) expected=2;
    if(u->outputs!=expected) BAD("Invalid output count");
    switch(u->type) {
+    case FM_Formant: n=3; break;
+    case FM_Formlet: n=4; break;
     case FM_Gendy1: n=10; break;
     case FM_Gendy2: n=12; break;
     case FM_Gendy3: n=9; break;
@@ -161,6 +163,11 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
      fm_ref *ref=&g->ref[u->input+j];unsigned rate=ref->node<0?0:g->node[ref->node].rate;
      if((audio && rate!=2)||(!audio && rate>1)) BAD("Reverbs require audio input and initial/control parameters");
     }
+   }
+   if(u->type==FM_Formant || u->type==FM_Formlet) {
+    if(u->type==FM_Formant && u->rate!=2)BAD("Formant requires audio rate");
+    for(j=u->type==FM_Formant?0:1;j<u->inputs;j++){fm_ref *ref=&g->ref[u->input+j];if(ref->node>=0 && g->node[ref->node].rate>1)BAD("Formant/Formlet parameters require initial/control rate");}
+    if(u->type==FM_Formlet && u->rate==2){fm_ref *ref=&g->ref[u->input];if(ref->node<0 || g->node[ref->node].rate!=2)BAD("Formlet.ar requires audio input");}
    }
    if(fm_is_gendy(u->type)) {
     unsigned cp=u->type==FM_Gendy3?7:8;
