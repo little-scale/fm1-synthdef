@@ -1,5 +1,18 @@
 # Verification record
 
+## Fixed-model Rings and compact buffers — 30 October 2026
+
+The development profile now has **124 compiled UGen types**, adding MiRings1–MiRings6. The operator count remains 33 unary and 40 binary selectors. Hardware checks remain deferred; saved slots and the running editor were not changed.
+
+- **1,290/1,290 reference cases pass on all three backends** (ordinary host, optimized host and firmware-math host emulation): 1,262 waveform/timing cases and the existing 28 labeled Gendy stochastic cases. The 42 new Rings graphs use test-only SC wrappers around pinned, unmodified Rings Part, matching the explicit-trigger/full-buffer API.
+- **160 direct Rings cases per math backend**, each 65,536 frames, cover four sample rates (32/44.1/48/192 kHz), internal/external excitation, retriggering, live changes and low/extreme controls. All 120 full-model cases pass peak 0.001 / RMS 0.0001 limits against upstream. Maximum full-model peak error is below 0.000144. Of 40 compact comparisons, 12 ordinary-pitch scenarios require waveform agreement; the other 28 check finite output/allocation guards and report the intentional differences. Compact mode is not a full-model fidelity claim.
+- **65 engine API groups**, the instrument tests and **960,000 UBSan/bounds/float-cast-overflow graph mutations** pass. Rings-specific checks cover rate/layout rejection, literal allocation controls, exact/missing/undersized arenas with guard samples, restart/seed isolation, shared scratch, explicit triggers, bypass, parameter clamping and sample-rate guards. The existing macOS AddressSanitizer initialization limitation remains; no ASan pass is claimed.
+- **Seven instrument scenarios**, each 262,144 frames, verify six playable examples plus an audio-excited master-bus example. Live knobs, two voices, voice stealing and release produce finite nonzero output with no faults. Six note-patch tails become silent; the persistent bus is allowed to retain its longer decay. Compact models 2/5 use **32,752 bytes per voice**; two voices plus the supplied master echo consume **131,040 / 131,072 bytes**. This proves allocation/playback in emulation, not realtime device capacity.
+- Model 6 saves **22,272 bytes** by removing reverb-ring padding: it uses **56,836 bytes** with the original reverb delay lengths and 16-bit precision. Full models 2/5 retain eight 2,048-sample float string buffers and need 67,568 bytes (effect-only); optional compact mode keeps all eight strings with 960-sample float buffers. No floating-point precision is reduced. See [Rings model/API details](RINGS.md).
+- The target application is **310,180 bytes**, packaged in **610,136 bytes**. Static RAM is **78,480 / 98,304 bytes** and pool use **326,008 / 344,064 bytes**, unchanged. Bluetooth remains disabled. Target build checks find no software-double routines or 64-bit multiply/load hazard.
+
+Reproduction commands and compatibility bounds are in [the Rings guide](RINGS.md); source hashes, package hash and individual results are in [machine-readable evidence](../evidence/rings-split-2026-10-30.json). Restart the editor to load the new library/classes. Physical listening, keyboard interaction and realtime timing remain pending.
+
 ## Operators and Scale/Tuning — 30 October 2026
 
 The development profile now contains **118 compiled UGen types**, adding immutable `MaxLocalBufs` / `LocalBuf` / `SetBuf` pitch tables and `DegreeToKey.ar/kr`. It also adds **28 operator selectors** (7 unary, 21 binary), bringing the totals to 33 unary and 40 binary selectors. Formant, Formlet and Gendy1/2/3 remain available. Hardware installation and checks remain deferred at the user's request.

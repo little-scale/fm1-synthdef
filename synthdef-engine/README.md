@@ -1,6 +1,6 @@
 # FM1 SynthDef engine
 
-A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 118 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
+A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 124 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
 
 ## Try it
 
@@ -36,6 +36,7 @@ The simpler example in `examples/voice.scd` exports a playable gated sine voice 
 | RandSeed (additional) | initial, control, audio | Rising-edge reseeding; seed must be a literal integer within ±2²⁴ |
 | FreeVerb, FreeVerb2 | audio | Audio signal input(s), initial/control mix/room/damp, parameters clipped to 0–1; caller-owned memory |
 | MiVerb | audio | One/two audio inputs, stereo output; six initial/control parameters, pinned upstream limits; caller-owned memory |
+| MiRings1–MiRings6 | audio | Separate mono-in/stereo-out models, one internal voice, explicit initial/control-rate trigger; other parameters initial/control rate; literal `compact` flag; 32–192 kHz. [Model, memory and compatibility details](../docs/RINGS.md) |
 | MiMu | audio | Mono input/output per instance; audio or initial/control gain; initial/control bypass; language-level array expansion gives stereo; no delay memory |
 | Fold, Wrap | audio, control | Bounds may be audio rate; control bounds interpolate at audio rate; ordered bounds required, equal bounds return that bound |
 | BrownNoise, ClipNoise | audio, control | Seeded per-voice random stream and reference constructor draws |
@@ -212,7 +213,7 @@ The October 30 expansion reuses existing node state: no additional per-voice or 
 
 `SelectX.ar/kr` now compiles and renders through supported selectors and crossfade nodes. As with Mix and Splay, it is a source helper rather than an additional runtime type.
 
-MiRings is deliberately absent from the supported types. The pinned upstream implementation passed a host smoke probe for six models and six alternate-mode effect settings, but its approximately 180,048-byte host instance (including 65,536 bytes of reverb) exceeds this firmware's 131,072-byte shared arena and 65,536-byte per-voice budget. A reduced modal-only implementation or a separate memory layout needs further work and must not be presented as full MiRings compatibility.
+MiRings1–MiRings6 now use independent model arenas. Models 2/5 offer optional compact eight-string buffers; model 6 removes unused reverb padding while retaining every delay length. The full upstream MiRings API and alternate/Easter-egg modes remain unsupported. See [Rings model/memory details](../docs/RINGS.md).
 
 ## Gendy profile
 

@@ -4,7 +4,7 @@
 
 FM1 SynthDef is an experimental embedded SynthDef runtime and programmable instrument. Write a patch in the local browser editor, compile it with SuperCollider on your Mac, send it over USB, and play it on the FM-1.
 
-The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and executes that graph using a bounded set of 118 supported UGen types in the development source. This is not the full SuperCollider language, scsynth server or plugin ecosystem.
+The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and executes that graph using a bounded set of 124 supported UGen types in the development source. This is not the full SuperCollider language, scsynth server or plugin ecosystem.
 
 ## What it does
 
@@ -18,9 +18,9 @@ The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and exec
 
 ## Supported UGens
 
-The development source includes **Formant, Formlet, Gendy1/2/3**, **MiMu.ar**, live Scale/Tuning pitch tables and 28 additional maths operators. [MiMu drive](fm1-synth/examples/mimu-drive.scd) and [modulation lab](fm1-synth/examples/modulation-lab.scd) are ready to compile and preview. Full **MiRings is not supported**: its upstream host probe works, but its roughly 176 KiB instance exceeds our 128 KiB shared DSP arena. See the [roadmap](docs/UGEN-ROADMAP.md).
+The development source includes **Formant, Formlet, Gendy1/2/3**, **MiMu.ar**, live Scale/Tuning pitch tables and 28 additional maths operators. [MiMu drive](fm1-synth/examples/mimu-drive.scd) and [modulation lab](fm1-synth/examples/modulation-lab.scd) are ready to compile and preview. **MiRings1–MiRings6** now provide separate Rings models, with optional compact buffers for models 2/5 and a smaller, unchanged-delay reverb allocation for model 6. See the [Rings model/memory guide](docs/RINGS.md). The complete upstream MiRings API remains unsupported.
 
-The development source supports these **118 compiled UGen types**, verified in emulation. The published **v0.1.0-preview firmware contains 53 types**; the additions below require a development build; the previous 77-type build has passed selected hardware tests. The latest 41 additions are awaiting hardware checks. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
+The development source supports these **124 compiled UGen types**, verified in emulation. The published **v0.1.0-preview firmware contains 53 types**; the additions below require a development build; the previous 77-type build has passed selected hardware tests. The latest 47 additions are awaiting hardware checks. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
 
 | Category | UGen types |
 | --- | --- |
@@ -31,6 +31,7 @@ The development source supports these **118 compiled UGen types**, verified in e
 | Envelopes and ramps | `EnvGen`, `Line`, `XLine`, `Decay`, `Decay2` |
 | Filters and DC removal | `LPF`, `HPF`, `RLPF`, `BPF`, `LeakDC`, `OnePole`, `OneZero`, `LPZ1`, `HPZ1`, `RHPF`, `BRF`, `BPeakEQ`, `BLowShelf`, `BHiShelf` |
 | Distortion | `MiMu` |
+| Rings models | `MiRings1`, `MiRings2`, `MiRings3`, `MiRings4`, `MiRings5`, `MiRings6` |
 | Reverbs | `FreeVerb`, `FreeVerb2`, `MiVerb` |
 | Resonators and oscillator banks | `Resonz`, `Ringz`, `Formlet`, `Klang`, `Klank` |
 | Delay and feedback filters | `Delay1`, `Delay2`, `DelayN`, `DelayL`, `DelayC`, `CombN`, `CombL`, `CombC`, `AllpassN`, `AllpassL`, `AllpassC` |

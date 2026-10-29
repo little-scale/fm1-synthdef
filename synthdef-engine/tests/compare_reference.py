@@ -74,7 +74,7 @@ def main():
     if os.environ.get('FM_REFERENCE_FILTER'):
         fixtures=[p for p in fixtures if p.stem.startswith(os.environ['FM_REFERENCE_FILTER'])]
     spec=importlib.util.spec_from_file_location('miverb_reference',ROOT/'tools/build-miverb-reference.py');builder=importlib.util.module_from_spec(spec);spec.loader.exec_module(builder)
-    plugin_path=builder.build() if any(p.stem.startswith(('m7_MiVerb','m8_MiMu')) for p in fixtures) else None
+    plugin_path=builder.build() if any(p.stem.startswith(('m7_MiVerb','m8_MiMu','m13_MiRings')) for p in fixtures) else None
     version=subprocess.check_output([str(SC), '-v'], text=True).strip()
     if 'scsynth 3.14.1' not in version:
         raise RuntimeError('Reference suite requires SuperCollider 3.14.1; found '+version)
@@ -83,7 +83,7 @@ def main():
         name = fixture.stem
         blocks = fixture_blocks(name)
         ref = ROOT/'build'/f'{name}-reference.wav'
-        plugins=str(SC.parent/'plugins')+(os.pathsep+str(plugin_path) if name.startswith(('m7_MiVerb','m8_MiMu')) else '')
+        plugins=str(SC.parent/'plugins')+(os.pathsep+str(plugin_path) if name.startswith(('m7_MiVerb','m8_MiMu','m13_MiRings')) else '')
         cmd = [str(SC), '-U', plugins, '-N', str(fixture.with_suffix('.osc')), '_', str(ref), '44100', 'WAV', 'float', '-o', '2', '-i', '0', '-z', '64']
         run = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if run.returncode or 'FAILURE' in run.stdout or 'ERROR' in run.stdout + run.stderr:

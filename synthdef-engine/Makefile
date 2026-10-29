@@ -16,6 +16,9 @@ test: all
 	python3 tests/test_expansion.py
 	python3 tests/test_gendy.py
 	python3 tests/test_formants.py
+	python3 tests/test_rings.py
+	python3 tests/test_rings_oracle.py
+	python3 tests/test_rings_oracle.py --device
 	python3 tests/test_operators_scales.py
 	python3 tests/test_operators_oracle.py
 	python3 tests/test_operators_oracle.py --device
@@ -81,3 +84,13 @@ sanitize: | build
 	build/fuzz-ubsan fixtures/m12_scale_multiple.scsyndef
 	build/fuzz-ubsan fixtures/m12_binary_lcm_ar_2.scsyndef
 	build/fuzz-ubsan fixtures/m12_binary_pow_ar_0.scsyndef
+
+# Each independent Rings state layout, including the packed reverb.
+	build/fuzz-ubsan fixtures/m13_MiRings1_internal.scsyndef
+	build/fuzz-ubsan fixtures/m13_MiRings2_internal.scsyndef
+	build/fuzz-ubsan fixtures/m13_MiRings3_internal.scsyndef
+	build/fuzz-ubsan fixtures/m13_MiRings4_internal.scsyndef
+	build/fuzz-ubsan fixtures/m13_MiRings5_internal.scsyndef
+	build/fuzz-ubsan fixtures/m13_MiRings6_internal.scsyndef
+	build/fuzz-ubsan ../fm1-synth/examples/rings-sympathetic.scsyndef
+	build/fuzz-ubsan ../fm1-synth/examples/rings-chords.scsyndef

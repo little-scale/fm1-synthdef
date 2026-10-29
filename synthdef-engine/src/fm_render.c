@@ -195,6 +195,7 @@ static void resonator(float freq,float param,float sr,int ring,float *a0,float *
 }
 #include "fm_filters.inc"
 #include "fm_bandlimited.inc"
+#include "fm_rings_state.inc"
 #include "fm_delay.inc"
 #include "fm_fast.inc"
 
@@ -232,6 +233,7 @@ static __attribute__((noinline)) void fast_envelope(const fm_graph *g,fm_voice *
 #include "fm_gendy.inc"
 #include "fm_formants.inc"
 #include "fm_reverb.inc"
+#include "fm_rings.inc"
 
 static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *stereo,int initializing,const float *input_stereo) {
  unsigned ni,j,k;int free_voice=0;float mixed[FM_BLOCK*2];memset(mixed,0,sizeof mixed);
@@ -297,6 +299,7 @@ static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *ster
   if(fm_is_gendy(n->type)){gendy_render(g,v,b,n,s,count,sr,initializing);continue;}
   if(n->type>=FM_VarSaw && n->type<=FM_BHiShelf){modulation(g,v,b,n,s,count,sr,initializing);continue;}
   if(n->type>=FM_Fold && n->type<=FM_MiMu){utilities(g,v,b,n,s,count,sr,initializing);continue;}
+  if(fm_is_rings(n->type)){rings_render(g,v,b,n,s,initializing);continue;}
   if(fm_is_reverb(n->type)){reverb_render(g,v,b,n,s,count,initializing);continue;}
   if(fm_is_delay(n->type)){delay_render(g,v,b,n,s,count,sr,initializing);continue;}
   if(!s->initialized && (n->type==FM_Klang || n->type==FM_Klank)) {

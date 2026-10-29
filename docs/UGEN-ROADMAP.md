@@ -1,6 +1,6 @@
 # UGen roadmap
 
-Updated 30 October 2026. The development engine contains **118 UGen types**. The 41 additions below are implemented; hardware installation and realtime checks are deferred at the user's request. The existing published preview remains unchanged.
+Updated 30 October 2026. The development engine contains **124 UGen types**. The 47 additions below are implemented; hardware installation and realtime checks are deferred at the user's request. The existing published preview remains unchanged.
 
 ## Completed expansion
 
@@ -14,6 +14,7 @@ Updated 30 October 2026. The development engine contains **118 UGen types**. The
 | Oscillators | VarSaw, SyncSaw, LFCub, LFPar, Gendy1, Gendy2, Gendy3, Formant |
 | Filters and EQ | RHPF, BRF, BPeakEQ, BLowShelf, BHiShelf, Formlet |
 | Distortion | MiMu |
+| Rings models | MiRings1, MiRings2, MiRings3, MiRings4, MiRings5, MiRings6 |
 | Scale/tuning tables | MaxLocalBufs, LocalBuf, SetBuf, DegreeToKey |
 
 A further 28 operators now cover signed `pow`, `div`, gcd/lcm, atan2/hypot, ring arithmetic, hyperbolic functions and octave conversions. Scale/Tuning tables use graph constants without increasing the DSP arena. Modulo, round, roundUp, trunc, clip2, fold2 and wrap2 binary selectors were added too. SelectX now compiles and renders at audio/control rate; it is a source helper, not a separate runtime UGen. The [full profile](../synthdef-engine/README.md#supported-profile) states rate and domain restrictions. In particular, the new EQ coefficients are initial/control rate, oscillator frequencies are bounded, and MiMu is audio-only.
@@ -37,9 +38,7 @@ The host probe measured:
 | Performance/patch state and 64-frame input/silence buffers | 548 |
 | Total, excluding wrapper overhead | **180,048** |
 
-Target pointer/alignment differences do not remove the large gap to the current **131,072-byte shared DSP arena**, or the **65,536-byte per-synth-voice admission limit**. The current pool has approximately 18 KiB free. Full MiRings therefore remains unsupported in this firmware; it is rejected at import rather than approximated under the same name.
-
-Possible next approaches are a deliberately named modal-only engine, splitting model-specific storage, or a dedicated lower-polyphony firmware/memory layout. These require design, audio-reference and realtime work. Existing Ringz/Klank can make useful resonant patches but are not claimed to sound identical to Rings.
+The full upstream layout remains too large, but the development engine now supplies **six independently allocated models** as MiRings1–MiRings6. Models 2/5 can use compact 960-sample floating-point string buffers (all eight strings retained), and model 6 removes unused reverb padding without changing its delay lengths. All six have playable configurations within the existing per-voice budget. Shared-effect memory and realtime CPU limits still apply. See [Rings compatibility and memory](RINGS.md) and [verification](VERIFICATION.md).
 
 Reproduce the host probe with `synthdef-engine/tools/probe-mirings.py --upstream PATH --output RESULT.json`, using mi-UGens commit `10f6824f68ad63475f67dfe3fe5016e2d2634f84` including its eurorack sources. The probe verifies source hashes before building. See [probe evidence](../evidence/mirings-feasibility-2026-10-30.json).
 

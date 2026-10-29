@@ -5,6 +5,7 @@
 static uint32_t delay_length(const fm_graph *g,const fm_node *n,float sr) {
  /* State and exact-size rings, in float-sized allocation units. MiVerb's
   * packed 16-bit ring is accessed through memcpy, without type aliasing. */
+ if(fm_is_rings(n->type))return rings_words(n->type-FM_MiRings1+1,(unsigned)g->constant[g->ref[n->input+9].output]);
  if(fm_is_gendy(n->type)){uint32_t cp=(uint32_t)g->constant[g->ref[n->input+(n->type==FM_Gendy3?7:8)].output];return n->type==FM_Gendy1?2*cp:n->type==FM_Gendy2?4*cp:4*cp+2;}
  if(n->type==FM_FreeVerb)return 12623;
  if(n->type==FM_FreeVerb2)return 25522;

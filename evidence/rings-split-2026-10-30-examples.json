@@ -1,0 +1,93 @@
+[
+  {
+    "patch": "rings-modal",
+    "voice_bytes": 1396,
+    "fx_bytes": 65536,
+    "shared_bytes": 68328,
+    "frames": 262144,
+    "peaks": [
+      0.04767775163054466,
+      0.08261454850435257
+    ],
+    "tail_peak": 1.91789498609526e-15,
+    "faults": 0
+  },
+  {
+    "patch": "rings-sympathetic",
+    "voice_bytes": 32752,
+    "fx_bytes": 65536,
+    "shared_bytes": 131040,
+    "frames": 262144,
+    "peaks": [
+      0.1273576319217682,
+      0.11750945448875427
+    ],
+    "tail_peak": 1.7916468005377273e-14,
+    "faults": 0
+  },
+  {
+    "patch": "rings-string",
+    "voice_bytes": 13536,
+    "fx_bytes": 65536,
+    "shared_bytes": 92608,
+    "frames": 262144,
+    "peaks": [
+      0.04774291068315506,
+      0.0559491328895092
+    ],
+    "tail_peak": 2.6734446904527753e-14,
+    "faults": 0
+  },
+  {
+    "patch": "rings-fm",
+    "voice_bytes": 228,
+    "fx_bytes": 65536,
+    "shared_bytes": 65992,
+    "frames": 262144,
+    "peaks": [
+      0.20073950290679932,
+      0.0946418046951294
+    ],
+    "tail_peak": 4.601249394518836e-13,
+    "faults": 0
+  },
+  {
+    "patch": "rings-chords",
+    "voice_bytes": 32752,
+    "fx_bytes": 65536,
+    "shared_bytes": 131040,
+    "frames": 262144,
+    "peaks": [
+      0.04110576584935188,
+      0.029273612424731255
+    ],
+    "tail_peak": 1.5343976428523233e-14,
+    "faults": 0
+  },
+  {
+    "patch": "rings-reverb",
+    "voice_bytes": 56836,
+    "fx_bytes": 0,
+    "shared_bytes": 113672,
+    "frames": 262144,
+    "peaks": [
+      0.04074176400899887,
+      0.040304314345121384
+    ],
+    "tail_peak": 0.0,
+    "faults": 0
+  },
+  {
+    "patch": "rings-bus",
+    "voice_bytes": 0,
+    "fx_bytes": 56836,
+    "shared_bytes": 56836,
+    "frames": 262144,
+    "peaks": [
+      0.7303601503372192,
+      0.09389058500528336
+    ],
+    "tail_peak": 0.019727665930986404,
+    "faults": 0
+  }
+]

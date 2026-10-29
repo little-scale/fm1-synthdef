@@ -25,12 +25,13 @@ typedef enum {
  FM_LagControl, FM_TrigControl, FM_LFSaw, FM_LFTri, FM_LFPulse, FM_Lag, FM_LagUD, FM_LPF, FM_HPF, FM_RLPF, FM_BPF, FM_LeakDC, FM_Select, FM_Clip,
  FM_WhiteNoise, FM_PinkNoise, FM_LFNoise0, FM_LFNoise1, FM_LFNoise2, FM_RandSeed, FM_Saw, FM_Pulse,
  FM_DelayN, FM_DelayL, FM_DelayC, FM_CombN, FM_CombL, FM_CombC, FM_AllpassN, FM_AllpassL, FM_AllpassC,
- FM_Rand, FM_ExpRand, FM_In, FM_SampleRate, FM_SampleDur, FM_ControlRate, FM_ControlDur, FM_BlockSize, FM_RadiansPerSample, FM_Delay1, FM_Delay2, FM_OnePole, FM_OneZero, FM_LPZ1, FM_HPZ1, FM_Latch, FM_Gate, FM_TRand, FM_TExpRand, FM_Dust, FM_Dust2, FM_Impulse, FM_Decay, FM_Decay2, FM_FreeVerb, FM_FreeVerb2, FM_MiVerb, FM_Fold, FM_Wrap, FM_BrownNoise, FM_ClipNoise, FM_Trig, FM_Trig1, FM_PulseDivider, FM_PulseCount, FM_ToggleFF, FM_SetResetFF, FM_Stepper, FM_XFade2, FM_LinXFade2, FM_Balance2, FM_LinExp, FM_Slew, FM_Lag2, FM_Lag3, FM_MiMu, FM_RHPF, FM_BRF, FM_VarSaw, FM_SyncSaw, FM_LFCub, FM_LFPar, FM_LFDNoise0, FM_LFDNoise1, FM_LFDNoise3, FM_Amplitude, FM_BPeakEQ, FM_BLowShelf, FM_BHiShelf, FM_Gendy1, FM_Gendy2, FM_Gendy3, FM_Formant, FM_Formlet, FM_MaxLocalBufs, FM_LocalBuf, FM_SetBuf, FM_DegreeToKey, FM_TYPES
+ FM_Rand, FM_ExpRand, FM_In, FM_SampleRate, FM_SampleDur, FM_ControlRate, FM_ControlDur, FM_BlockSize, FM_RadiansPerSample, FM_Delay1, FM_Delay2, FM_OnePole, FM_OneZero, FM_LPZ1, FM_HPZ1, FM_Latch, FM_Gate, FM_TRand, FM_TExpRand, FM_Dust, FM_Dust2, FM_Impulse, FM_Decay, FM_Decay2, FM_FreeVerb, FM_FreeVerb2, FM_MiVerb, FM_Fold, FM_Wrap, FM_BrownNoise, FM_ClipNoise, FM_Trig, FM_Trig1, FM_PulseDivider, FM_PulseCount, FM_ToggleFF, FM_SetResetFF, FM_Stepper, FM_XFade2, FM_LinXFade2, FM_Balance2, FM_LinExp, FM_Slew, FM_Lag2, FM_Lag3, FM_MiMu, FM_RHPF, FM_BRF, FM_VarSaw, FM_SyncSaw, FM_LFCub, FM_LFPar, FM_LFDNoise0, FM_LFDNoise1, FM_LFDNoise3, FM_Amplitude, FM_BPeakEQ, FM_BLowShelf, FM_BHiShelf, FM_Gendy1, FM_Gendy2, FM_Gendy3, FM_Formant, FM_Formlet, FM_MaxLocalBufs, FM_LocalBuf, FM_SetBuf, FM_DegreeToKey, FM_MiRings1, FM_MiRings2, FM_MiRings3, FM_MiRings4, FM_MiRings5, FM_MiRings6, FM_TYPES
 } fm_type;
 static inline int fm_is_delay(unsigned type){return type>=FM_DelayN && type<=FM_AllpassC;}
 static inline int fm_is_reverb(unsigned type){return type>=FM_FreeVerb && type<=FM_MiVerb;}
 static inline int fm_is_gendy(unsigned type){return type>=FM_Gendy1 && type<=FM_Gendy3;}
-static inline int fm_uses_memory(unsigned type){return fm_is_delay(type)||fm_is_reverb(type)||fm_is_gendy(type);}
+static inline int fm_is_rings(unsigned type){return type>=FM_MiRings1 && type<=FM_MiRings6;}
+static inline int fm_uses_memory(unsigned type){return fm_is_delay(type)||fm_is_reverb(type)||fm_is_gendy(type)||fm_is_rings(type);}
 typedef struct { int16_t node; uint16_t output; } fm_ref;
 typedef struct {
  uint16_t input, inputs, output, outputs, partial, partials;
