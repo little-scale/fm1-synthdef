@@ -1,6 +1,6 @@
 # Random and chaotic generators
 
-The development firmware adds 18 UGen types, bringing the total to **142**. These are bounded ports of SuperCollider 3.14.1 algorithms. Their state fits in the existing node storage; none allocates DSP-arena or delay memory. Hardware timing/listening checks are deferred.
+The stochastic expansion introduced these **18 UGen types**. See the main README for the current total. These are bounded ports of SuperCollider 3.14.1 algorithms. Their state fits in the existing node storage; none allocates DSP-arena or delay memory. Hardware timing/listening checks are deferred.
 
 ## Available types
 

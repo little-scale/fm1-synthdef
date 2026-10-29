@@ -1,6 +1,6 @@
 # FM1 SynthDef engine
 
-A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 142 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
+A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 154 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
 
 ## Try it
 
@@ -27,6 +27,13 @@ The simpler example in `examples/voice.scd` exports a playable gated sine voice 
 | --- | --- | --- |
 | Control | initial, control | Up to 64 parameters; initial parameters freeze after rendering starts |
 | LagControl, TrigControl | control | Per-output lag state; triggers reset after one block; lag times are initial rate |
+| SinOscFB, Blip | audio/control | Initial/control parameters; bounded feedback/harmonic count and frequency; no arena |
+| Phasor | audio/control | Audio trigger/increment supported; audio increment requires audio trigger; bounded control range/reset |
+| Pluck | audio | Audio excitation; audio/control trigger and damping; literal maximum delay; bounded arena |
+| MoogFF | audio/control | Initial/control cutoff, feedback and reset; audio input for `.ar` |
+| FreqShift | audio | Audio input; audio/control shift and phase; corrected initial control phase; no arena |
+| Limiter | audio | Audio input; control threshold; positive literal lookahead; three bounded buffers |
+| FBSineN/L/C, StandardN/L | audio | Float chaotic maps; initial/control parameters; no arena |
 | SinOsc | audio, control | Frequency and phase inputs; bounded integer phase accumulator |
 | Saw, Pulse | audio, control | Band-limited impulse kernels with harmonic-count crossfades; parameters initial/control rate |
 | LFSaw, LFTri, LFPulse | audio, control | Frequency may be audio rate; initial phase is initial rate; pulse width initial/control rate |
@@ -246,3 +253,7 @@ Examples: [Formant voice](../fm1-synth/examples/formant.scd) maps knobs to forma
 ## Random and chaotic generator profile
 
 See [the detailed generator guide](../docs/STOCHASTIC.md) for all 18 additions, precise domains/rates, single-precision behavior, deliberate TIRand trigger fixes, validation and examples. They reuse existing node state and require no DSP-arena storage.
+
+## Synthesis/effects expansion profile
+
+The [complete rate, domain, memory and precision guide](../docs/SYNTHESIS-EXPANSION.md) covers the 12 newer types, the FreqShift constructor-phase correction and four optional example patches. Pluck and Limiter share the existing arena; other additions reuse node storage.

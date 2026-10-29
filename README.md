@@ -4,7 +4,7 @@
 
 FM1 SynthDef is an experimental embedded SynthDef runtime and programmable instrument. Write a patch in the local browser editor, compile it with SuperCollider on your Mac, send it over USB, and play it on the FM-1.
 
-The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and executes that graph using a bounded set of 142 supported UGen types in the development source. This is not the full SuperCollider language, scsynth server or plugin ecosystem.
+The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and executes that graph using a bounded set of 154 supported UGen types in the development source. This is not the full SuperCollider language, scsynth server or plugin ecosystem.
 
 ## What it does
 
@@ -18,21 +18,26 @@ The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and exec
 
 ## Supported UGens
 
+The latest expansion adds **SinOscFB, Blip, Phasor, Pluck, MoogFF, FreqShift, Limiter, FBSineN/L/C and StandardN/L**. See the [synthesis/effects guide and four new patches](docs/SYNTHESIS-EXPANSION.md).
+
 The development source adds **18 random/chaotic generators** with no additional arena allocation. See the [generator guide and playable examples](docs/STOCHASTIC.md).
 
 The development source includes **Formant, Formlet, Gendy1/2/3**, **MiMu.ar**, live Scale/Tuning pitch tables and 28 additional maths operators. [MiMu drive](fm1-synth/examples/mimu-drive.scd) and [modulation lab](fm1-synth/examples/modulation-lab.scd) are ready to compile and preview. **MiRings1–MiRings6** now provide separate Rings models, with optional compact buffers for models 2/5 and a smaller, unchanged-delay reverb allocation for model 6. See the [Rings model/memory guide](docs/RINGS.md). The complete upstream MiRings API remains unsupported.
 
-The development source supports these **142 compiled UGen types**, verified in emulation. The published **v0.1.0-preview firmware contains 53 types**; the additions below require a development build; the previous 77-type build has passed selected hardware tests. The latest 65 additions are awaiting hardware checks. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
+The development source supports these **154 compiled UGen types**, verified in emulation. The published **v0.1.0-preview firmware contains 53 types**; the additions below require a development build; the previous 77-type build has passed selected hardware tests. The latest 77 additions are awaiting hardware checks. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
 
 | Category | UGen types |
 | --- | --- |
-| Oscillators | `SinOsc`, `Saw`, `Pulse`, `LFSaw`, `LFTri`, `LFPulse`, `Impulse`, `VarSaw`, `SyncSaw`, `LFCub`, `LFPar`, `Formant` |
-| Chaotic oscillators | `Crackle`, `Logistic`, `HenonN`, `HenonL`, `HenonC`, `CuspN`, `CuspL`, `LatoocarfianN`, `LatoocarfianL`, `LatoocarfianC`, `LorenzL` |
+| Oscillators | `SinOsc`, `Saw`, `Pulse`, `LFSaw`, `LFTri`, `LFPulse`, `Impulse`, `VarSaw`, `SyncSaw`, `LFCub`, `LFPar`, `Formant`, `SinOscFB`, `Blip` |
+| Chaotic oscillators | `Crackle`, `Logistic`, `HenonN`, `HenonL`, `HenonC`, `CuspN`, `CuspL`, `LatoocarfianN`, `LatoocarfianL`, `LatoocarfianC`, `LorenzL`, `FBSineN`, `FBSineL`, `FBSineC`, `StandardN`, `StandardL` |
 | Stochastic oscillators | `Gendy1`, `Gendy2`, `Gendy3` (audio/control; 1–64 literal initial breakpoints) |
 | Noise | `WhiteNoise`, `PinkNoise`, `LFNoise0`, `LFNoise1`, `LFNoise2`, `Dust`, `Dust2`, `BrownNoise`, `ClipNoise`, `LFDNoise0`, `LFDNoise1`, `LFDNoise3`, `LFClipNoise`, `LFDClipNoise`, `GrayNoise`, `Hasher` |
 | Random values and seed | `Rand`, `ExpRand`, `RandSeed`, `TRand`, `TExpRand`, `TIRand`, `TWindex`, `CoinGate` |
 | Envelopes and ramps | `EnvGen`, `Line`, `XLine`, `Decay`, `Decay2` |
-| Filters and DC removal | `LPF`, `HPF`, `RLPF`, `BPF`, `LeakDC`, `OnePole`, `OneZero`, `LPZ1`, `HPZ1`, `RHPF`, `BRF`, `BPeakEQ`, `BLowShelf`, `BHiShelf` |
+| Filters and DC removal | `LPF`, `HPF`, `RLPF`, `BPF`, `LeakDC`, `OnePole`, `OneZero`, `LPZ1`, `HPZ1`, `RHPF`, `BRF`, `BPeakEQ`, `BLowShelf`, `BHiShelf`, `MoogFF` |
+| Dynamics | `Limiter` |
+| Frequency shifting | `FreqShift` |
+| Plucked strings | `Pluck` |
 | Distortion | `MiMu` |
 | Rings models | `MiRings1`, `MiRings2`, `MiRings3`, `MiRings4`, `MiRings5`, `MiRings6` |
 | Reverbs | `FreeVerb`, `FreeVerb2`, `MiVerb` |
@@ -42,7 +47,7 @@ The development source supports these **142 compiled UGen types**, verified in e
 | Routing, selection and panning | `In`, `Out`, `Select`, `Pan2`, `XFade2`, `LinXFade2`, `Balance2` |
 | Constants, rate conversion and bounds | `DC`, `K2A`, `A2K`, `Clip`, `Fold`, `Wrap`, `LinExp` |
 | Timing information (initial rate) | `SampleRate`, `SampleDur`, `ControlRate`, `ControlDur`, `BlockSize`, `RadiansPerSample` |
-| Triggers and counters | `Trig`, `Trig1`, `PulseDivider`, `PulseCount`, `ToggleFF`, `SetResetFF`, `Stepper` |
+| Triggers and counters | `Trig`, `Trig1`, `PulseDivider`, `PulseCount`, `ToggleFF`, `SetResetFF`, `Stepper`, `Phasor` |
 | Scale/tuning lookup | `DegreeToKey`, with bounded immutable `MaxLocalBufs`, `LocalBuf`, `SetBuf` tables |
 | Arithmetic | `UnaryOpUGen`, `BinaryOpUGen`, `MulAdd`, `Sum3`, `Sum4` |
 
@@ -134,7 +139,7 @@ SELECT scrolls the focused code, OCT± transposes subsequent keyboard notes, and
 
 ## Status
 
-The development engine passes **1,370 reference cases on three rendering backends**: 1,316 waveform/timing checks and 54 labeled stochastic checks, supported by independent identical-state source oracles. It also passes **71 API test groups and 1,320,000 sanitizer mutation/truncation cases**. All 108 stock Scale and 35 Tuning presets pass live lookup checks; each maths backend passes 1,835,103 direct operator comparisons. Instrument emulation covers two voices, live knobs, stealing, release and master echo, including three new random/chaotic examples. Chaotic generators use single precision and can produce different long waveforms from desktop SuperCollider; their equations and individual transitions are checked separately from long-render statistics. The earlier 77-type build passed 189 hardware checks; the latest 65 additions still need hardware timing and listening checks. See [verification and limitations](docs/VERIFICATION.md).
+The development engine passes **1,444 reference cases on three rendering backends**: 1,378 waveform/timing checks and 66 labeled statistical checks, supported by independent identical-state source oracles. It also passes **80 API test groups and 1,560,000 sanitizer mutation/truncation cases**. All 108 stock Scale and 35 Tuning presets pass live lookup checks; each maths backend passes 1,835,103 direct operator comparisons. Instrument emulation covers two voices, live knobs, stealing, release and persistent effects, including three new playable patches and a stereo frequency-shift/limiter bus. High-feedback and chaotic generators can produce different long waveforms from desktop SuperCollider; their calculations are checked separately from long-render statistics. The earlier 77-type build passed selected hardware checks; the latest 77 additions still need hardware timing and listening checks. See [verification and limitations](docs/VERIFICATION.md).
 
 Passing the graph and memory checks does **not** guarantee that an arbitrary patch fits the audio processing budget. The overload guard stops notes and disables effects when the device is over budget. Final-release power-cycle persistence and recovery are not yet part of the acceptance record. This is an independent project, not an official M-VAVE or SuperCollider product.
 

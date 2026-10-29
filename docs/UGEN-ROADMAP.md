@@ -1,6 +1,6 @@
 # UGen roadmap
 
-Updated 30 October 2026. The development engine contains **142 UGen types**. The 65 additions below are implemented; hardware installation and realtime checks are deferred at the user's request. The existing published preview remains unchanged.
+Updated 30 October 2026. The development engine contains **154 UGen types**. The 77 additions below are implemented; hardware installation and realtime checks are deferred at the user's request. The existing published preview remains unchanged.
 
 ## Completed expansion
 
@@ -9,12 +9,13 @@ Updated 30 October 2026. The development engine contains **142 UGen types**. The
 | Bounds and mappings | Fold, Wrap, LinExp |
 | Noise | BrownNoise, ClipNoise, LFDNoise0, LFDNoise1, LFDNoise3, LFClipNoise, LFDClipNoise, GrayNoise, Hasher |
 | Random control | CoinGate, TIRand, TWindex |
-| Chaotic oscillators | Crackle, Logistic, HenonN/L/C, CuspN/L, LatoocarfianN/L/C, LorenzL |
-| Triggers and counters | Trig, Trig1, PulseDivider, PulseCount, ToggleFF, SetResetFF, Stepper |
+| Chaotic oscillators | Crackle, Logistic, HenonN/L/C, CuspN/L, LatoocarfianN/L/C, LorenzL, FBSineN/L/C, StandardN/L |
+| Triggers and counters | Trig, Trig1, PulseDivider, PulseCount, ToggleFF, SetResetFF, Stepper, Phasor |
 | Mixing and panning | XFade2, LinXFade2, Balance2 |
 | Smoothing and tracking | Slew, Lag2, Lag3, Amplitude |
-| Oscillators | VarSaw, SyncSaw, LFCub, LFPar, Gendy1, Gendy2, Gendy3, Formant |
-| Filters and EQ | RHPF, BRF, BPeakEQ, BLowShelf, BHiShelf, Formlet |
+| Oscillators | VarSaw, SyncSaw, LFCub, LFPar, Gendy1, Gendy2, Gendy3, Formant, SinOscFB, Blip |
+| Filters and EQ | RHPF, BRF, BPeakEQ, BLowShelf, BHiShelf, Formlet, MoogFF |
+| Physical strings and effects | Pluck, FreqShift, Limiter |
 | Distortion | MiMu |
 | Rings models | MiRings1, MiRings2, MiRings3, MiRings4, MiRings5, MiRings6 |
 | Scale/tuning tables | MaxLocalBufs, LocalBuf, SetBuf, DegreeToKey |
@@ -45,6 +46,8 @@ The host probe measured:
 The full upstream layout remains too large, but the development engine now supplies **six independently allocated models** as MiRings1–MiRings6. Models 2/5 can use compact 960-sample floating-point string buffers (all eight strings retained), and model 6 removes unused reverb padding without changing its delay lengths. All six have playable configurations within the existing per-voice budget. Shared-effect memory and realtime CPU limits still apply. See [Rings compatibility and memory](RINGS.md) and [verification](VERIFICATION.md).
 
 Reproduce the host probe with `synthdef-engine/tools/probe-mirings.py --upstream PATH --output RESULT.json`, using mi-UGens commit `10f6824f68ad63475f67dfe3fe5016e2d2634f84` including its eurorack sources. The probe verifies source hashes before building. See [probe evidence](../evidence/mirings-feasibility-2026-10-30.json).
+
+The [12 synthesis/effect additions](SYNTHESIS-EXPANSION.md) are now implemented, including the remaining recommended feedback/standard-map generators. Their examples include a stereo frequency-shift/limiter effect.
 
 ## Remaining work
 

@@ -1,0 +1,227 @@
+[
+  {
+    "patch": "feedback-lead",
+    "voice_bytes": 0,
+    "fx_bytes": 3192,
+    "shared_bytes": 3192,
+    "initial_knobs": 0,
+    "live_knobs": 1,
+    "frames": 307200,
+    "peaks": [
+      0.08767139166593552,
+      0.07823500037193298
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "feedback-lead",
+    "voice_bytes": 0,
+    "fx_bytes": 3192,
+    "shared_bytes": 3192,
+    "initial_knobs": 0.25,
+    "live_knobs": 0.75,
+    "frames": 307200,
+    "peaks": [
+      0.035407230257987976,
+      0.03644121438264847
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "feedback-lead",
+    "voice_bytes": 0,
+    "fx_bytes": 3192,
+    "shared_bytes": 3192,
+    "initial_knobs": 0.5,
+    "live_knobs": 0.5,
+    "frames": 307200,
+    "peaks": [
+      0.025716446340084076,
+      0.025716446340084076
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "feedback-lead",
+    "voice_bytes": 0,
+    "fx_bytes": 3192,
+    "shared_bytes": 3192,
+    "initial_knobs": 0.75,
+    "live_knobs": 0.25,
+    "frames": 307200,
+    "peaks": [
+      0.03823705017566681,
+      0.03998468443751335
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "feedback-lead",
+    "voice_bytes": 0,
+    "fx_bytes": 3192,
+    "shared_bytes": 3192,
+    "initial_knobs": 1,
+    "live_knobs": 0,
+    "frames": 307200,
+    "peaks": [
+      0.09498278051614761,
+      0.08007488399744034
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "plucked-string",
+    "voice_bytes": 8192,
+    "fx_bytes": 3192,
+    "shared_bytes": 19576,
+    "initial_knobs": 0,
+    "live_knobs": 1,
+    "frames": 307200,
+    "peaks": [
+      0.00448558060452342,
+      0.0044152503833174706
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "plucked-string",
+    "voice_bytes": 8192,
+    "fx_bytes": 3192,
+    "shared_bytes": 19576,
+    "initial_knobs": 0.25,
+    "live_knobs": 0.75,
+    "frames": 307200,
+    "peaks": [
+      0.017216647043824196,
+      0.015649408102035522
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "plucked-string",
+    "voice_bytes": 8192,
+    "fx_bytes": 3192,
+    "shared_bytes": 19576,
+    "initial_knobs": 0.5,
+    "live_knobs": 0.5,
+    "frames": 307200,
+    "peaks": [
+      0.028406698256731033,
+      0.028406698256731033
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "plucked-string",
+    "voice_bytes": 8192,
+    "fx_bytes": 3192,
+    "shared_bytes": 19576,
+    "initial_knobs": 0.75,
+    "live_knobs": 0.25,
+    "frames": 307200,
+    "peaks": [
+      0.029971778392791748,
+      0.03193755820393562
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "plucked-string",
+    "voice_bytes": 8192,
+    "fx_bytes": 3192,
+    "shared_bytes": 19576,
+    "initial_knobs": 1,
+    "live_knobs": 0,
+    "frames": 307200,
+    "peaks": [
+      0.012212964706122875,
+      0.012180798687040806
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "harmonic-blip",
+    "voice_bytes": 0,
+    "fx_bytes": 3192,
+    "shared_bytes": 3192,
+    "initial_knobs": 0,
+    "live_knobs": 1,
+    "frames": 307200,
+    "peaks": [
+      0.032956454902887344,
+      0.032927535474300385
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "harmonic-blip",
+    "voice_bytes": 0,
+    "fx_bytes": 3192,
+    "shared_bytes": 3192,
+    "initial_knobs": 0.25,
+    "live_knobs": 0.75,
+    "frames": 307200,
+    "peaks": [
+      0.02284936234354973,
+      0.02321322076022625
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "harmonic-blip",
+    "voice_bytes": 0,
+    "fx_bytes": 3192,
+    "shared_bytes": 3192,
+    "initial_knobs": 0.5,
+    "live_knobs": 0.5,
+    "frames": 307200,
+    "peaks": [
+      0.016071869060397148,
+      0.016071869060397148
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "harmonic-blip",
+    "voice_bytes": 0,
+    "fx_bytes": 3192,
+    "shared_bytes": 3192,
+    "initial_knobs": 0.75,
+    "live_knobs": 0.25,
+    "frames": 307200,
+    "peaks": [
+      0.029439309611916542,
+      0.028862005099654198
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "harmonic-blip",
+    "voice_bytes": 0,
+    "fx_bytes": 3192,
+    "shared_bytes": 3192,
+    "initial_knobs": 1,
+    "live_knobs": 0,
+    "frames": 307200,
+    "peaks": [
+      0.04561419412493706,
+      0.03856031596660614
+    ],
+    "faults": 0,
+    "release_silent": true
+  }
+]

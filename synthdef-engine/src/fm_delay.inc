@@ -10,7 +10,8 @@ static uint32_t delay_length(const fm_graph *g,const fm_node *n,float sr) {
  if(n->type==FM_FreeVerb)return 12623;
  if(n->type==FM_FreeVerb2)return 25522;
  if(n->type==FM_MiVerb)return 16384;
- float x=g->constant[g->ref[n->input+1].output]*(n->rate==2?sr:sr/FM_BLOCK)+1;
+ if(n->type==FM_Limiter){float dur=g->constant[g->ref[n->input+2].output],product=dur*sr,samples=ceilf(product);if(samples==product&&product_error(dur,sr,product)>0)samples++;if(!isfinite(samples)||samples<1||samples>FM_DELAY_LIMIT/3)return UINT32_MAX;return 3*(uint32_t)samples;}
+ float x=g->constant[g->ref[n->input+(n->type==FM_Pluck?2:1)].output]*(n->rate==2?sr:sr/FM_BLOCK)+1;
  uint32_t want,length=1;
  if(!isfinite(x) || x>FM_DELAY_LIMIT-FM_BLOCK || x<1)return UINT32_MAX;
  want=(uint32_t)ceilf(x)+(n->rate==2?FM_BLOCK:1);

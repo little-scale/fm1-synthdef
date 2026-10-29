@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #define FM_VALID 0x464d5331u
-static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In","SampleRate","SampleDur","ControlRate","ControlDur","BlockSize","RadiansPerSample","Delay1","Delay2","OnePole","OneZero","LPZ1","HPZ1","Latch","Gate","TRand","TExpRand","Dust","Dust2","Impulse","Decay","Decay2","FreeVerb","FreeVerb2","MiVerb","Fold","Wrap","BrownNoise","ClipNoise","Trig","Trig1","PulseDivider","PulseCount","ToggleFF","SetResetFF","Stepper","XFade2","LinXFade2","Balance2","LinExp","Slew","Lag2","Lag3","MiMu","RHPF","BRF","VarSaw","SyncSaw","LFCub","LFPar","LFDNoise0","LFDNoise1","LFDNoise3","Amplitude","BPeakEQ","BLowShelf","BHiShelf","Gendy1","Gendy2","Gendy3","Formant","Formlet","MaxLocalBufs","LocalBuf","SetBuf","DegreeToKey","MiRings1","MiRings2","MiRings3","MiRings4","MiRings5","MiRings6","Crackle","LFClipNoise","LFDClipNoise","GrayNoise","Hasher","CoinGate","TIRand","TWindex","Logistic","HenonN","HenonL","HenonC","CuspN","CuspL","LatoocarfianN","LatoocarfianL","LatoocarfianC","LorenzL"};
+static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In","SampleRate","SampleDur","ControlRate","ControlDur","BlockSize","RadiansPerSample","Delay1","Delay2","OnePole","OneZero","LPZ1","HPZ1","Latch","Gate","TRand","TExpRand","Dust","Dust2","Impulse","Decay","Decay2","FreeVerb","FreeVerb2","MiVerb","Fold","Wrap","BrownNoise","ClipNoise","Trig","Trig1","PulseDivider","PulseCount","ToggleFF","SetResetFF","Stepper","XFade2","LinXFade2","Balance2","LinExp","Slew","Lag2","Lag3","MiMu","RHPF","BRF","VarSaw","SyncSaw","LFCub","LFPar","LFDNoise0","LFDNoise1","LFDNoise3","Amplitude","BPeakEQ","BLowShelf","BHiShelf","Gendy1","Gendy2","Gendy3","Formant","Formlet","MaxLocalBufs","LocalBuf","SetBuf","DegreeToKey","MiRings1","MiRings2","MiRings3","MiRings4","MiRings5","MiRings6","Crackle","LFClipNoise","LFDClipNoise","GrayNoise","Hasher","CoinGate","TIRand","TWindex","Logistic","HenonN","HenonL","HenonC","CuspN","CuspL","LatoocarfianN","LatoocarfianL","LatoocarfianC","LorenzL","SinOscFB","Blip","Phasor","Pluck","MoogFF","FreqShift","Limiter","FBSineN","FBSineL","FBSineC","StandardN","StandardL"};
 const char *fm_type_name(unsigned type) { return type < FM_TYPES ? types[type] : "unknown"; }
 typedef struct { const uint8_t *p; size_t left; int failed; } reader;
 static uint32_t rd(reader *r, unsigned n) {
@@ -81,6 +81,18 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
     for(j=0;j<u->inputs;j++) {fm_ref *ref=&g->ref[u->input+j];if(ref->node>=0 && g->node[ref->node].rate!=0) BAD("LagControl times must be initial rate");}
    } else if(u->inputs || (u->type==FM_TrigControl && u->rate!=1)) BAD("Invalid control inputs/rate");
    if(!u->outputs || u->rate>1 || u->special<0 || u->special+u->outputs>g->controls) BAD("Invalid Control layout/rate");
+  } else if(u->type>=FM_SinOscFB && u->type<=FM_StandardL) {
+   static const unsigned counts[]={2,2,5,6,4,3,3,7,7,7,4,4};
+   if(u->rate<1 || u->outputs!=1 || u->inputs!=counts[u->type-FM_SinOscFB])BAD("Invalid synthesis/effect layout/rate");
+   if((u->type==FM_Pluck || u->type==FM_FreqShift || u->type==FM_Limiter || u->type>=FM_FBSineN) && u->rate!=2)BAD("UGen requires audio rate");
+   for(j=0;j<u->inputs;j++){
+    fm_ref *ref=&g->ref[u->input+j];unsigned rate=ref->node<0?0:g->node[ref->node].rate;
+    int audio=(u->type==FM_Phasor&&j<2)||(u->type==FM_Pluck&&(j==0||j==1||j==5))||(u->type==FM_MoogFF&&j==0)||u->type==FM_FreqShift||(u->type==FM_Limiter&&j==0);
+    if(rate==2 && (!audio || u->rate!=2))BAD("Parameter requires initial/control rate");
+    if(j==0 && u->rate==2 && (u->type==FM_Pluck||u->type==FM_MoogFF||u->type==FM_FreqShift||u->type==FM_Limiter) && rate!=2)BAD("Audio effect requires audio input");
+   }
+   if(u->type==FM_Phasor && g->ref[u->input+1].node>=0 && g->node[g->ref[u->input+1].node].rate==2 && (g->ref[u->input].node<0 || g->node[g->ref[u->input].node].rate!=2))BAD("Audio Phasor rate requires audio trigger");
+   if(u->type==FM_Pluck || u->type==FM_Limiter){if(!literal(g,u,2,&v) || v<0 || (u->type==FM_Limiter && v==0))BAD("Buffer duration must be a positive literal (Pluck permits zero)");}
   } else if(u->type>=FM_Crackle && u->type<=FM_LorenzL) {
    static const unsigned counts[]={1,1,1,0,1,2,3,0,3,5,5,5,4,4,7,7,7,8};
    unsigned want=counts[u->type-FM_Crackle];

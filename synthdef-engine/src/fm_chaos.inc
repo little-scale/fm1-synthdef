@@ -6,6 +6,7 @@ typedef struct {float x0,y0,z0,x1,xn,yn,zn,xnm1,ynm1,znm1,xnm2,xnm3,frac,c0,c1,c
 typedef char chaos_fits_node[(sizeof(chaos_state)<=offsetof(fm_state,initialized))?1:-1];
 typedef struct {chaos_state *s;const float *args;float *out;float sr;} chaos_unit;
 #define CHAOS_COEF(X3,X2,X1,X,C0,C1,C2,C3) do { C0=X2; C1=.5f*(X1-X3); C2=X3-2.5f*X2+X1+X1-.5f*X; C3=.5f*(X-X3)+1.5f*(X2-X1); } while(0)
+static float chaos_mod2pi(float x){return bounded_wrap(x,0,TAU);}
 static float chaos_ipol(float f,float c0,float c1,float c2,float c3){return ((c3*f+c2)*f+c1)*f+c0;}
 
 static void chaos_HenonN_next(chaos_unit* unit, int inNumSamples) {
@@ -708,6 +709,341 @@ static void chaos_LorenzL_Ctor(chaos_unit* unit) {
     unit->s->frac = 0.f;
 
     chaos_LorenzL_next(unit, 1);
+}
+
+static void chaos_FBSineN_next(chaos_unit* unit, int inNumSamples) {
+    float* out = unit->out;
+    float freq = unit->args[0];
+    float a = unit->args[1];
+    float b = unit->args[2];
+    float c = unit->args[3];
+    float d = unit->args[4];
+    float x0 = unit->args[5];
+    float y0 = unit->args[6];
+
+    float xn = unit->s->xn;
+    float yn = unit->s->yn;
+    float counter = unit->s->counter;
+
+    float samplesPerCycle;
+    if (freq < unit->sr)
+        samplesPerCycle = unit->sr / fmaxf(freq, 0.001f);
+    else
+        samplesPerCycle = 1.f;
+
+    if ((unit->s->x0 != x0) || (unit->s->y0 != y0)) {
+        unit->s->x0 = xn = x0;
+        unit->s->y0 = yn = y0;
+    }
+
+    for (int i = 0; i < inNumSamples; ++i) {
+        if (counter >= samplesPerCycle) {
+            counter -= samplesPerCycle;
+
+            xn = sinf(a * yn + b * xn);
+            yn = c * yn + d;
+            yn = chaos_mod2pi(yn);
+        }
+        counter++;
+        *out++ = xn;
+    }
+    unit->s->xn = xn;
+    unit->s->yn = yn;
+    unit->s->counter = counter;
+}
+
+static void chaos_FBSineN_Ctor(chaos_unit* unit) {
+
+    unit->s->x0 = unit->args[5];
+    unit->s->y0 = unit->args[6];
+    unit->s->xn = unit->s->x0;
+    unit->s->yn = unit->s->y0;
+    unit->s->counter = 0.f;
+
+    chaos_FBSineN_next(unit, 1);
+}
+
+static void chaos_FBSineL_next(chaos_unit* unit, int inNumSamples) {
+    float* out = unit->out;
+    float freq = unit->args[0];
+    float a = unit->args[1];
+    float b = unit->args[2];
+    float c = unit->args[3];
+    float d = unit->args[4];
+    float x0 = unit->args[5];
+    float y0 = unit->args[6];
+
+    float xn = unit->s->xn;
+    float yn = unit->s->yn;
+    float xnm1 = unit->s->xnm1;
+    float counter = unit->s->counter;
+    float frac = unit->s->frac;
+
+    float samplesPerCycle;
+    float slope;
+    if (freq < unit->sr) {
+        samplesPerCycle = unit->sr / fmaxf(freq, 0.001f);
+        slope = 1.f / samplesPerCycle;
+    } else {
+        samplesPerCycle = 1.f;
+        slope = 1.f;
+    }
+
+    if ((unit->s->x0 != x0) || (unit->s->y0 != y0)) {
+        xnm1 = xn;
+        unit->s->x0 = xn = x0;
+        unit->s->y0 = yn = y0;
+    }
+
+    float dx = xn - xnm1;
+
+    for (int i = 0; i < inNumSamples; ++i) {
+        if (counter >= samplesPerCycle) {
+            counter -= samplesPerCycle;
+            frac = 0.0f;
+            xnm1 = xn;
+
+            xn = sinf(a * yn + b * xn);
+            yn = c * yn + d;
+            yn = chaos_mod2pi(yn);
+
+            dx = xn - xnm1;
+        }
+        counter++;
+        *out++ = xnm1 + dx * frac;
+        frac += slope;
+    }
+    unit->s->xn = xn;
+    unit->s->yn = yn;
+    unit->s->xnm1 = xnm1;
+    unit->s->counter = counter;
+    unit->s->frac = frac;
+}
+
+static void chaos_FBSineL_Ctor(chaos_unit* unit) {
+
+    unit->s->x0 = unit->args[5];
+    unit->s->y0 = unit->args[6];
+    unit->s->xn = unit->s->x0;
+    unit->s->yn = unit->s->y0;
+    unit->s->xnm1 = unit->s->x0;
+    unit->s->counter = 0.f;
+    unit->s->frac = 0.0f;
+    chaos_FBSineL_next(unit, 1);
+}
+
+static void chaos_FBSineC_next(chaos_unit* unit, int inNumSamples) {
+    float* out = unit->out;
+    float freq = unit->args[0];
+    float a = unit->args[1];
+    float b = unit->args[2];
+    float c = unit->args[3];
+    float d = unit->args[4];
+    float x0 = unit->args[5];
+    float y0 = unit->args[6];
+
+    float xn = unit->s->xn;
+    float xnm1 = unit->s->xnm1;
+    float xnm2 = unit->s->xnm2;
+    float xnm3 = unit->s->xnm3;
+    float yn = unit->s->yn;
+    float counter = unit->s->counter;
+    float frac = unit->s->frac;
+    float c0 = unit->s->c0;
+    float c1 = unit->s->c1;
+    float c2 = unit->s->c2;
+    float c3 = unit->s->c3;
+
+    float samplesPerCycle;
+    float slope;
+    if (freq < unit->sr) {
+        samplesPerCycle = unit->sr / fmaxf(freq, 0.001f);
+        slope = 1.f / samplesPerCycle;
+    } else
+        samplesPerCycle = slope = 1.f;
+
+    if ((unit->s->x0 != x0) || (unit->s->y0 != y0)) {
+        unit->s->x0 = xn = x0;
+        unit->s->y0 = y0;
+        xnm3 = xnm2;
+        xnm2 = xnm1;
+        xnm1 = xn;
+    }
+
+    for (int i = 0; i < inNumSamples; ++i) {
+        if (counter >= samplesPerCycle) {
+            counter -= samplesPerCycle;
+
+            frac = 0.0f;
+            xnm3 = xnm2;
+            xnm2 = xnm1;
+            xnm1 = xn;
+
+            xn = sinf(a * yn + b * xn);
+            yn = c * yn + d;
+            yn = chaos_mod2pi(yn);
+
+            CHAOS_COEF(xnm3, xnm2, xnm1, xn, c0, c1, c2, c3);
+        }
+        counter++;
+        *out++ = chaos_ipol(frac, c0, c1, c2, c3);
+        frac += slope;
+    }
+
+    unit->s->xn = xn;
+    unit->s->xnm1 = xnm1;
+    unit->s->xnm2 = xnm2;
+    unit->s->xnm3 = xnm3;
+    unit->s->yn = yn;
+    unit->s->counter = counter;
+    unit->s->frac = frac;
+    unit->s->c0 = c0;
+    unit->s->c1 = c1;
+    unit->s->c2 = c2;
+    unit->s->c3 = c3;
+}
+
+static void chaos_FBSineC_Ctor(chaos_unit* unit) {
+
+
+    unit->s->x0 = unit->args[5];
+    unit->s->y0 = unit->args[6];
+    unit->s->xn = unit->s->x0;
+    unit->s->yn = unit->s->y0;
+    unit->s->xnm1 = unit->s->xnm2 = unit->s->xnm3 = unit->s->x0;
+    unit->s->counter = 0.f;
+    unit->s->frac = 0.0f;
+    unit->s->c0 = unit->s->c1 = unit->s->c2 = unit->s->c3 = 0.f;
+
+    chaos_FBSineC_next(unit, 1);
+}
+
+static void chaos_StandardN_next(chaos_unit* unit, int inNumSamples) {
+    float* out = unit->out;
+    float freq = unit->args[0];
+    float k = unit->args[1];
+    float x0 = unit->args[2];
+    float y0 = unit->args[3];
+
+    float xn = unit->s->xn;
+    float output = (xn - PI) * (1.0f/PI);
+    float yn = unit->s->yn;
+    float counter = unit->s->counter;
+
+    float samplesPerCycle;
+    if (freq < unit->sr)
+        samplesPerCycle = unit->sr / fmaxf(freq, 0.001f);
+    else
+        samplesPerCycle = 1.f;
+
+    if ((unit->s->x0 != x0) || (unit->s->y0 != y0)) {
+        unit->s->x0 = xn = x0;
+        unit->s->y0 = yn = y0;
+    }
+
+    for (int i = 0; i < inNumSamples; ++i) {
+        if (counter >= samplesPerCycle) {
+            counter -= samplesPerCycle;
+
+            yn = yn + k * sinf(xn);
+            yn = chaos_mod2pi(yn);
+
+            xn = xn + yn;
+            xn = chaos_mod2pi(xn);
+
+            output = (xn - PI) * (1.0f/PI);
+        }
+        counter++;
+        *out++ = output;
+    }
+
+    unit->s->xn = xn;
+    unit->s->yn = yn;
+    unit->s->counter = counter;
+}
+
+static void chaos_StandardN_Ctor(chaos_unit* unit) {
+
+
+    unit->s->x0 = unit->args[2];
+    unit->s->y0 = unit->args[3];
+    unit->s->xn = unit->s->x0;
+    unit->s->yn = unit->s->y0;
+    unit->s->counter = 0.f;
+
+    chaos_StandardN_next(unit, 1);
+}
+
+static void chaos_StandardL_next(chaos_unit* unit, int inNumSamples) {
+    float* out = unit->out;
+    float freq = unit->args[0];
+    float k = unit->args[1];
+    float x0 = unit->args[2];
+    float y0 = unit->args[3];
+
+    float xn = unit->s->xn;
+    float yn = unit->s->yn;
+    float counter = unit->s->counter;
+    float xnm1 = unit->s->xnm1;
+    float frac = unit->s->frac;
+
+    float samplesPerCycle;
+    float slope;
+    if (freq < unit->sr) {
+        samplesPerCycle = unit->sr / fmaxf(freq, 0.001f);
+        slope = 1.f / samplesPerCycle;
+    } else {
+        samplesPerCycle = 1.f;
+        slope = 1.f;
+    }
+
+    if ((unit->s->x0 != x0) || (unit->s->y0 != y0)) {
+        xnm1 = xn;
+        unit->s->x0 = xn = x0;
+        unit->s->y0 = yn = y0;
+    }
+
+    float dx = xn - xnm1;
+
+    for (int i = 0; i < inNumSamples; ++i) {
+        if (counter >= samplesPerCycle) {
+            counter -= samplesPerCycle;
+            frac = 0.f;
+
+            xnm1 = xn;
+
+            yn = yn + k * sinf(xn);
+            yn = chaos_mod2pi(yn);
+
+            xn = xn + yn;
+            xn = chaos_mod2pi(xn);
+
+            dx = xn - xnm1;
+        }
+        counter++;
+        *out++ = (xnm1 + dx * frac - PI) * (1.0f/PI);
+        frac += slope;
+    }
+
+    unit->s->xn = xn;
+    unit->s->yn = yn;
+    unit->s->counter = counter;
+    unit->s->xnm1 = xnm1;
+    unit->s->frac = frac;
+}
+
+static void chaos_StandardL_Ctor(chaos_unit* unit) {
+
+
+    unit->s->x0 = unit->args[2];
+    unit->s->y0 = unit->args[3];
+    unit->s->xn = unit->s->x0;
+    unit->s->yn = unit->s->y0;
+    unit->s->xnm1 = unit->s->x0;
+    unit->s->counter = 0.f;
+    unit->s->frac = 0.f;
+
+    chaos_StandardL_next(unit, 1);
 }
 
 #undef CHAOS_COEF

@@ -1,5 +1,18 @@
 # Verification record
 
+## Synthesis and effects — 30 October 2026
+
+The development profile now has **154 compiled UGen types**, adding SinOscFB, Blip, Phasor, Pluck, MoogFF, FreqShift, Limiter, FBSineN/L/C and StandardN/L. Operators remain 33 unary and 40 binary selectors. Saved slots and the running editor were not changed; hardware checks remain deferred.
+
+- **1,444/1,444 reference cases pass on all three backends**: ordinary host, optimized host and firmware-math host emulation. There are 1,378 waveform/timing cases and 66 labeled statistical cases. The 74 new graphs include 62 waveform and 12 statistical comparisons, covering control/audio variants, parameter changes, audio modulation, constructors, delay rounding and limiter lookahead.
+- **800,000 identical-state SinOscFB/MoogFF comparisons per backend** pass against unchanged functions extracted from hash-verified upstream sources; maximum absolute error is below 0.00000003. The extended chaos oracle now passes **11,320,460 comparisons per backend**, including the five new maps; maximum normalized error is below 0.000000633. High-feedback/chaotic long waveforms are not claimed identical to the desktop reference.
+- **80 engine API groups**, instrument tests and **1,560,000 UBSan/bounds/float-cast-overflow graph mutations** pass. New API checks cover rate/layout rejection, exact/missing/undersized allocations and guard samples, limiter duration rounding/latency/peak behavior, restart/shared scratch, live invalid parameters, corrected FreqShift initial phase and Phasor minimum-range rejection, and immediate graph termination after a node faults. No ASan pass is claimed because of the previously recorded macOS runtime limitation.
+- **48 extended renders**, each 65,536 frames, cover all 12 additions at 32/44.1/48/192 kHz, with finite output, no faults and intact allocation guards.
+- **15 instrument scenarios**, each 307,200 frames, exercise Feedback lead, Plucked string and Harmonic blip with two voices through the stereo frequency-shift/limiter bus. Five starting knob settings, live changes, voice stealing and release produce finite nonzero output and silent released tails. Maximum peak is below 0.095. The largest shared allocation is **19,576 / 131,072 bytes**: two 8,192-byte string voices plus the 3,192-byte bus.
+- The target application is **8,264 bytes**, packaged in **610,136 bytes**. Static RAM remains **78,480 / 98,304 bytes**; pool use remains **326,008 / 344,064 bytes**. Bluetooth remains disabled. Target checks find no software-double routines or 64-bit multiply/load hazard. Pluck and Limiter use bounded arena allocations; the other additions reuse existing node storage.
+
+See [the compatibility/reproduction guide](SYNTHESIS-EXPANSION.md) and [machine-readable results and hashes](../evidence/synthesis-2026-10-30.json). Physical listening, keyboard interaction and realtime CPU measurements remain pending. Restart the local editor to load the new native library.
+
 ## Random and chaotic generators — 30 October 2026
 
 The development profile now has **142 compiled UGen types**, adding 18 random/chaotic generators. Operators remain 33 unary and 40 binary selectors. Hardware checks remain deferred; saved slots and the running editor were not changed.

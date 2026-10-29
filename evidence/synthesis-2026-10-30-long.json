@@ -1,0 +1,386 @@
+[
+  {
+    "name": "SinOscFB",
+    "sample_rate": 32000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.9999995827674866,
+    "faults": 0
+  },
+  {
+    "name": "SinOscFB",
+    "sample_rate": 44100,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "SinOscFB",
+    "sample_rate": 48000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.9999995231628418,
+    "faults": 0
+  },
+  {
+    "name": "SinOscFB",
+    "sample_rate": 192000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "Blip",
+    "sample_rate": 32000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0018855333328247,
+    "faults": 0
+  },
+  {
+    "name": "Blip",
+    "sample_rate": 44100,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0018839836120605,
+    "faults": 0
+  },
+  {
+    "name": "Blip",
+    "sample_rate": 48000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0010184049606323,
+    "faults": 0
+  },
+  {
+    "name": "Blip",
+    "sample_rate": 192000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0018823146820068,
+    "faults": 0
+  },
+  {
+    "name": "Phasor",
+    "sample_rate": 32000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "Phasor",
+    "sample_rate": 44100,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "Phasor",
+    "sample_rate": 48000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "Phasor",
+    "sample_rate": 192000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "Pluck",
+    "sample_rate": 32000,
+    "frames": 65536,
+    "arena_bytes": 4096,
+    "peak": 0.09999999403953552,
+    "faults": 0
+  },
+  {
+    "name": "Pluck",
+    "sample_rate": 44100,
+    "frames": 65536,
+    "arena_bytes": 4096,
+    "peak": 0.10121656954288483,
+    "faults": 0
+  },
+  {
+    "name": "Pluck",
+    "sample_rate": 48000,
+    "frames": 65536,
+    "arena_bytes": 8192,
+    "peak": 0.09999999403953552,
+    "faults": 0
+  },
+  {
+    "name": "Pluck",
+    "sample_rate": 192000,
+    "frames": 65536,
+    "arena_bytes": 16384,
+    "peak": 0.09999999403953552,
+    "faults": 0
+  },
+  {
+    "name": "MoogFF",
+    "sample_rate": 32000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.049554962664842606,
+    "faults": 0
+  },
+  {
+    "name": "MoogFF",
+    "sample_rate": 44100,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.049563437700271606,
+    "faults": 0
+  },
+  {
+    "name": "MoogFF",
+    "sample_rate": 48000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.04956924542784691,
+    "faults": 0
+  },
+  {
+    "name": "MoogFF",
+    "sample_rate": 192000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.04957195371389389,
+    "faults": 0
+  },
+  {
+    "name": "FreqShift",
+    "sample_rate": 32000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.14142054319381714,
+    "faults": 0
+  },
+  {
+    "name": "FreqShift",
+    "sample_rate": 44100,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.1414242833852768,
+    "faults": 0
+  },
+  {
+    "name": "FreqShift",
+    "sample_rate": 48000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.14142458140850067,
+    "faults": 0
+  },
+  {
+    "name": "FreqShift",
+    "sample_rate": 192000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.14140838384628296,
+    "faults": 0
+  },
+  {
+    "name": "Limiter",
+    "sample_rate": 32000,
+    "frames": 65536,
+    "arena_bytes": 3840,
+    "peak": 0.10000000149011612,
+    "faults": 0
+  },
+  {
+    "name": "Limiter",
+    "sample_rate": 44100,
+    "frames": 65536,
+    "arena_bytes": 5292,
+    "peak": 0.10000000149011612,
+    "faults": 0
+  },
+  {
+    "name": "Limiter",
+    "sample_rate": 48000,
+    "frames": 65536,
+    "arena_bytes": 5760,
+    "peak": 0.10000000149011612,
+    "faults": 0
+  },
+  {
+    "name": "Limiter",
+    "sample_rate": 192000,
+    "frames": 65536,
+    "arena_bytes": 23040,
+    "peak": 0.10000000149011612,
+    "faults": 0
+  },
+  {
+    "name": "FBSineN",
+    "sample_rate": 32000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "FBSineN",
+    "sample_rate": 44100,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "FBSineN",
+    "sample_rate": 48000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "FBSineN",
+    "sample_rate": 192000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "FBSineL",
+    "sample_rate": 32000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "FBSineL",
+    "sample_rate": 44100,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "FBSineL",
+    "sample_rate": 48000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "FBSineL",
+    "sample_rate": 192000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0,
+    "faults": 0
+  },
+  {
+    "name": "FBSineC",
+    "sample_rate": 32000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0183051824569702,
+    "faults": 0
+  },
+  {
+    "name": "FBSineC",
+    "sample_rate": 44100,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0180156230926514,
+    "faults": 0
+  },
+  {
+    "name": "FBSineC",
+    "sample_rate": 48000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0183051824569702,
+    "faults": 0
+  },
+  {
+    "name": "FBSineC",
+    "sample_rate": 192000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 1.0154011249542236,
+    "faults": 0
+  },
+  {
+    "name": "StandardN",
+    "sample_rate": 32000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.9999494552612305,
+    "faults": 0
+  },
+  {
+    "name": "StandardN",
+    "sample_rate": 44100,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.9999494552612305,
+    "faults": 0
+  },
+  {
+    "name": "StandardN",
+    "sample_rate": 48000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.9999494552612305,
+    "faults": 0
+  },
+  {
+    "name": "StandardN",
+    "sample_rate": 192000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.9993529319763184,
+    "faults": 0
+  },
+  {
+    "name": "StandardL",
+    "sample_rate": 32000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.9999494552612305,
+    "faults": 0
+  },
+  {
+    "name": "StandardL",
+    "sample_rate": 44100,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.9999494552612305,
+    "faults": 0
+  },
+  {
+    "name": "StandardL",
+    "sample_rate": 48000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.9999494552612305,
+    "faults": 0
+  },
+  {
+    "name": "StandardL",
+    "sample_rate": 192000,
+    "frames": 65536,
+    "arena_bytes": 0,
+    "peak": 0.9993529319763184,
+    "faults": 0
+  }
+]

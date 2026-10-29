@@ -2,7 +2,8 @@
 import math
 TYPES=('Crackle','Logistic','Henon','Cusp','Latoocarfian','Lorenz')
 def comparison(name,a,b):
- if not name.startswith('m14_') or not any(name.startswith('m14_'+t) for t in TYPES) or name.endswith('_stable'):return {}
+ eligible=(name.startswith('m14_') and any(name.startswith('m14_'+t) for t in TYPES)) or (name.startswith(('m15_FBSine','m15_Standard')) and not name.endswith('_stable')) or name in ('m15_SinOscFB_ar_3','m15_SinOscFB_ar_4')
+ if not eligible or name.endswith('_stable'):return {}
  # Remove stereo padding and constructor transient; kr outputs are held for 64 frames.
  stride=128 if '_kr_' in name else 2
  x=list(a)[::stride];y=list(b)[::stride];skip=max(4,len(x)//10);x=x[skip:];y=y[skip:]

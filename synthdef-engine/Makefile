@@ -17,6 +17,9 @@ test: all
 	python3 tests/test_gendy.py
 	python3 tests/test_formants.py
 	python3 tests/test_rings.py
+	python3 tests/test_synthesis.py
+	python3 tests/test_synthesis_oracle.py
+	python3 tests/test_synthesis_oracle.py --device
 	python3 tests/test_stochastic.py
 	python3 tests/test_chaos_oracle.py
 	python3 tests/test_chaos_oracle.py --device
@@ -117,3 +120,17 @@ sanitize: | build
 	build/fuzz-ubsan fixtures/m14_LatoocarfianL_chaotic.scsyndef
 	build/fuzz-ubsan fixtures/m14_LatoocarfianC_chaotic.scsyndef
 	build/fuzz-ubsan fixtures/m14_LorenzL_chaotic.scsyndef
+
+# Synthesis and effect expansion.
+	build/fuzz-ubsan fixtures/m15_SinOscFB_ar_4.scsyndef
+	build/fuzz-ubsan fixtures/m15_Blip_ar_2.scsyndef
+	build/fuzz-ubsan fixtures/m15_Phasor_ar_0.scsyndef
+	build/fuzz-ubsan fixtures/m15_Pluck_live.scsyndef
+	build/fuzz-ubsan fixtures/m15_MoogFF_ar_live.scsyndef
+	build/fuzz-ubsan fixtures/m15_FreqShift_live.scsyndef
+	build/fuzz-ubsan fixtures/m15_Limiter_2.scsyndef
+	build/fuzz-ubsan fixtures/m15_FBSineN_chaotic.scsyndef
+	build/fuzz-ubsan fixtures/m15_FBSineL_chaotic.scsyndef
+	build/fuzz-ubsan fixtures/m15_FBSineC_chaotic.scsyndef
+	build/fuzz-ubsan fixtures/m15_StandardN_chaotic.scsyndef
+	build/fuzz-ubsan fixtures/m15_StandardL_chaotic.scsyndef

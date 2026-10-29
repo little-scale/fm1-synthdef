@@ -235,13 +235,15 @@ static __attribute__((noinline)) void fast_envelope(const fm_graph *g,fm_voice *
 #include "fm_reverb.inc"
 #include "fm_rings.inc"
 #include "fm_stochastic.inc"
+#include "fm_expansion.inc"
 
 static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *stereo,int initializing,const float *input_stereo) {
  unsigned ni,j,k;int free_voice=0;float mixed[FM_BLOCK*2];memset(mixed,0,sizeof mixed);
  if(!v->active || g->valid!=FM_VALID)return;
  /* Scratch is shared across voices. Restore cached initial-rate results from
     this voice before consumers run; never rely on the last voice's scratch. */
- for(ni=0;ni<g->nodes;ni++) {
+ /* Stop before consumers can read an output rejected by an earlier node. */
+ for(ni=0;ni<g->nodes && !v->fault;ni++) {
   const fm_node *n=&g->node[ni];fm_state *s=&v->state[ni];
   unsigned count=n->rate==2 && !initializing?FM_BLOCK:1;
   float sr=n->rate==2?v->sample_rate:v->sample_rate/FM_BLOCK;
@@ -300,6 +302,7 @@ static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *ster
   if(fm_is_gendy(n->type)){gendy_render(g,v,b,n,s,count,sr,initializing);continue;}
   if(n->type>=FM_VarSaw && n->type<=FM_BHiShelf){modulation(g,v,b,n,s,count,sr,initializing);continue;}
   if(n->type>=FM_Fold && n->type<=FM_MiMu){utilities(g,v,b,n,s,count,sr,initializing);continue;}
+  if(n->type>=FM_SinOscFB && n->type<=FM_StandardL){if(n->type>=FM_FBSineN)chaos_render(g,v,b,n,s,count,sr,initializing);else expansion_render(g,v,b,n,s,count,sr,initializing);continue;}
   if(n->type>=FM_Crackle && n->type<=FM_LorenzL){stochastic_render(g,v,b,n,s,count,sr,initializing);continue;}
   if(fm_is_rings(n->type)){rings_render(g,v,b,n,s,initializing);continue;}
   if(fm_is_reverb(n->type)){reverb_render(g,v,b,n,s,count,initializing);continue;}

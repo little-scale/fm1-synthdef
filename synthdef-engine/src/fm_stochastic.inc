@@ -23,11 +23,13 @@ static void chaos_render(const fm_graph *g,fm_voice *v,fm_scratch *b,const fm_no
  if(henon)valid=valid&&fabsf(args[1])<=2&&fabsf(args[2])<=1&&fabsf(args[3])<=1.5f&&fabsf(args[4])<=1.5f;
  else if(cusp)valid=valid&&fabsf(args[1])<=2&&fabsf(args[2])<=2&&fabsf(args[3])<=4;
  else if(lato)valid=valid&&fabsf(args[1])<=3&&fabsf(args[2])<=3&&fabsf(args[3])<=2&&fabsf(args[4])<=2&&fabsf(args[5])<=4&&fabsf(args[6])<=4;
+ else if(n->type>=FM_FBSineN && n->type<=FM_FBSineC){for(unsigned k=1;k<7;k++)valid=valid&&fabsf(args[k])<=16;}
+ else if(n->type>=FM_StandardN){valid=valid&&fabsf(args[1])<=16&&fabsf(args[2])<=16&&fabsf(args[3])<=16;}
  else {valid=valid&&args[1]>=0&&args[1]<=30&&args[2]>=0&&args[2]<=60&&args[3]>=0&&args[3]<=8&&args[4]>=0&&args[4]<=.05f;for(unsigned k=5;k<8;k++)valid=valid&&fabsf(args[k])<=100;}
  if(!valid){v->fault=1;return;}
  chaos_state state;memcpy(&state,s,sizeof state);chaos_unit unit={&state,args,b->signal[n->output],sr};
  #define CHAOS_CASE(N) case FM_##N:if(init)chaos_##N##_Ctor(&unit);else chaos_##N##_next(&unit,(int)count);break
- switch(n->type){CHAOS_CASE(HenonN);CHAOS_CASE(HenonL);CHAOS_CASE(HenonC);CHAOS_CASE(CuspN);CHAOS_CASE(CuspL);CHAOS_CASE(LatoocarfianN);CHAOS_CASE(LatoocarfianL);CHAOS_CASE(LatoocarfianC);CHAOS_CASE(LorenzL);default:v->fault=1;break;}
+ switch(n->type){CHAOS_CASE(HenonN);CHAOS_CASE(HenonL);CHAOS_CASE(HenonC);CHAOS_CASE(CuspN);CHAOS_CASE(CuspL);CHAOS_CASE(LatoocarfianN);CHAOS_CASE(LatoocarfianL);CHAOS_CASE(LatoocarfianC);CHAOS_CASE(LorenzL);CHAOS_CASE(FBSineN);CHAOS_CASE(FBSineL);CHAOS_CASE(FBSineC);CHAOS_CASE(StandardN);CHAOS_CASE(StandardL);default:v->fault=1;break;}
  #undef CHAOS_CASE
  if(!isfinite(state.xn)||!isfinite(state.yn)||!isfinite(state.zn)||fabsf(state.xn)>1e6f||fabsf(state.yn)>1e6f||fabsf(state.zn)>1e6f)v->fault=1;
  memcpy(s,&state,sizeof state);s->initialized=1;for(unsigned j=0;j<count;j++)checked_signal(v,&b->signal[n->output][j],b->signal[n->output][j]);

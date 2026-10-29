@@ -32,6 +32,11 @@ case 5:if(init)chaos_LatoocarfianN_Ctor(&unit);else chaos_LatoocarfianN_next(&un
 case 6:if(init)chaos_LatoocarfianL_Ctor(&unit);else chaos_LatoocarfianL_next(&unit,1);break;
 case 7:if(init)chaos_LatoocarfianC_Ctor(&unit);else chaos_LatoocarfianC_next(&unit,1);break;
 case 8:if(init)chaos_LorenzL_Ctor(&unit);else chaos_LorenzL_next(&unit,1);break;
+case 9:if(init)chaos_FBSineN_Ctor(&unit);else chaos_FBSineN_next(&unit,1);break;
+case 10:if(init)chaos_FBSineL_Ctor(&unit);else chaos_FBSineL_next(&unit,1);break;
+case 11:if(init)chaos_FBSineC_Ctor(&unit);else chaos_FBSineC_next(&unit,1);break;
+case 12:if(init)chaos_StandardN_Ctor(&unit);else chaos_StandardN_next(&unit,1);break;
+case 13:if(init)chaos_StandardL_Ctor(&unit);else chaos_StandardL_next(&unit,1);break;
 }
 values[0]=(float)s.x0;
 values[1]=(float)s.y0;
