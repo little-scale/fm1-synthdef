@@ -1,6 +1,6 @@
 {
-  "id": "host-9",
-  "status": "development: 109 types verified in emulation; October 30 expansion hardware checks deferred",
+  "id": "host-10",
+  "status": "development: 112 types verified in emulation; hardware checks deferred",
   "implemented_types": [
     "Control",
     "SinOsc",
@@ -110,7 +110,10 @@
     "Amplitude",
     "BPeakEQ",
     "BLowShelf",
-    "BHiShelf"
+    "BHiShelf",
+    "Gendy1",
+    "Gendy2",
+    "Gendy3"
   ],
   "planned_remaining_types": [
     "MiRings (full port exceeds current memory budget)"
@@ -466,5 +469,37 @@
       "reason": "exceeds 131072-byte shared arena and 65536-byte per-synth-voice limit"
     },
     "hardware_tested": false
+  },
+  "gendy": {
+    "rates": [
+      "audio",
+      "control"
+    ],
+    "parameter_rates": [
+      "initial",
+      "control"
+    ],
+    "initCPs": "literal integer 1..64",
+    "memory_bytes": {
+      "Gendy1": "8 * initCPs",
+      "Gendy2": "16 * initCPs",
+      "Gendy3": "16 * initCPs + 8"
+    },
+    "default_memory_bytes": [
+      96,
+      192,
+      200
+    ],
+    "distribution_selectors": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "hardware_tested": false,
+    "known_numerical_difference": "Gendy2 chaotic trajectory drift; Gendy3 integer interpolation boundaries; not bit-identical desktop waveforms"
   }
 }

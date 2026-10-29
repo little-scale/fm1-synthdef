@@ -14,6 +14,9 @@ test: all
 	build/decay-sparse-test
 	python3 tests/test_engine.py
 	python3 tests/test_expansion.py
+	python3 tests/test_gendy.py
+	python3 tests/test_gendy_oracle.py
+	python3 tests/test_gendy_oracle.py --device
 	python3 tests/test_miverb_oracle.py
 	python3 tests/test_mimu_oracle.py
 clean:
@@ -62,3 +65,7 @@ sanitize: | build
 	build/fuzz-ubsan fixtures/m9_SyncSaw_ar_1.scsyndef
 	build/fuzz-ubsan fixtures/m9_Amplitude_kr_ar_0.scsyndef
 	build/fuzz-ubsan fixtures/m9_BLowShelf_2_2.scsyndef
+
+	build/fuzz-ubsan fixtures/m10_Gendy1_ar_cp64.scsyndef
+	build/fuzz-ubsan fixtures/m10_Gendy2_ar_cp64.scsyndef
+	build/fuzz-ubsan fixtures/m10_Gendy3_ar_cp64.scsyndef

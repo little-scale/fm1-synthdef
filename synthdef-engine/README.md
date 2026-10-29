@@ -1,6 +1,6 @@
 # FM1 SynthDef engine
 
-A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 109 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
+A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 112 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
 
 ## Try it
 
@@ -51,6 +51,7 @@ The simpler example in `examples/voice.scd` exports a playable gated sine voice 
 | LFDNoise0, LFDNoise1, LFDNoise3 | audio, control | Frequency may be audio rate; supported domain 0 to four times calculation rate; negative frequency faults; cubic version retains upstream 0.8 scaling |
 | RHPF, BRF | audio, control | Initial/control cutoff and resonance/bandwidth; SC coefficient interpolation in a stable difference-state realization |
 | Amplitude | audio, control | Also supports audio input with control output; nonnegative initial/control attack/release; pinned SC rate semantics |
+| Gendy1, Gendy2, Gendy3 | audio/control | All seven distributions; every parameter initial/control; `initCPs` must be an integer literal 1–64; runtime `knum` follows upstream fallback to allocated count |
 | BPeakEQ, BLowShelf, BHiShelf | audio | Initial/control frequency, reciprocal Q/slope and gain; frequency strictly inside (0, Nyquist), positive Q/slope, gain ±120 dB; invalid coefficient domains fault |
 | SampleRate, SampleDur, ControlRate, ControlDur, BlockSize, RadiansPerSample | initial | Information for this voice; control rate uses engine block size 64 |
 | Delay1, Delay2 | audio, control | One/two calculation-sample delay; explicit initial values are initial/control inputs |
@@ -188,3 +189,15 @@ The October 30 expansion reuses existing node state: no additional per-voice or 
 `SelectX.ar/kr` now compiles and renders through supported selectors and crossfade nodes. As with Mix and Splay, it is a source helper rather than an additional runtime type.
 
 MiRings is deliberately absent from the supported types. The pinned upstream implementation passed a host smoke probe for six models and six alternate-mode effect settings, but its approximately 180,048-byte host instance (including 65,536 bytes of reverb) exceeds this firmware's 131,072-byte shared arena and 65,536-byte per-voice budget. A reduced modal-only implementation or a separate memory layout needs further work and must not be presented as full MiRings compatibility.
+
+## Gendy profile
+
+Gendy1 and Gendy2 expose their min/max frequency, amplitude/duration scales and distribution controls; Gendy2 also exposes `a` and `c`. Gendy3 uses a single cycle-frequency control. Standard SuperCollider `.ar`/`.kr` defaults, `mul`/`add`, multichannel expansion and `RandSeed` work within the normal graph limits. Rates and random draw order follow the pinned 3.14.1 implementation. All parameters must be initial/control rate, including frequency. `initCPs` must be a literal integer in 1–64; changing `knum` affects active points without reallocating memory. A `knum` outside 1–initCPs selects the allocated count, as upstream does.
+
+Each instance charges the shared DSP arena: Gendy1 uses `8 * initCPs` bytes, Gendy2 `16 * initCPs`, Gendy3 `16 * initCPs + 8`. At the default 12 points this is 96, 192 and 200 bytes respectively. There is no heap allocation or increase to fixed per-node/per-voice state. The same synth-plus-effect memory admission applies as for delay/reverb buffers.
+
+Distribution parameters are clamped to 0.0001–1, and unrecognized distribution selectors use the upstream linear fallback. Negative frequencies, non-finite controls or control magnitudes above 1,000,000 fault the voice. Degenerate duration/interpolation state or an exhausted Gendy3 breakpoint list faults safely instead of accessing outside the allocation. Excessive frequency relative to breakpoint count can extrapolate beyond ±1, as upstream does; the supplied examples soft-clip before filtering and leave output headroom.
+
+Floating-point details matter here. Compensated phase pairs preserve timing without software doubles. Gendy3 retains the upstream **integer** interpolation multiplier. Gendy2 feedback amplifies minute numerical differences; Gendy3 can cross an integer interpolation boundary differently. Exact long waveform identity with desktop SuperCollider is therefore not promised. The 81 Gendy fixtures use 53 ordinary waveform checks and 28 stochastic-summary checks (RMS/peak ratios and mean offset). Independently, 707,707 distribution inputs and 2,795,520 identical-state transitions are compared with the unmodified upstream kernels on host and firmware-math backends. Breakpoint updates and RNG draw order are checked; the two observed host integer-boundary transitions use an analytical discontinuity bound. See [Gendy verification](../docs/VERIFICATION.md).
+
+Examples: [Gendy1](../fm1-synth/examples/gendy1.scd), [Gendy2](../fm1-synth/examples/gendy2.scd), [Gendy3](../fm1-synth/examples/gendy3.scd). Knobs 1–4 control amplitude movement, duration movement, active points and cutoff. Existing slots are not overwritten. Restart an already-running local editor to load the updated native library. Hardware CPU, listening and power-cycle checks remain deferred.

@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-30",
+  "implemented_types": 112,
+  "added_types": [
+    "Gendy1",
+    "Gendy2",
+    "Gendy3"
+  ],
+  "rates": [
+    "audio",
+    "control"
+  ],
+  "initCPs_literal_range": [
+    1,
+    64
+  ],
+  "default_instance_bytes": [
+    96,
+    192,
+    200
+  ],
+  "reference_cases_per_backend": 886,
+  "waveform_or_timing_cases_per_backend": 858,
+  "stochastic_summary_cases_per_backend": 28,
+  "stochastic_summary_does_not_establish_waveform_identity": true,
+  "all_reference_cases_passed": true,
+  "oracle_backends": [
+    "host",
+    "freestanding device math on host"
+  ],
+  "oracle_distribution_cases_per_backend": 707707,
+  "oracle_state_transition_samples_per_backend": 2795520,
+  "engine_api_groups": 45,
+  "instrument_python_groups": 7,
+  "ubsan_mutations": 700000,
+  "address_sanitizer": "Not completed: macOS ASan runtime deadlocked in shadow-memory initialization before main; sampled and stopped",
+  "gendy_long_render_frames": 3145728,
+  "example_scenarios": 15,
+  "example_frames_each": 307200,
+  "maximum_example_peak": 0.4151473343372345,
+  "hardware_tested": false,
+  "hardware_status": "User deferred installation, listening and realtime timing checks",
+  "user_slots_changed": false,
+  "running_editor_changed": false,
+  "editor_action": "Restart the editor to load the updated native engine",
+  "target": {
+    "application_bytes": 254532,
+    "package_bytes": 610136,
+    "static_ram_bytes": 78480,
+    "static_ram_capacity": 98304,
+    "pool_bytes": 326008,
+    "pool_capacity": 344064,
+    "ble": false,
+    "identity": "FM-1_1200",
+    "software_double_helpers": false,
+    "multiply_load_hazards": false
+  },
+  "sha256": {
+    "synthdef.bin": "4fafbb5a270bfa653aba8a8b4de745663cbe88e42de2f618d639c06a4f581877",
+    "synthdef.fwsc": "f2e9b20945151f582c4dd8b52d277009d42b348b2ad9b5242ed6677a7b2fdbde"
+  },
+  "source_sha256": {
+    "synthdef-engine/src/fm_synth.h": "f6e45be65d6ec215e2bef61d3e443c3ecc171052af8230c2ee0e617f71c74130",
+    "synthdef-engine/src/fm_load.c": "70b4f635e3da5a3840b5f6ea8bd1a524c391e185fdb5f5e7dbe2d362c8a3e031",
+    "synthdef-engine/src/fm_render.c": "8fed7f5e9fcc3081f0e93bc5b51efd5655669090747dfca2ce554d06be482938",
+    "synthdef-engine/src/fm_delay.inc": "068309a6a5da497329c96ee0929d526a491d9e6026108d9e8422ab68f9215294",
+    "synthdef-engine/src/fm_gendy.inc": "f646aaa70a435acca6cc2f73fe1e33825365488e3c4845d52119317a5811a21e"
+  },
+  "results": [
+    "gendy-2026-10-30-reference.json",
+    "gendy-2026-10-30-optimized-host.json",
+    "gendy-2026-10-30-device-math.json",
+    "gendy-2026-10-30-oracle.json",
+    "gendy-2026-10-30-oracle-device.json",
+    "gendy-2026-10-30-examples.json"
+  ]
+}

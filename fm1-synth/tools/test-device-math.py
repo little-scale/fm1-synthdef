@@ -25,8 +25,9 @@ for p in sorted((ENGINE/'fixtures').glob('*.scsyndef')):
  peak_limit=limits[name]['peak_limit'] if host else 0.001
  rms_limit=limits[name]['rms_limit'] if host else 0.0001
  timing=ref.impulse_timing(a,b) if name=='m6_Impulse_ar_fm' else {}
- passed=all(math.isfinite(x) for x in a) and len(a)==len(b) and timing.get('timing_passed',peak<peak_limit and rms<rms_limit)
- results.append(dict(**timing,name=name,peak=peak,rms=rms,passed=passed))
+ stochastic=ref.gendy_comparison(name,a,b)
+ passed=all(math.isfinite(x) for x in a) and len(a)==len(b) and stochastic.get('stochastic_passed',timing.get('timing_passed',peak<peak_limit and rms<rms_limit))
+ results.append(dict(**stochastic,**timing,name=name,peak=peak,rms=rms,passed=passed))
 (OUT/('host-fast-results.json' if host else 'device-math-results.json')).write_text(json.dumps(results,indent=2)+'\n')
 for r in results:
  if not r['passed']:print('FAIL',r)

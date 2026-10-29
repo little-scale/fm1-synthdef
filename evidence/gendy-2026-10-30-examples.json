@@ -1,0 +1,182 @@
+[
+  {
+    "patch": "gendy1",
+    "initial_knobs": 0,
+    "live_knobs": 1,
+    "frames": 307200,
+    "peaks": [
+      0.12347925454378128,
+      0.12347925454378128
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy1",
+    "initial_knobs": 0.25,
+    "live_knobs": 0.75,
+    "frames": 307200,
+    "peaks": [
+      0.12406180799007416,
+      0.12406180799007416
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy1",
+    "initial_knobs": 0.5,
+    "live_knobs": 0.5,
+    "frames": 307200,
+    "peaks": [
+      0.07938412576913834,
+      0.07938412576913834
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy1",
+    "initial_knobs": 0.75,
+    "live_knobs": 0.25,
+    "frames": 307200,
+    "peaks": [
+      0.08403175324201584,
+      0.08403175324201584
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy1",
+    "initial_knobs": 1,
+    "live_knobs": 0,
+    "frames": 307200,
+    "peaks": [
+      0.08294171839952469,
+      0.08294171839952469
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy2",
+    "initial_knobs": 0,
+    "live_knobs": 1,
+    "frames": 307200,
+    "peaks": [
+      0.4151473343372345,
+      0.4151473343372345
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy2",
+    "initial_knobs": 0.25,
+    "live_knobs": 0.75,
+    "frames": 307200,
+    "peaks": [
+      0.12115239351987839,
+      0.12115239351987839
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy2",
+    "initial_knobs": 0.5,
+    "live_knobs": 0.5,
+    "frames": 307200,
+    "peaks": [
+      0.12231716513633728,
+      0.12231716513633728
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy2",
+    "initial_knobs": 0.75,
+    "live_knobs": 0.25,
+    "frames": 307200,
+    "peaks": [
+      0.11444050818681717,
+      0.11444050818681717
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy2",
+    "initial_knobs": 1,
+    "live_knobs": 0,
+    "frames": 307200,
+    "peaks": [
+      0.11513347923755646,
+      0.11513347923755646
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy3",
+    "initial_knobs": 0,
+    "live_knobs": 1,
+    "frames": 307200,
+    "peaks": [
+      0.2423168122768402,
+      0.2423168122768402
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy3",
+    "initial_knobs": 0.25,
+    "live_knobs": 0.75,
+    "frames": 307200,
+    "peaks": [
+      0.09856994450092316,
+      0.09856994450092316
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy3",
+    "initial_knobs": 0.5,
+    "live_knobs": 0.5,
+    "frames": 307200,
+    "peaks": [
+      0.06797316670417786,
+      0.06797316670417786
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy3",
+    "initial_knobs": 0.75,
+    "live_knobs": 0.25,
+    "frames": 307200,
+    "peaks": [
+      0.08318007737398148,
+      0.08318007737398148
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "gendy3",
+    "initial_knobs": 1,
+    "live_knobs": 0,
+    "frames": 307200,
+    "peaks": [
+      0.0811181291937828,
+      0.0811181291937828
+    ],
+    "faults": 0,
+    "release_silent": true
+  }
+]

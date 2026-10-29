@@ -1,5 +1,19 @@
 # Verification record
 
+
+## Gendy1 / Gendy2 / Gendy3 — 30 October 2026
+
+The development engine now has **112 UGen types**. All three Gendy types support audio/control rates and all seven distributions, with a literal initial allocation of 1–64 breakpoints and live control parameters. Hardware installation and listening/timing checks remain deferred at the user's request; saved slots and the running editor were not changed.
+
+- **886/886 reference cases pass on all three backends**: ordinary host, optimized host and freestanding firmware math under host emulation. Of these, **858 use waveform/timing comparisons** and **28 use stochastic summaries**. The latter are explicitly labeled in the results; they do not establish sample-for-sample waveform identity.
+- Each of the two independent Gendy oracle backends compares **707,707 distribution inputs** and **2,795,520 one-sample transitions** against pinned, unmodified SuperCollider 3.14.1 code. Constructor arrays, breakpoint updates and RNG draw order are checked. Breakpoint-state error stays below 2e-6 in these tests; the allowed limit is 1e-5. Gendy3’s integer reciprocal causes two host interpolation-boundary differences, checked against an analytical bound. Gendy2’s feedback can amplify minute floating-point differences over time.
+- **45 engine API test groups** and **700,000 malformed/truncated graph mutations** pass, alongside the existing MiMu/MiVerb oracles and long-decay regression. New tests cover exact memory requirements, undersized/missing arenas, allocation canaries, parameter/rate rejection, restart reproducibility, shared scratch isolation, live control faults and 3,145,728 long-render frames over four sample rates.
+- An additional AddressSanitizer attempt could not start: the macOS ASan runtime deadlocked in shadow-memory initialization before `main`. It was sampled and stopped; no ASan pass is claimed. The completed sanitizer coverage above is UBSan/bounds/float-cast-overflow, supplemented by exact-allocation canaries.
+- **15 two-voice example scenarios**, each 307,200 frames, exercise Gendy1/2/3 through master echo with knobs at five settings, live changes, voice stealing and release. All produce finite nonzero audio, no faults and a silent tail after release; maximum peak is below 0.416. Three example source/compiled/slot files are supplied without installing them into user slots.
+- The target application is **254,532 bytes**; static RAM is **78,480 / 98,304 bytes** and pool use **326,008 / 344,064 bytes**. The package is 610,136 bytes, Bluetooth disabled. The build checks report no software-double routines and no 64-bit multiply/load hazard. Gendy arrays use the existing shared arena: default instance costs are 96/192/200 bytes. Build fit does not establish realtime CPU capacity.
+
+Reproduction: `make -C synthdef-engine test`, `make -C synthdef-engine sanitize`, `synthdef-engine/tests/compare_reference.py`, both modes of `fm1-synth/tools/test-device-math.py`, `make -C fm1-synth test`, and `fm1-synth/tools/test-gendy.py`. See [Gendy evidence](../evidence/gendy-2026-10-30.json) for results and source/package hashes. Restart an existing local editor to load the new native library.
+
 ## UGen expansion — 30 October 2026
 
 The development engine now implements **109 UGen types**, adding the 32 types listed in [the roadmap](UGEN-ROADMAP.md), seven binary selectors and SelectX helper compatibility. **Hardware checks and installation are deferred at the user's request.** The existing preview release and user slot banks are unchanged.

@@ -2,6 +2,7 @@
 
 Reference implementation: [SuperCollider 3.14.1](https://github.com/supercollider/supercollider/tree/Version-3.14.1), installed binary commit `426edf6`. These files were downloaded from that tag:
 
+- `server/plugins/GendynUGens.cpp`: Gendy1/2/3 stochastic oscillators, Nick Collins (GPL-2.0-or-later).
 - `server/plugins/LFUGens.cpp`: envelope and Line/XLine definitions.
 - `server/plugins/FilterUGens.cpp`: filter, decay and resonator recurrences.
 - `server/plugins/TriggerUGens.cpp`: Latch/Gate trigger and constructor behavior.
@@ -38,3 +39,5 @@ The m6 extension fixtures cover 21 additional types and five pitch/gain selector
 `export-utilities.scd` and `export-modulation.scd` add 252 fixtures for 32 UGen types, seven binary selectors and SelectX. `DynNoiseUGens.cpp` is pinned to SuperCollider 3.14.1 and included in the main source manifest. The MiMu source/class/help are pinned alongside MiVerb; the isolated plugin builder builds both plugins. `tests/test_mimu_oracle.py` checks 1,048,576 identical-input samples bit for bit, covering control/audio gain and changing bypass.
 
 `tools/probe-mirings.py --upstream PATH --output RESULT.json` builds a host-only feasibility probe from a separately checked-out mi-UGens commit `10f6824f68ad63475f67dfe3fe5016e2d2634f84`. `mirings-probe-sources.json` verifies its upstream Rings/stmlib sources. The probe does not provide MiRings support in the engine and cannot establish hardware timing.
+
+`export-gendy.scd` supplies 81 Gendy graphs. `tests/gendy_oracle.cpp` compiles the unmodified pinned source and compares distribution values, constructor arrays, RNG consumption and identical-state one-sample transitions against both C math backends. This isolates chaotic drift from implementation errors. Long NRT comparisons are explicitly labeled waveform or stochastic-summary; neither is a hardware timing measurement.

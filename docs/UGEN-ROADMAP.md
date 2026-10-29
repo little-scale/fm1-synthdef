@@ -1,6 +1,6 @@
 # UGen roadmap
 
-Updated 30 October 2026. The development engine contains **109 UGen types**. The 32 additions below are implemented; hardware installation and realtime checks are deferred at the user's request. The existing published preview remains unchanged.
+Updated 30 October 2026. The development engine contains **112 UGen types**. The 35 additions below are implemented; hardware installation and realtime checks are deferred at the user's request. The existing published preview remains unchanged.
 
 ## Completed expansion
 
@@ -11,13 +11,13 @@ Updated 30 October 2026. The development engine contains **109 UGen types**. The
 | Triggers and counters | Trig, Trig1, PulseDivider, PulseCount, ToggleFF, SetResetFF, Stepper |
 | Mixing and panning | XFade2, LinXFade2, Balance2 |
 | Smoothing and tracking | Slew, Lag2, Lag3, Amplitude |
-| Oscillators | VarSaw, SyncSaw, LFCub, LFPar |
+| Oscillators | VarSaw, SyncSaw, LFCub, LFPar, Gendy1, Gendy2, Gendy3 |
 | Filters and EQ | RHPF, BRF, BPeakEQ, BLowShelf, BHiShelf |
 | Distortion | MiMu |
 
 Modulo, round, roundUp, trunc, clip2, fold2 and wrap2 binary selectors were added too. SelectX now compiles and renders at audio/control rate; it is a source helper, not a separate runtime UGen. The [full profile](../synthdef-engine/README.md#supported-profile) states rate and domain restrictions. In particular, the new EQ coefficients are initial/control rate, oscillator frequencies are bounded, and MiMu is audio-only.
 
-New types reuse existing per-node state and allocate no delay buffers. Static RAM and the instrument pool remain unchanged. A stable difference-state form avoids cancellation in low-cutoff high-pass/notch/EQ filters. Control-frequency SinOsc increments and MiMu's float-to-PCM conversion match the reference without software double routines on the single-precision device.
+The initial 32 types reuse existing per-node state and allocate no delay buffers. Gendy1/2/3 additionally charge bounded breakpoint arrays to the existing shared arena (default 96/192/200 bytes per instance). Static RAM and the instrument pool remain unchanged. A stable difference-state form avoids cancellation in low-cutoff high-pass/notch/EQ filters. Control-frequency SinOsc increments and MiMu's float-to-PCM conversion match the reference without software double routines on the single-precision device.
 
 [MiMu drive](../fm1-synth/examples/mimu-drive.scd) is a stereo master-effect example; [modulation lab](../fm1-synth/examples/modulation-lab.scd) exercises VarSaw, LFDNoise1, LinExp and Lag3 with live knobs. Neither example replaces a saved user slot.
 
