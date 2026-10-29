@@ -1,0 +1,182 @@
+[
+  {
+    "patch": "stochastic-plucks",
+    "initial_knobs": 0,
+    "live_knobs": 1,
+    "frames": 307200,
+    "peaks": [
+      0.46186962723731995,
+      0.46186962723731995
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "stochastic-plucks",
+    "initial_knobs": 0.25,
+    "live_knobs": 0.75,
+    "frames": 307200,
+    "peaks": [
+      0.20890766382217407,
+      0.20890766382217407
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "stochastic-plucks",
+    "initial_knobs": 0.5,
+    "live_knobs": 0.5,
+    "frames": 307200,
+    "peaks": [
+      0.1302090287208557,
+      0.1302090287208557
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "stochastic-plucks",
+    "initial_knobs": 0.75,
+    "live_knobs": 0.25,
+    "frames": 307200,
+    "peaks": [
+      0.11456245183944702,
+      0.11456245183944702
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "stochastic-plucks",
+    "initial_knobs": 1,
+    "live_knobs": 0,
+    "frames": 307200,
+    "peaks": [
+      0.2951476573944092,
+      0.2951476573944092
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "chaos-voice",
+    "initial_knobs": 0,
+    "live_knobs": 1,
+    "frames": 307200,
+    "peaks": [
+      0.26376840472221375,
+      0.26376840472221375
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "chaos-voice",
+    "initial_knobs": 0.25,
+    "live_knobs": 0.75,
+    "frames": 307200,
+    "peaks": [
+      0.07998823374509811,
+      0.07998823374509811
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "chaos-voice",
+    "initial_knobs": 0.5,
+    "live_knobs": 0.5,
+    "frames": 307200,
+    "peaks": [
+      0.0701870247721672,
+      0.0701870247721672
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "chaos-voice",
+    "initial_knobs": 0.75,
+    "live_knobs": 0.25,
+    "frames": 307200,
+    "peaks": [
+      0.07467469573020935,
+      0.07467469573020935
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "chaos-voice",
+    "initial_knobs": 1,
+    "live_knobs": 0,
+    "frames": 307200,
+    "peaks": [
+      0.18000134825706482,
+      0.18000134825706482
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "chaos-attractors",
+    "initial_knobs": 0,
+    "live_knobs": 1,
+    "frames": 307200,
+    "peaks": [
+      0.12010060250759125,
+      0.12010060250759125
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "chaos-attractors",
+    "initial_knobs": 0.25,
+    "live_knobs": 0.75,
+    "frames": 307200,
+    "peaks": [
+      0.09374123811721802,
+      0.09374123811721802
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "chaos-attractors",
+    "initial_knobs": 0.5,
+    "live_knobs": 0.5,
+    "frames": 307200,
+    "peaks": [
+      0.05607452243566513,
+      0.05607452243566513
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "chaos-attractors",
+    "initial_knobs": 0.75,
+    "live_knobs": 0.25,
+    "frames": 307200,
+    "peaks": [
+      0.06866025179624557,
+      0.06866025179624557
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "chaos-attractors",
+    "initial_knobs": 1,
+    "live_knobs": 0,
+    "frames": 307200,
+    "peaks": [
+      0.07364844530820847,
+      0.07364844530820847
+    ],
+    "faults": 0,
+    "release_silent": true
+  }
+]

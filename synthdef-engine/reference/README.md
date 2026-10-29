@@ -2,6 +2,7 @@
 
 Reference implementation: [SuperCollider 3.14.1](https://github.com/supercollider/supercollider/tree/Version-3.14.1), installed binary commit `426edf6`. These files were downloaded from that tag:
 
+- `server/plugins/ChaosUGens.cpp`: Hénon, Cusp, Latoocarfian and Lorenz, Lance Putnam (2004), with James McCartney copyright (GPL-2.0-or-later). `tools/generate-chaos.py` verifies its pinned hash and generates the float C adaptation.
 - `server/plugins/GendynUGens.cpp`: Gendy1/2/3 stochastic oscillators, Nick Collins (GPL-2.0-or-later).
 - `server/plugins/LFUGens.cpp`: envelope and Line/XLine definitions.
 - `server/plugins/FilterUGens.cpp`: filter, decay and resonator recurrences, including Formlet.
@@ -49,3 +50,5 @@ The m6 extension fixtures cover 21 additional types and five pitch/gain selector
 ## Fixed-model Rings
 
 `mi-rings/` retains the required original mi-UGens/eurorack sources at commit `10f6824f68ad63475f67dfe3fe5016e2d2634f84`. `sources.json` pins every original file. The MIT Rings/stmlib DSP is by Emilie Gillet (2014–2015); original source notices and LICENSE are retained. The original mi-UGens wrapper/class files retain Volker Bohm's notices. The runtime is a separate C adaptation with model-specific arena storage, explicit triggers and optional compact string buffers; it does not compile the original C++ DSP into firmware. `tools/generate-rings-tables.py` reproduces the exact lookup/chord data from verified pinned sources. `tests/rings_oracle.cpp` uses unmodified upstream Part; `tests/rings_reference_plugin.cpp` is a test-only SC adapter to that Part, restricted to full buffers. See [the Rings guide](../../docs/RINGS.md).
+
+`export-stochastic.scd` adds 80 graphs for 18 generators. `test_chaos_oracle.py` compares identical-state transitions against the unmodified Chaos/Noise sources on both math backends, plus exact integer random mapping and float-bit hashing. The m14 statistical cases are explicitly labeled; they are not waveform matches. See [generator compatibility](../../docs/STOCHASTIC.md) for the upstream TIRand held-trigger and constructor-alias fixes.

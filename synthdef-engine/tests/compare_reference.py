@@ -50,6 +50,9 @@ def fixture_blocks(name):
     return 2756 if name.startswith("m7_") else 827 if name=="m5_addy" else 345
 
 def gendy_comparison(name,a,b):
+    from stochastic_metrics import comparison
+    extra=comparison(name,a,b)
+    if extra:return extra
     """Chaotic/quantized walks: acoustic agreement plus separate state oracle.
 
     No waveform-equivalence claim for these cases. Stable Gendy1, external-

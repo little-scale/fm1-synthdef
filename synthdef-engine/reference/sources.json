@@ -21,6 +21,7 @@
     "ReverbUGens.cpp": "c3cebdf729874c7a8bfc3d449238c87dc23aa02cfe2a9fffefcd1c6a49362fe4",
     "DynNoiseUGens.cpp": "160d9c1a3bcf68e719a651c9d6f667fc2336c6c38f71cf2766e5f84895b7eb55",
     "GendynUGens.cpp": "573e3cbb9cd67281b184610a0a2c3dfe2acb70f648c23f39553f72bd78d60a94",
-    "UnaryOpUGens.cpp": "8ad8e92fe5988c9af2b6fdca33c4f7f8365e57849f4a5504448c8d957f05743d"
+    "UnaryOpUGens.cpp": "8ad8e92fe5988c9af2b6fdca33c4f7f8365e57849f4a5504448c8d957f05743d",
+    "ChaosUGens.cpp": "b35f47b3f200ac2f871cfa36ccd5f85663b60bb806e167d8e05cf67b01be54cc"
   }
 }

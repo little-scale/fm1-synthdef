@@ -1,5 +1,18 @@
 # Verification record
 
+## Random and chaotic generators — 30 October 2026
+
+The development profile now has **142 compiled UGen types**, adding 18 random/chaotic generators. Operators remain 33 unary and 40 binary selectors. Hardware checks remain deferred; saved slots and the running editor were not changed.
+
+- **1,370/1,370 reference cases pass on all three backends**: ordinary host, optimized host and firmware-math host emulation. There are 1,316 waveform/timing cases and 54 labeled stochastic cases. The 80 new graphs include 54 waveform and 26 statistical comparisons. The statistical checks use mean, RMS, standard deviation and first-difference energy; they are tested to reject silence, gross gain errors and DC offsets, but do not prove perceptual identity.
+- **7,960,312 identical-state chaos comparisons per math backend** check constructors, interpolation, state and live iteration-frequency changes against unmodified upstream C++. Maximum normalized error is below 0.000000633. Each backend also passes **2,196,149 noise/random checks**, including 200,000 identical-state Crackle/Logistic steps, integer random mapping, float-bit hashing and the documented upstream TIRand constructor-alias behavior. See [compatibility details](STOCHASTIC.md).
+- **71 engine API groups**, the instrument tests and **1,320,000 UBSan/bounds/float-cast-overflow graph mutations** pass. New API checks cover graph/rate rejection, bounded domains, fault-to-silence, restart/seed/shared-scratch isolation, weighted choices and held trigger edges. No ASan pass is claimed because of the previously recorded macOS runtime initialization problem.
+- **44 extended renders**, each 131,072 frames, exercise 11 chaotic generators at 32/44.1/48/192 kHz. They remain finite and active and have no exact repeating period up to 128 samples in the inspected tail. This is not a proof against longer finite-precision cycles or unstable untested parameter combinations.
+- **15 instrument scenarios**, each 307,200 frames, exercise three new examples with two voices, master echo, five starting knob settings, live changes, voice stealing and release. All produce finite nonzero audio, no faults and silent released tails. Maximum output peak is below 0.462. The chaotic examples remove DC and smooth filter changes to control transients.
+- These UGens allocate **no DSP-arena memory** and do not enlarge fixed node/voice state. The application is **322,480 bytes**, packaged in **610,136 bytes**. Static RAM remains **78,480 / 98,304 bytes**; pool use remains **326,008 / 344,064 bytes**. Bluetooth is disabled. Target checks find no software-double routines or 64-bit multiply/load hazard. Build fit and host emulation do not establish realtime device capacity.
+
+Reproduce with `make -C synthdef-engine test`, `make -C synthdef-engine sanitize`, `synthdef-engine/tests/compare_reference.py`, both modes of `fm1-synth/tools/test-device-math.py`, `make -C fm1-synth test`, and `fm1-synth/tools/test-stochastic.py`. See [individual results and hashes](../evidence/stochastic-2026-10-30.json). Restart the local editor to load the rebuilt native library. Hardware installation, listening and CPU checks remain pending.
+
 ## Fixed-model Rings and compact buffers — 30 October 2026
 
 The development profile now has **124 compiled UGen types**, adding MiRings1–MiRings6. The operator count remains 33 unary and 40 binary selectors. Hardware checks remain deferred; saved slots and the running editor were not changed.

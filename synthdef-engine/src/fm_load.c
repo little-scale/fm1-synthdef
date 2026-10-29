@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #define FM_VALID 0x464d5331u
-static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In","SampleRate","SampleDur","ControlRate","ControlDur","BlockSize","RadiansPerSample","Delay1","Delay2","OnePole","OneZero","LPZ1","HPZ1","Latch","Gate","TRand","TExpRand","Dust","Dust2","Impulse","Decay","Decay2","FreeVerb","FreeVerb2","MiVerb","Fold","Wrap","BrownNoise","ClipNoise","Trig","Trig1","PulseDivider","PulseCount","ToggleFF","SetResetFF","Stepper","XFade2","LinXFade2","Balance2","LinExp","Slew","Lag2","Lag3","MiMu","RHPF","BRF","VarSaw","SyncSaw","LFCub","LFPar","LFDNoise0","LFDNoise1","LFDNoise3","Amplitude","BPeakEQ","BLowShelf","BHiShelf","Gendy1","Gendy2","Gendy3","Formant","Formlet","MaxLocalBufs","LocalBuf","SetBuf","DegreeToKey","MiRings1","MiRings2","MiRings3","MiRings4","MiRings5","MiRings6"};
+static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In","SampleRate","SampleDur","ControlRate","ControlDur","BlockSize","RadiansPerSample","Delay1","Delay2","OnePole","OneZero","LPZ1","HPZ1","Latch","Gate","TRand","TExpRand","Dust","Dust2","Impulse","Decay","Decay2","FreeVerb","FreeVerb2","MiVerb","Fold","Wrap","BrownNoise","ClipNoise","Trig","Trig1","PulseDivider","PulseCount","ToggleFF","SetResetFF","Stepper","XFade2","LinXFade2","Balance2","LinExp","Slew","Lag2","Lag3","MiMu","RHPF","BRF","VarSaw","SyncSaw","LFCub","LFPar","LFDNoise0","LFDNoise1","LFDNoise3","Amplitude","BPeakEQ","BLowShelf","BHiShelf","Gendy1","Gendy2","Gendy3","Formant","Formlet","MaxLocalBufs","LocalBuf","SetBuf","DegreeToKey","MiRings1","MiRings2","MiRings3","MiRings4","MiRings5","MiRings6","Crackle","LFClipNoise","LFDClipNoise","GrayNoise","Hasher","CoinGate","TIRand","TWindex","Logistic","HenonN","HenonL","HenonC","CuspN","CuspL","LatoocarfianN","LatoocarfianL","LatoocarfianC","LorenzL"};
 const char *fm_type_name(unsigned type) { return type < FM_TYPES ? types[type] : "unknown"; }
 typedef struct { const uint8_t *p; size_t left; int failed; } reader;
 static uint32_t rd(reader *r, unsigned n) {
@@ -81,6 +81,19 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
     for(j=0;j<u->inputs;j++) {fm_ref *ref=&g->ref[u->input+j];if(ref->node>=0 && g->node[ref->node].rate!=0) BAD("LagControl times must be initial rate");}
    } else if(u->inputs || (u->type==FM_TrigControl && u->rate!=1)) BAD("Invalid control inputs/rate");
    if(!u->outputs || u->rate>1 || u->special<0 || u->special+u->outputs>g->controls) BAD("Invalid Control layout/rate");
+  } else if(u->type>=FM_Crackle && u->type<=FM_LorenzL) {
+   static const unsigned counts[]={1,1,1,0,1,2,3,0,3,5,5,5,4,4,7,7,7,8};
+   unsigned want=counts[u->type-FM_Crackle];
+   if(u->rate<1 || u->outputs!=1 || (u->type!=FM_TWindex && u->inputs!=want))BAD("Invalid stochastic generator layout/rate");
+   if(u->type==FM_TWindex && (u->inputs<3 || u->inputs>66))BAD("TWindex requires 1–64 weights");
+   if(u->type>=FM_HenonN && u->rate!=2)BAD("Chaotic map oscillators support audio rate only");
+   for(j=0;j<u->inputs;j++){
+    fm_ref *ref=&g->ref[u->input+j];unsigned rate=ref->node<0?0:g->node[ref->node].rate;
+    int audio=(u->type==FM_LFDClipNoise||u->type==FM_Hasher)||(u->type==FM_CoinGate&&j==1)||(u->type==FM_TIRand&&j==2)||(u->type==FM_TWindex&&j==0);
+    if(rate==2 && (!audio || u->rate!=2))BAD("Stochastic parameter requires initial/control rate");
+    if(u->rate==2 && ((u->type==FM_Hasher&&j==0)||(u->type==FM_CoinGate&&j==1)||(u->type==FM_TIRand&&j==2)) && rate!=2)BAD("Audio stochastic input/trigger requires audio rate");
+    if(u->type==FM_Logistic&&j==2&&rate!=0)BAD("Logistic init must be initial rate");
+   }
   } else if(fm_is_rings(u->type)) {
    if(u->rate!=2 || u->inputs!=10 || u->outputs!=2)BAD("MiRings1-6 require ten inputs and two audio outputs");
    if(!literal(g,u,9,&v) || (v!=0 && v!=1))BAD("MiRings compact must be a literal 0 or 1");

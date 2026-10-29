@@ -17,6 +17,9 @@ test: all
 	python3 tests/test_gendy.py
 	python3 tests/test_formants.py
 	python3 tests/test_rings.py
+	python3 tests/test_stochastic.py
+	python3 tests/test_chaos_oracle.py
+	python3 tests/test_chaos_oracle.py --device
 	python3 tests/test_rings_oracle.py
 	python3 tests/test_rings_oracle.py --device
 	python3 tests/test_operators_scales.py
@@ -94,3 +97,23 @@ sanitize: | build
 	build/fuzz-ubsan fixtures/m13_MiRings6_internal.scsyndef
 	build/fuzz-ubsan ../fm1-synth/examples/rings-sympathetic.scsyndef
 	build/fuzz-ubsan ../fm1-synth/examples/rings-chords.scsyndef
+
+# Stochastic and chaotic state layouts.
+	build/fuzz-ubsan fixtures/m14_Crackle_ar_2.scsyndef
+	build/fuzz-ubsan fixtures/m14_LFClipNoise_ar_2.scsyndef
+	build/fuzz-ubsan fixtures/m14_LFDClipNoise_audio.scsyndef
+	build/fuzz-ubsan fixtures/m14_GrayNoise_ar_0.scsyndef
+	build/fuzz-ubsan fixtures/m14_Hasher_ar_0.scsyndef
+	build/fuzz-ubsan fixtures/m14_CoinGate_ar_1.scsyndef
+	build/fuzz-ubsan fixtures/m14_TIRand_ar_0.scsyndef
+	build/fuzz-ubsan fixtures/m14_TWindex_ar_2.scsyndef
+	build/fuzz-ubsan fixtures/m14_Logistic_ar_chaotic.scsyndef
+	build/fuzz-ubsan fixtures/m14_HenonN_chaotic.scsyndef
+	build/fuzz-ubsan fixtures/m14_HenonL_chaotic.scsyndef
+	build/fuzz-ubsan fixtures/m14_HenonC_chaotic.scsyndef
+	build/fuzz-ubsan fixtures/m14_CuspN_chaotic.scsyndef
+	build/fuzz-ubsan fixtures/m14_CuspL_chaotic.scsyndef
+	build/fuzz-ubsan fixtures/m14_LatoocarfianN_chaotic.scsyndef
+	build/fuzz-ubsan fixtures/m14_LatoocarfianL_chaotic.scsyndef
+	build/fuzz-ubsan fixtures/m14_LatoocarfianC_chaotic.scsyndef
+	build/fuzz-ubsan fixtures/m14_LorenzL_chaotic.scsyndef

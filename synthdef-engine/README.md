@@ -1,6 +1,6 @@
 # FM1 SynthDef engine
 
-A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 124 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
+A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 142 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
 
 ## Try it
 
@@ -54,6 +54,10 @@ The simpler example in `examples/voice.scd` exports a playable gated sine voice 
 | Amplitude | audio, control | Also supports audio input with control output; nonnegative initial/control attack/release; pinned SC rate semantics |
 | Formant | audio | Initial/control fundamental, formant frequency and bandwidth, each 0–Nyquist; bandwidth is raised to at least the fundamental internally, as upstream |
 | Formlet | audio/control | Audio input required for `.ar`; initial/control resonance frequency and attack/decay; nonnegative times; no extra arena allocation |
+| Crackle, LFClipNoise, LFDClipNoise, GrayNoise, Hasher | audio/control | Bounded random/chaotic generators; Hasher audio requires audio input; LFDClipNoise supports audio frequency |
+| CoinGate, TIRand, TWindex | audio/control | Probability/weighted/integer edge-triggered random values; audio CoinGate/TIRand require audio trigger; TWindex 1–64 weights |
+| Logistic | audio/control | Chaos parameter 0–4, initial-only value 0–1; initial/control frequency |
+| HenonN/L/C, CuspN/L, LatoocarfianN/L/C, LorenzL | audio | Single-precision upstream maps and interpolation; initial/control parameters; explicit bounded domains |
 | Gendy1, Gendy2, Gendy3 | audio/control | All seven distributions; every parameter initial/control; `initCPs` must be an integer literal 1–64; runtime `knum` follows upstream fallback to allocated count |
 | BPeakEQ, BLowShelf, BHiShelf | audio | Initial/control frequency, reciprocal Q/slope and gain; frequency strictly inside (0, Nyquist), positive Q/slope, gain ±120 dB; invalid coefficient domains fault |
 | SampleRate, SampleDur, ControlRate, ControlDur, BlockSize, RadiansPerSample | initial | Information for this voice; control rate uses engine block size 64 |
@@ -238,3 +242,7 @@ A compensated difference-state realization reduces cancellation near DC. Alterna
 The 95 new waveform fixtures cover audio/control operation, zero and boundary frequencies, seeded-noise/sine/impulse excitation, equal/reversed/zero times and live controls, including repeated changes between the low- and high-frequency representations. Ordinary-host limits are peak 1e-4 / RMS 3e-5; firmware-math limits remain peak 1e-3 / RMS 1e-4. All 15 Formant fixtures match the pinned desktop reference exactly on the ordinary host. API tests also cover restart, shared scratch, invalid inputs and 2,097,152 long-render frames over four sample rates. These are emulation checks, not measured realtime device performance.
 
 Examples: [Formant voice](../fm1-synth/examples/formant.scd) maps knobs to formant frequency, bandwidth, note attack and release; [Formlet voice](../fm1-synth/examples/formlet.scd) maps knobs to resonant harmonic, resonance attack, resonance decay and note release. No saved slot is replaced automatically. See the [upstream Formant help](https://doc.sccode.org/Classes/Formant.html) and [Formlet help](https://doc.sccode.org/Classes/Formlet.html).
+
+## Random and chaotic generator profile
+
+See [the detailed generator guide](../docs/STOCHASTIC.md) for all 18 additions, precise domains/rates, single-precision behavior, deliberate TIRand trigger fixes, validation and examples. They reuse existing node state and require no DSP-arena storage.

@@ -3,6 +3,7 @@
 import importlib.util,json,math,subprocess,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2];ENGINE=ROOT/'synthdef-engine';OUT=ROOT/'fm1-synth/build'
+sys.path.insert(0,str(ENGINE/'tests'))
 spec=importlib.util.spec_from_file_location('reference',ENGINE/'tests/compare_reference.py');ref=importlib.util.module_from_spec(spec);spec.loader.exec_module(ref)
 host='--host' in sys.argv
 exe=OUT/('host-fast-render' if host else 'device-math-render')

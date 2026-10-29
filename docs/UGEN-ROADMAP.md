@@ -1,13 +1,15 @@
 # UGen roadmap
 
-Updated 30 October 2026. The development engine contains **124 UGen types**. The 47 additions below are implemented; hardware installation and realtime checks are deferred at the user's request. The existing published preview remains unchanged.
+Updated 30 October 2026. The development engine contains **142 UGen types**. The 65 additions below are implemented; hardware installation and realtime checks are deferred at the user's request. The existing published preview remains unchanged.
 
 ## Completed expansion
 
 | Group | Added types |
 | --- | --- |
 | Bounds and mappings | Fold, Wrap, LinExp |
-| Noise | BrownNoise, ClipNoise, LFDNoise0, LFDNoise1, LFDNoise3 |
+| Noise | BrownNoise, ClipNoise, LFDNoise0, LFDNoise1, LFDNoise3, LFClipNoise, LFDClipNoise, GrayNoise, Hasher |
+| Random control | CoinGate, TIRand, TWindex |
+| Chaotic oscillators | Crackle, Logistic, HenonN/L/C, CuspN/L, LatoocarfianN/L/C, LorenzL |
 | Triggers and counters | Trig, Trig1, PulseDivider, PulseCount, ToggleFF, SetResetFF, Stepper |
 | Mixing and panning | XFade2, LinXFade2, Balance2 |
 | Smoothing and tracking | Slew, Lag2, Lag3, Amplitude |
@@ -22,6 +24,8 @@ A further 28 operators now cover signed `pow`, `div`, gcd/lcm, atan2/hypot, ring
 The initial 32 types reuse existing per-node state and allocate no delay buffers. Gendy1/2/3 additionally charge bounded breakpoint arrays to the existing shared arena (default 96/192/200 bytes per instance). Formant and Formlet also use existing per-node state and require no arena memory. Static RAM and the instrument pool remain unchanged. A stable difference-state form avoids cancellation in low-cutoff high-pass/notch/EQ filters. Control-frequency SinOsc increments and MiMu's float-to-PCM conversion match the reference without software double routines on the single-precision device.
 
 [MiMu drive](../fm1-synth/examples/mimu-drive.scd) is a stereo master-effect example; [modulation lab](../fm1-synth/examples/modulation-lab.scd) exercises VarSaw, LFDNoise1, LinExp and Lag3 with live knobs. Neither example replaces a saved user slot.
+
+The [18 stochastic/chaotic additions](STOCHASTIC.md) reuse existing state without arena allocation. Their equations and interpolation are ported from the pinned sources; chaotic trajectories intentionally use single precision. Stable waveform, identical-state transition and labeled statistical checks cover different aspects of correctness.
 
 ## MiRings feasibility result
 

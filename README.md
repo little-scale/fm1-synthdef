@@ -4,7 +4,7 @@
 
 FM1 SynthDef is an experimental embedded SynthDef runtime and programmable instrument. Write a patch in the local browser editor, compile it with SuperCollider on your Mac, send it over USB, and play it on the FM-1.
 
-The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and executes that graph using a bounded set of 124 supported UGen types in the development source. This is not the full SuperCollider language, scsynth server or plugin ecosystem.
+The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and executes that graph using a bounded set of 142 supported UGen types in the development source. This is not the full SuperCollider language, scsynth server or plugin ecosystem.
 
 ## What it does
 
@@ -18,16 +18,19 @@ The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and exec
 
 ## Supported UGens
 
+The development source adds **18 random/chaotic generators** with no additional arena allocation. See the [generator guide and playable examples](docs/STOCHASTIC.md).
+
 The development source includes **Formant, Formlet, Gendy1/2/3**, **MiMu.ar**, live Scale/Tuning pitch tables and 28 additional maths operators. [MiMu drive](fm1-synth/examples/mimu-drive.scd) and [modulation lab](fm1-synth/examples/modulation-lab.scd) are ready to compile and preview. **MiRings1–MiRings6** now provide separate Rings models, with optional compact buffers for models 2/5 and a smaller, unchanged-delay reverb allocation for model 6. See the [Rings model/memory guide](docs/RINGS.md). The complete upstream MiRings API remains unsupported.
 
-The development source supports these **124 compiled UGen types**, verified in emulation. The published **v0.1.0-preview firmware contains 53 types**; the additions below require a development build; the previous 77-type build has passed selected hardware tests. The latest 47 additions are awaiting hardware checks. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
+The development source supports these **142 compiled UGen types**, verified in emulation. The published **v0.1.0-preview firmware contains 53 types**; the additions below require a development build; the previous 77-type build has passed selected hardware tests. The latest 65 additions are awaiting hardware checks. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
 
 | Category | UGen types |
 | --- | --- |
 | Oscillators | `SinOsc`, `Saw`, `Pulse`, `LFSaw`, `LFTri`, `LFPulse`, `Impulse`, `VarSaw`, `SyncSaw`, `LFCub`, `LFPar`, `Formant` |
+| Chaotic oscillators | `Crackle`, `Logistic`, `HenonN`, `HenonL`, `HenonC`, `CuspN`, `CuspL`, `LatoocarfianN`, `LatoocarfianL`, `LatoocarfianC`, `LorenzL` |
 | Stochastic oscillators | `Gendy1`, `Gendy2`, `Gendy3` (audio/control; 1–64 literal initial breakpoints) |
-| Noise | `WhiteNoise`, `PinkNoise`, `LFNoise0`, `LFNoise1`, `LFNoise2`, `Dust`, `Dust2`, `BrownNoise`, `ClipNoise`, `LFDNoise0`, `LFDNoise1`, `LFDNoise3` |
-| Random values and seed | `Rand`, `ExpRand`, `RandSeed`, `TRand`, `TExpRand` |
+| Noise | `WhiteNoise`, `PinkNoise`, `LFNoise0`, `LFNoise1`, `LFNoise2`, `Dust`, `Dust2`, `BrownNoise`, `ClipNoise`, `LFDNoise0`, `LFDNoise1`, `LFDNoise3`, `LFClipNoise`, `LFDClipNoise`, `GrayNoise`, `Hasher` |
+| Random values and seed | `Rand`, `ExpRand`, `RandSeed`, `TRand`, `TExpRand`, `TIRand`, `TWindex`, `CoinGate` |
 | Envelopes and ramps | `EnvGen`, `Line`, `XLine`, `Decay`, `Decay2` |
 | Filters and DC removal | `LPF`, `HPF`, `RLPF`, `BPF`, `LeakDC`, `OnePole`, `OneZero`, `LPZ1`, `HPZ1`, `RHPF`, `BRF`, `BPeakEQ`, `BLowShelf`, `BHiShelf` |
 | Distortion | `MiMu` |
@@ -95,7 +98,7 @@ For example: `sig * amp`, `sig.pow(0.5)` or `sig.clip2(0.8)`. `%` is the modulo 
 
 **Limits and semantics:** `.div` uses floor division; `.trunc` uses floor quantization. `.sqrt` and `.pow` retain SuperCollider's signed-input behaviour. `.gcd` / `.lcm` truncate their inputs to integers and require absolute inputs no greater than 2²⁴. Nonfinite results or signal magnitudes above 1e12 retire the affected voice. Mixed audio/control arithmetic interpolates control inputs across each block.
 
-Bitwise/shift selectors, random arithmetic selectors such as `.rand` / `.rrand`, demand-rate operators and selectors absent from these tables remain unsupported. `Rand`, `ExpRand`, `TRand`, `TExpRand` and noise UGens are available separately. See the [engine profile](synthdef-engine/README.md#supported-profile) for detailed domains and the documented SuperCollider 3.14.1 edge differences.
+Bitwise/shift selectors, random arithmetic selectors such as `.rand` / `.rrand`, demand-rate operators and selectors absent from these tables remain unsupported. `Rand`, `ExpRand`, `TRand`, `TExpRand`, `TIRand`, `TWindex`, `CoinGate` and noise UGens are available separately. See the [engine profile](synthdef-engine/README.md#supported-profile) for detailed domains and the documented SuperCollider 3.14.1 edge differences.
 
 ## Start here
 
@@ -131,7 +134,7 @@ SELECT scrolls the focused code, OCT± transposes subsequent keyboard notes, and
 
 ## Status
 
-The development engine passes 1,248 reference cases on three rendering backends: 1,220 waveform/timing checks and 28 stochastic-summary checks, with separate identical-state Gendy oracles. It also passes 60 API test groups and 800,000 sanitizer mutation/truncation cases. All 108 stock Scale and 35 Tuning presets pass live lookup checks. Each maths backend also passes 1,835,103 direct operator comparisons. The instrument simulator covers the tuned-scale, Gendy, Formant and Formlet examples with two voices and master echo. Gendy2’s chaotic feedback and Gendy3’s quantized interpolation can produce different long waveforms across floating-point implementations; these are algorithm-compatible ports, not bit-identical desktop output. The earlier 77-type build passed 189 hardware checks of the three reverbs with four lighter two-voice synths; two Addy voices through FreeVerb exceed the processing budget. The earlier 53-type preview was tested on one FM-1 and an Apple silicon Mac; its recorded hardware checks cover two voices, stealing, release, live knobs, persistent effects and code browsing. See [verification and limitations](docs/VERIFICATION.md).
+The development engine passes **1,370 reference cases on three rendering backends**: 1,316 waveform/timing checks and 54 labeled stochastic checks, supported by independent identical-state source oracles. It also passes **71 API test groups and 1,320,000 sanitizer mutation/truncation cases**. All 108 stock Scale and 35 Tuning presets pass live lookup checks; each maths backend passes 1,835,103 direct operator comparisons. Instrument emulation covers two voices, live knobs, stealing, release and master echo, including three new random/chaotic examples. Chaotic generators use single precision and can produce different long waveforms from desktop SuperCollider; their equations and individual transitions are checked separately from long-render statistics. The earlier 77-type build passed 189 hardware checks; the latest 65 additions still need hardware timing and listening checks. See [verification and limitations](docs/VERIFICATION.md).
 
 Passing the graph and memory checks does **not** guarantee that an arbitrary patch fits the audio processing budget. The overload guard stops notes and disables effects when the device is over budget. Final-release power-cycle persistence and recovery are not yet part of the acceptance record. This is an independent project, not an official M-VAVE or SuperCollider product.
 
