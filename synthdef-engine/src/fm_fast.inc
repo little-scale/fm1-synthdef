@@ -41,7 +41,7 @@ static __attribute__((noinline)) void fast_arithmetic(const fm_graph *g,fm_voice
   goto arithmetic_done;
  }
  general_arithmetic:
- if(n->type==FM_BinaryOpUGen && (op==5 || (op>=19 && op<=21) || op==42 || op==44 || op==45)){
+ if(n->type==FM_BinaryOpUGen && (op==3 || op==5 || (op>=17 && op<=21) || op==39 || op==42 || op==43 || op==44 || op==45)){
   /* SC accumulates control ramps; discontinuous operators must retain the
      exact accumulated endpoint rather than recomputing a mathematically
      equivalent interpolation, which can cross quantization boundaries. */

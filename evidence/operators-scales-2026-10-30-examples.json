@@ -1,0 +1,62 @@
+[
+  {
+    "patch": "just-intonation",
+    "initial_knobs": 0,
+    "live_knobs": 1,
+    "frames": 307200,
+    "peaks": [
+      0.19456294178962708,
+      0.19456294178962708
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "just-intonation",
+    "initial_knobs": 0.25,
+    "live_knobs": 0.75,
+    "frames": 307200,
+    "peaks": [
+      0.19496463239192963,
+      0.19496463239192963
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "just-intonation",
+    "initial_knobs": 0.5,
+    "live_knobs": 0.5,
+    "frames": 307200,
+    "peaks": [
+      0.14319153130054474,
+      0.14319153130054474
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "just-intonation",
+    "initial_knobs": 0.75,
+    "live_knobs": 0.25,
+    "frames": 307200,
+    "peaks": [
+      0.14253811538219452,
+      0.14253811538219452
+    ],
+    "faults": 0,
+    "release_silent": true
+  },
+  {
+    "patch": "just-intonation",
+    "initial_knobs": 1,
+    "live_knobs": 0,
+    "frames": 307200,
+    "peaks": [
+      0.15029972791671753,
+      0.15029972791671753
+    ],
+    "faults": 0,
+    "release_silent": true
+  }
+]

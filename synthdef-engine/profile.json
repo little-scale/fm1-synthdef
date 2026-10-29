@@ -1,6 +1,6 @@
 {
-  "id": "host-11",
-  "status": "development: 114 types verified in emulation; hardware checks deferred",
+  "id": "host-12",
+  "status": "development: 118 types verified in emulation; hardware checks deferred",
   "implemented_types": [
     "Control",
     "SinOsc",
@@ -115,7 +115,11 @@
     "Gendy2",
     "Gendy3",
     "Formant",
-    "Formlet"
+    "Formlet",
+    "MaxLocalBufs",
+    "LocalBuf",
+    "SetBuf",
+    "DegreeToKey"
   ],
   "planned_remaining_types": [
     "MiRings (full port exceeds current memory budget)"
@@ -124,6 +128,7 @@
     0,
     1,
     2,
+    3,
     4,
     5,
     6,
@@ -134,12 +139,32 @@
     11,
     12,
     13,
+    17,
+    18,
     19,
     20,
     21,
+    22,
+    23,
+    24,
+    25,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
     42,
+    43,
     44,
-    45
+    45,
+    46
   ],
   "unary_selectors": [
     0,
@@ -159,6 +184,8 @@
     20,
     21,
     22,
+    23,
+    24,
     25,
     26,
     27,
@@ -166,6 +193,11 @@
     29,
     30,
     31,
+    32,
+    33,
+    34,
+    35,
+    36,
     42,
     43
   ],
@@ -301,7 +333,16 @@
     "Amplitude",
     "BPeakEQ",
     "BLowShelf",
-    "BHiShelf"
+    "BHiShelf",
+    "Gendy1",
+    "Gendy2",
+    "Gendy3",
+    "Formant",
+    "Formlet",
+    "MaxLocalBufs",
+    "LocalBuf",
+    "SetBuf",
+    "DegreeToKey"
   ],
   "band_limited_oscillators": {
     "frequency": "positive, <= half calculation rate; at most 2^24 harmonics",
@@ -418,7 +459,9 @@
     "Mix.ar",
     "Splay.ar (constant levelComp)",
     "SelectX.ar",
-    "SelectX.kr"
+    "SelectX.kr",
+    "Scale/Tuning constructors, presets, semitones, ratios, cents (compile time)",
+    "Scale.as(LocalBuf), Tuning.as(LocalBuf), DegreeToKey.ar/kr (live degree)"
   ],
   "expansion_2026_10_30": {
     "types": [
@@ -527,5 +570,67 @@
     "extra_arena_bytes": 0,
     "reference_fixtures": 95,
     "hardware_tested": false
+  },
+  "scale_tables": {
+    "maximum_tables": 16,
+    "maximum_entries_per_table": 128,
+    "channels": 1,
+    "storage": "immutable literal values in graph constants; no additional arena allocation",
+    "initialization": "one complete SetBuf at offset zero before first DegreeToKey use",
+    "degree": "audio/control; floor; abs <= 16777216; Euclidean wrap for negative degrees",
+    "octave": "literal finite constant, abs <= 16777216; truncated to integer as in SC",
+    "excluded": [
+      "mutable/general buffers",
+      "sample playback",
+      "dynamic table replacement",
+      "server buffer IDs",
+      "automatic keyboard/Event scale mapping"
+    ]
+  },
+  "operator_expansion": {
+    "unary": [
+      "octcps",
+      "cpsoct",
+      "acos",
+      "atan",
+      "sinh",
+      "cosh",
+      "tanh"
+    ],
+    "binary": [
+      "div",
+      "lcm",
+      "gcd",
+      "atan2",
+      "hypot",
+      "hypotApx",
+      "pow",
+      "ring1",
+      "ring2",
+      "ring3",
+      "ring4",
+      "difsqr",
+      "sumsqr",
+      "sqrsum",
+      "sqrdif",
+      "absdif",
+      "thresh",
+      "amclip",
+      "scaleneg",
+      "excess",
+      "firstArg"
+    ],
+    "integer_domain": "gcd/lcm inputs truncate to integers; abs <= 16777216",
+    "intentional_sc_3_14_1_edge_differences": [
+      "DegreeToKey exact negative octaves use valid table index zero",
+      "div audio/control fills every sample for a held divisor",
+      "firstArg control/audio returns its first input with control interpolation, instead of the upstream addition fallback"
+    ],
+    "still_excluded": [
+      "bitwise and shift selectors",
+      "random arithmetic selectors",
+      "demand-rate operators",
+      "other selectors not explicitly listed"
+    ]
   }
 }

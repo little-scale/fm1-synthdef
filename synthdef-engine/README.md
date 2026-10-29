@@ -1,6 +1,6 @@
 # FM1 SynthDef engine
 
-A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 114 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
+A bounded C99 runtime that reads SuperCollider version-2 `.scsyndef` files and executes their UGen graphs. It powers the Mac preview and the installed FM-1 instrument. The development profile implements 118 UGen types, with explicit limits on rates, operators, memory and graph size. It is an embedded SynthDef runtime, not the full SuperCollider language or server. See [the project overview](../README.md) for installation and [the instrument](../fm1-synth/README.md) for controls and hardware behaviour.
 
 ## Try it
 
@@ -15,7 +15,7 @@ build/fm-inspect fixtures/fm1_voice.scsyndef
 python3 tools/render-wav.py fixtures/fm1_voice.scsyndef build/fm1-voice.wav
 ```
 
-`make test` needs C99 and C++17 compilers and Python 3, with no Python packages. `make reference-test` additionally uses the installed SuperCollider **3.14.1** offline server, without opening audio hardware. Override `SCSYNTH` to change its location. The recorded fixtures are sufficient to run these tests; regeneration uses `python3 tools/export-all.py` with the installed `sclang` 3.14.1. It runs all nine export scripts with timeouts and refreshes the fixture integrity manifest. The Makefile currently targets macOS shared libraries.
+`make test` needs C99 and C++17 compilers and Python 3, with no Python packages. `make reference-test` additionally uses the installed SuperCollider **3.14.1** offline server, without opening audio hardware. Override `SCSYNTH` to change its location. The recorded fixtures are sufficient to run these tests; regeneration uses `python3 tools/export-all.py` with the installed `sclang` 3.14.1. It runs all twelve export scripts with timeouts and refreshes the fixture integrity manifest. The Makefile currently targets macOS shared libraries.
 
 The example in `examples/subtractive.scd` combines Saw, Pulse, a modulated RLPF, envelopes and panning. `build/subtractive-voice.wav` is its host-rendered companion test voice.
 
@@ -68,6 +68,8 @@ The simpler example in `examples/voice.scd` exports a playable gated sine voice 
 | Pan2 | audio, control | Position can be audio rate; level must be initial/control rate |
 | In | audio | Bus 0, one or two channels from the immutable input mix; effect slot only in the instrument |
 | Out | audio | Bus 0, literal or initial/control expression; one or two audio channels; additive mixing |
+| MaxLocalBufs, LocalBuf, SetBuf | initial | Up to 16 mono immutable tables, 1–128 literal entries each; one complete initializer before lookup; no general buffers |
+| DegreeToKey | audio, control | Live degree; literal octave; bounded table and degree rules below |
 | UnaryOpUGen | initial, control, audio | Explicit selector subset below |
 | BinaryOpUGen | initial, control, audio | Explicit selector subset below |
 | MulAdd, Sum3, Sum4 | initial, control, audio | Optimizer-generated arithmetic nodes |
@@ -85,11 +87,31 @@ The simpler example in `examples/voice.scd` exports a playable gated sine voice 
 
 This is a tested compatibility subset, not full scsynth compatibility or bit-identical output. `DynKlang` expands to supported oscillators and arithmetic. `DynKlank` expands to Ringz and arithmetic, including control-rate frequency/decay modulation. Fixed Klang/Klank banks retain initial-rate parameter restrictions.
 
-Unary selectors: neg (0), abs (5), ceil (8), floor (9), frac (10), sign (11), squared (12), cubed (13), sqrt (14), exp (15), reciprocal (16), midicps (17), cpsmidi (18), midiratio (19), ratiomidi (20), dbamp (21), ampdb (22), log (25), log2 (26), log10 (27), sin (28), cos (29), tan (30), asin (31), distort (42), softclip (43).
+Unary selectors: neg (0), abs (5), ceil (8), floor (9), frac (10), sign (11), squared (12), cubed (13), sqrt (14), exp (15), reciprocal (16), midicps (17), cpsmidi (18), midiratio (19), ratiomidi (20), dbamp (21), ampdb (22), octcps (23), cpsoct (24), log (25), log2 (26), log10 (27), sin (28), cos (29), tan (30), asin (31), acos (32), atan (33), sinh (34), cosh (35), tanh (36), distort (42), softclip (43).
 
 Mixed audio/control arithmetic interpolates control operands across the block, including optimizer-generated MulAdd/Sum3/Sum4 nodes. A separate constructor pass initializes upstream outputs before the first audio block.
 
-Binary selectors: add (0), subtract (1), multiply (2), divide (4), equal (6), unequal (7), less (8), greater (9), less-or-equal (10), greater-or-equal (11), min (12), max (13), modulo (5), round (19), roundUp (20), trunc (21; floor quantization), clip2 (42), fold2 (44), wrap2 (45). Other selectors are rejected. Supporting the arithmetic UGen names does not imply support for every SuperCollider operator.
+Binary selectors: add (0), subtract (1), multiply (2), integer div (3; floor division), divide (4), modulo (5), equal (6), unequal (7), less (8), greater (9), less-or-equal (10), greater-or-equal (11), min (12), max (13), lcm (17), gcd (18), round (19), roundUp (20), trunc (21; floor quantization), atan2 (22), hypot (23), hypotApx (24), signed pow / ** (25), ring1–ring4 (30–33), difsqr (34), sumsqr (35), sqrsum (36), sqrdif (37), absdif (38), thresh (39), amclip (40), scaleneg (41), clip2 (42), excess (43), fold2 (44), wrap2 (45), firstArg (46). Other selectors are rejected. These are **33 unary and 40 binary selectors**. Bitwise/shift selectors, random arithmetic selectors (`.rand`, `.rrand`, etc.), and demand-rate operators remain unsupported; existing Rand/TRand and noise UGens remain available.
+
+`pow` retains SC's signed-base convention: `(-a).pow(b)` returns `-pow(a,b)` for positive `a`, including fractional exponents. `gcd`/`lcm` truncate their inputs to integers and require absolute inputs ≤ 2²⁴; this avoids unbounded/64-bit arithmetic in the callback. Nonfinite results and outputs above the engine's 1e12 magnitude ceiling fault the voice.
+
+Three explicitly tested SC 3.14.1 edge differences are intentional: DegreeToKey uses safe Euclidean indexing at exact negative octave multiples, where upstream can read one past the table; audio/control `div` fills every sample for a held divisor, where upstream omits a loop; control/audio `firstArg` returns the first input with the usual control interpolation, where upstream falls back to addition. Those paths are checked against independent mathematical expectations, not treated as matching broken reference output.
+
+### Scale and Tuning
+
+These are sclang objects, not additional DSP oscillators. Stock named scales/tunings and custom `Scale.new` / `Tuning.new` objects, `.semitones`, `.ratios`, `.cents`, and numeric `.degreeToFreq` / `.degreeToRatio` are evaluated on the Mac. For a **live control/audio degree**, use the standard pitch-table path:
+
+```supercollider
+var scale = Scale.major(Tuning.just);
+var table = scale.as(LocalBuf);
+var semitones = DegreeToKey.kr(table, degree, 12);
+var freq = (60 + semitones).midicps;
+```
+
+`degree` can be a SynthDef control, knob expression or audio signal (`DegreeToKey.ar`). It is floored, wraps through the table in both directions, and must stay within ±2²⁴. `octave` is a literal constant truncated to an integer, matching SC; fractional periods need an explicit ratio-array/Select/pow construction instead. The table must be mono, contain 1–128 literal values, and have exactly one full SetBuf initializer at offset zero before lookup. At most 16 tables are accepted, still subject to overall constant/node/input limits. Their values share the immutable graph constants and require **no extra DSP arena memory**. LocalBuf references may only feed SetBuf or DegreeToKey; sample playback, mutable buffers, server buffer IDs and live table editing are not supplied.
+
+The installed SC library still governs source-language methods: `scale.degreeToFreq` with an ordinary numeric degree is compile-time work; use DegreeToKey for UGen degrees rather than assuming every Scale method accepts a signal. Merely declaring a scale does not change the keyboard mapping or create a Pbind/Event system. See the [playable just-intonation example](../fm1-synth/examples/just-intonation.scd). All 108 stock Scale and 35 Tuning presets pass live-table lookup checks, including negative degrees.
+
 
 ### Reverbs
 

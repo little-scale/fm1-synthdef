@@ -1,6 +1,6 @@
 # UGen roadmap
 
-Updated 30 October 2026. The development engine contains **114 UGen types**. The 37 additions below are implemented; hardware installation and realtime checks are deferred at the user's request. The existing published preview remains unchanged.
+Updated 30 October 2026. The development engine contains **118 UGen types**. The 41 additions below are implemented; hardware installation and realtime checks are deferred at the user's request. The existing published preview remains unchanged.
 
 ## Completed expansion
 
@@ -14,8 +14,9 @@ Updated 30 October 2026. The development engine contains **114 UGen types**. The
 | Oscillators | VarSaw, SyncSaw, LFCub, LFPar, Gendy1, Gendy2, Gendy3, Formant |
 | Filters and EQ | RHPF, BRF, BPeakEQ, BLowShelf, BHiShelf, Formlet |
 | Distortion | MiMu |
+| Scale/tuning tables | MaxLocalBufs, LocalBuf, SetBuf, DegreeToKey |
 
-Modulo, round, roundUp, trunc, clip2, fold2 and wrap2 binary selectors were added too. SelectX now compiles and renders at audio/control rate; it is a source helper, not a separate runtime UGen. The [full profile](../synthdef-engine/README.md#supported-profile) states rate and domain restrictions. In particular, the new EQ coefficients are initial/control rate, oscillator frequencies are bounded, and MiMu is audio-only.
+A further 28 operators now cover signed `pow`, `div`, gcd/lcm, atan2/hypot, ring arithmetic, hyperbolic functions and octave conversions. Scale/Tuning tables use graph constants without increasing the DSP arena. Modulo, round, roundUp, trunc, clip2, fold2 and wrap2 binary selectors were added too. SelectX now compiles and renders at audio/control rate; it is a source helper, not a separate runtime UGen. The [full profile](../synthdef-engine/README.md#supported-profile) states rate and domain restrictions. In particular, the new EQ coefficients are initial/control rate, oscillator frequencies are bounded, and MiMu is audio-only.
 
 The initial 32 types reuse existing per-node state and allocate no delay buffers. Gendy1/2/3 additionally charge bounded breakpoint arrays to the existing shared arena (default 96/192/200 bytes per instance). Formant and Formlet also use existing per-node state and require no arena memory. Static RAM and the instrument pool remain unchanged. A stable difference-state form avoids cancellation in low-cutoff high-pass/notch/EQ filters. Control-frequency SinOsc increments and MiMu's float-to-PCM conversion match the reference without software double routines on the single-precision device.
 
@@ -45,7 +46,7 @@ Reproduce the host probe with `synthdef-engine/tools/probe-mirings.py --upstream
 ## Remaining work
 
 - Install the new image, preserve/read back all slots, and check two voices through the chosen master effect with live knobs. Emulation cannot certify realtime load.
-- General signed-base `pow` remains unsupported and needs its own reference/domain work.
+- Signed-base `pow`, hyperbolic/trigonometric functions, ring arithmetic, integer gcd/lcm and live scale tables are now implemented and tested. Bitwise/shift selectors, random arithmetic selectors and demand-rate operators remain excluded.
 - PlayBuf/BufRd and granular processing require sample storage, a buffer registry and memory/streaming budgets.
 - FFT/PV processing requires spectral buffers and transforms.
 - LocalIn/LocalOut require explicit graph feedback semantics.

@@ -31,7 +31,7 @@ python3 fm1-synth/tools/test-device-math.py --host
 python3 fm1-synth/tools/test-device-math.py
 ```
 
-The test build also uses C++17 for an isolated MiVerb oracle. Pinned DSP sources, plugin headers and the language class are included; no extra system plugin install or network download is required. `make test` includes the identical-input MiVerb comparison. Fixture export and browser compilation load stock SC classes plus the bundled MiVerb class, with user extensions excluded.
+The test build also uses C++17 for an isolated MiVerb oracle. Pinned DSP sources, plugin headers and the language class are included; no extra system plugin install or network download is required. `make test` includes the identical-input MiVerb comparison, Gendy/MiMu oracles and direct operator-grid checks on host and firmware maths. `make reference-test` also compiles all stock Scale/Tuning presets and validates live pitch lookups. Run `python3 fm1-synth/tools/test-operators-scales.py` for the two-voice tuned-scale example through master echo. Fixture export and browser compilation load stock SC classes plus the bundled MiVerb class, with user extensions excluded.
 
 Run those reference commands sequentially: they share generated files. Reference audio is generated locally, not shipped as a large build cache. See the engine README for tolerances and fixture regeneration.
 

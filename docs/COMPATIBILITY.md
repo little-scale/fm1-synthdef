@@ -2,7 +2,7 @@
 
 The on-device program executes a compiled SynthDef graph. Source-language constructs such as `Array.fill`, `.sum` and Env constructors run in SuperCollider on the Mac during compilation; their resulting graph must fit this profile. The device does not interpret arbitrary SuperCollider source.
 
-The authoritative type/operator list is [profile.json](../synthdef-engine/profile.json), with per-UGen rates and parameter rules in the [engine README](../synthdef-engine/README.md). The development source supports 77 types, including FreeVerb/FreeVerb2/MiVerb and the new Dust/Dust2, Decay/Decay2, Impulse, triggered random, sample/track-and-hold and one-sample filter/delay families. The published v0.1.0-preview firmware has the earlier 53 types and rejects the new nodes. Host compilation success does not update the connected device. New firmware has passed emulation and build checks, but still needs hardware playback/timing verification.
+The authoritative type/operator list is [profile.json](../synthdef-engine/profile.json), with per-UGen rates and parameter rules in the [engine README](../synthdef-engine/README.md). The development source supports 118 compiled types, including Formant, Formlet, Gendy1/2/3, the three reverbs, MiMu and bounded Scale/Tuning pitch tables. The published v0.1.0-preview firmware has the earlier 53 types and rejects the new nodes. Host compilation success does not update the connected device. New firmware has passed emulation and build checks, but still needs hardware playback/timing verification.
 
 All nine EnvGen curve types are supported, with sustain, loop, retrigger and forced-release behaviour. Env.perc, adsr, dadsr, asr, cutoff, linen, triangle, sine and custom breakpoints are covered. Done actions are 0 and 2; effects require 0. This is not a server node tree.
 
@@ -14,6 +14,7 @@ All nine EnvGen curve types are supported, with sustain, loop, retrigger and for
 | Effect packages | 7,916 bytes shared across four presets, including source and metadata |
 | Nodes / output signals / input references | 160 / 192 / 1,024 per graph |
 | Constants / controls | 512 / 64 per graph |
+| Immutable pitch tables | At most 16 mono tables, 1–128 literal entries each, within graph limits |
 | Envelope segments / bank partials | 32 per envelope / 64 total partials per graph |
 | Sample rate / engine block | 44.1 kHz / 64 samples |
 | Device callback | 256 samples |
@@ -31,3 +32,5 @@ Note arguments are filled when present: `freq` in Hz; `pitch` and `midinote` in 
 PRESET selects synths; ALGORITHM selects FX1–FX4 or bypass. FX toggles code view and knob bank without changing held notes. Effect replacement fades output briefly and ends the old tail. HOME stops voices and clears the effect tail. A numerical fault retires a voice; an overload stops notes and disables the effect until reset/reloaded.
 
 Reverbs allocate from the same 128 KiB delay arena: FreeVerb 50,492 bytes, FreeVerb2 102,088 bytes, MiVerb 65,536 bytes per instance. Parameters are initial/control rate and signal inputs are audio rate. Prefer slot 0; FreeVerb2 exceeds the per-synth-voice limit. MiVerb supports mono/stereo input, freeze, diffusion and its upstream output soft clipping. The bundled MiVerb class supports compilation without installing extra plugins.
+
+Scale and Tuning are evaluated by the Mac compiler. Live `DegreeToKey.ar/kr` uses immutable LocalBuf tables; it does not add general sample buffers or automatic keyboard scale mapping. See the [Scale/Tuning profile](../synthdef-engine/README.md#scale-and-tuning) and complete supported operator list, including the documented bounded integer domain and SC 3.14.1 edge differences.

@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-30",
+  "implemented_types": 118,
+  "added_types": [
+    "MaxLocalBufs",
+    "LocalBuf",
+    "SetBuf",
+    "DegreeToKey"
+  ],
+  "added_operators": 28,
+  "unary_selectors": 33,
+  "binary_selectors": 40,
+  "extra_node_state_bytes": 0,
+  "extra_arena_bytes": 0,
+  "reference_cases_per_backend": 1248,
+  "waveform_or_timing_cases_per_backend": 1220,
+  "stochastic_summary_cases_per_backend": 28,
+  "new_waveform_cases_per_backend": 267,
+  "maximum_new_ordinary_host_peak_error": 8.195638656616211e-08,
+  "all_reference_cases_passed": true,
+  "direct_operator_comparisons_per_backend": 1835103,
+  "catalog_scales": 108,
+  "catalog_tunings": 35,
+  "catalog_live_lookups": 6514,
+  "catalog_maximum_error": 0,
+  "engine_api_groups": 60,
+  "instrument_python_groups": 7,
+  "ubsan_mutations": 800000,
+  "example_scenarios": 5,
+  "example_frames_each": 307200,
+  "maximum_example_peak": 0.19496463239192963,
+  "intentional_upstream_edge_differences": [
+    "DegreeToKey safe exact negative-octave indexing",
+    "div fills every audio sample with a held control-rate divisor",
+    "firstArg control/audio preserves the first operand instead of falling back to addition"
+  ],
+  "hardware_tested": false,
+  "hardware_status": "User deferred installation, listening and realtime timing checks",
+  "user_slots_changed": false,
+  "running_editor_changed": false,
+  "editor_action": "Restart the editor to load the updated native engine",
+  "target": {
+    "application_bytes": 267660,
+    "package_bytes": 610136,
+    "static_ram_bytes": 78480,
+    "static_ram_capacity": 98304,
+    "pool_bytes": 326008,
+    "pool_capacity": 344064,
+    "ble": false,
+    "identity": "FM-1_1200",
+    "software_double_helpers": false,
+    "multiply_load_hazards": false
+  },
+  "sha256": {
+    "synthdef.bin": "b5328a979fe5cf1cca76afca60ccb45707a13c6680df5a6a16d106e906d46130",
+    "synthdef.fwsc": "2fca254ca6c7bfd0f47d61e0867e5e06ef73e5379b1bcd04f4bc1e195aeb548c"
+  },
+  "source_sha256": {
+    "synthdef-engine/src/fm_synth.h": "6489124c5ea16f01d38944634efc82c2cfda5ce2c1ecb99a0f36d169acc1e608",
+    "synthdef-engine/src/fm_load.c": "8b4cb5ec22cebfd7a61bd4d452e8907f10442fc11c3a789fc02fd3a83d7843ac",
+    "synthdef-engine/src/fm_render.c": "01d54795dc683f2f3f57bbe1e0430cb2a26c7e20cd3ab3b6301a176a0467582d",
+    "synthdef-engine/src/fm_fast.inc": "cffe0679d7804f6db660182cbd4ada25d204b97aa50f46935dcfc57e99fca204",
+    "fm1-synth/firmware/device_include/math.h": "4bd98390712648eef2db36e5e08c60e7face5d5d22d374312509dc3e540065dc"
+  },
+  "results": [
+    "operators-scales-2026-10-30-reference.json",
+    "operators-scales-2026-10-30-optimized-host.json",
+    "operators-scales-2026-10-30-device-math.json",
+    "operators-scales-2026-10-30-examples.json",
+    "operators-scales-2026-10-30-oracle-host.json",
+    "operators-scales-2026-10-30-oracle-device.json",
+    "operators-scales-2026-10-30-catalog.json"
+  ]
+}

@@ -16,6 +16,9 @@ test: all
 	python3 tests/test_expansion.py
 	python3 tests/test_gendy.py
 	python3 tests/test_formants.py
+	python3 tests/test_operators_scales.py
+	python3 tests/test_operators_oracle.py
+	python3 tests/test_operators_oracle.py --device
 	python3 tests/test_gendy_oracle.py
 	python3 tests/test_gendy_oracle.py --device
 	python3 tests/test_miverb_oracle.py
@@ -29,6 +32,7 @@ reference-test: all
 	$(CC) $(CFLAGS) -Isrc src/fm_load.c tests/decay_sparse.c -lm -o build/decay-sparse-test
 	build/decay-sparse-test
 	python3 tests/compare_reference.py
+	python3 tests/test_scale_catalog.py
 sanitize: | build
 	$(CC) -std=c99 -O1 -g -ffp-contract=off -fsanitize=undefined,bounds,float-cast-overflow -fno-sanitize-recover=all -Isrc $(SRC) tests/fuzz.c -lm -o build/fuzz-ubsan
 	build/fuzz-ubsan fixtures/perc.scsyndef
@@ -73,3 +77,7 @@ sanitize: | build
 
 	build/fuzz-ubsan fixtures/m11_Formant_0.scsyndef
 	build/fuzz-ubsan fixtures/m11_Formlet_ar_2_9.scsyndef
+
+	build/fuzz-ubsan fixtures/m12_scale_multiple.scsyndef
+	build/fuzz-ubsan fixtures/m12_binary_lcm_ar_2.scsyndef
+	build/fuzz-ubsan fixtures/m12_binary_pow_ar_0.scsyndef

@@ -1,5 +1,20 @@
 # Verification record
 
+## Operators and Scale/Tuning — 30 October 2026
+
+The development profile now contains **118 compiled UGen types**, adding immutable `MaxLocalBufs` / `LocalBuf` / `SetBuf` pitch tables and `DegreeToKey.ar/kr`. It also adds **28 operator selectors** (7 unary, 21 binary), bringing the totals to 33 unary and 40 binary selectors. Formant, Formlet and Gendy1/2/3 remain available. Hardware installation and checks remain deferred at the user's request.
+
+- **1,248/1,248 reference cases pass on all three backends**: ordinary host, optimized host and firmware-math host emulation. The 267 new cases use waveform comparisons. Overall there are 1,220 waveform/timing cases and 28 explicitly labeled Gendy stochastic-summary cases.
+- **1,835,103 direct operator comparisons per math backend** pass against pinned SC formulas/standard-library functions. Maximum error divided by `1 + abs(reference)` is 1.13e-7 on host and 1.14e-6 with firmware maths (limit 2e-5). The grid includes signed powers, transcendental domains, both signs, signed zero and worst-case bounded Fibonacci gcd/lcm inputs.
+- All **108 stock Scale and 35 Tuning presets** compile and pass **6,514 live pitch lookups**, including fractional/negative degrees and octave boundaries. Tables add no DSP arena allocation and do not grow graph, voice or scratch structures. General buffers and runtime table edits remain unsupported.
+- **60 engine API groups**, **800,000 UBSan/bounds/float-cast-overflow mutation/truncation cases**, the existing Gendy/MiMu/MiVerb oracles, long-decay regression and instrument tests pass. No new AddressSanitizer pass is claimed; the previously recorded macOS runtime initialization problem remains.
+- Five **two-voice just-intonation/Formant scenarios**, each 307,200 frames, pass through master echo with live knob changes, voice stealing and release. There are no faults, all outputs are finite/nonzero, peaks stay below 0.195, and tails become silent. Source, compiled graph and an importable slot package are supplied; user slots were not modified.
+- Three SC 3.14.1 edge bugs have explicit independent mathematical checks: DegreeToKey's exact negative-octave boundary, the held-divisor audio/control `div` loop, and control/audio `firstArg` dispatch. These cases retain safe/intended arithmetic rather than reproducing the upstream bugs. See the [compatibility profile](../synthdef-engine/README.md#supported-profile).
+- The built application is **267,660 bytes**, in a **610,136-byte package**. Static RAM remains **78,480 / 98,304 bytes** and pool use **326,008 / 344,064 bytes**. Bluetooth is disabled; the target checks find no software-double routines or 64-bit multiply/load hazard. Build fit and host emulation do not establish realtime hardware performance.
+
+Reproduction: the engine `test`, `reference-test` and `sanitize` targets; both modes of `fm1-synth/tools/test-device-math.py`; the instrument `test` target; and `fm1-synth/tools/test-operators-scales.py`. The reference target also runs the complete stock Scale/Tuning catalog check. See [machine-readable evidence](../evidence/operators-scales-2026-10-30.json). Restart an already-running local editor to load the updated native library.
+
+
 
 ## Formant / Formlet — 30 October 2026
 

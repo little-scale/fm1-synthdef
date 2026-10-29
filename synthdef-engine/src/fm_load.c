@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #define FM_VALID 0x464d5331u
-static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In","SampleRate","SampleDur","ControlRate","ControlDur","BlockSize","RadiansPerSample","Delay1","Delay2","OnePole","OneZero","LPZ1","HPZ1","Latch","Gate","TRand","TExpRand","Dust","Dust2","Impulse","Decay","Decay2","FreeVerb","FreeVerb2","MiVerb","Fold","Wrap","BrownNoise","ClipNoise","Trig","Trig1","PulseDivider","PulseCount","ToggleFF","SetResetFF","Stepper","XFade2","LinXFade2","Balance2","LinExp","Slew","Lag2","Lag3","MiMu","RHPF","BRF","VarSaw","SyncSaw","LFCub","LFPar","LFDNoise0","LFDNoise1","LFDNoise3","Amplitude","BPeakEQ","BLowShelf","BHiShelf","Gendy1","Gendy2","Gendy3","Formant","Formlet"};
+static const char *const types[] = {"Control","SinOsc","EnvGen","Pan2","Out","BinaryOpUGen","UnaryOpUGen","MulAdd","Sum3","Sum4","DC","K2A","A2K","Line","XLine","Resonz","Ringz","Klang","Klank","LagControl","TrigControl","LFSaw","LFTri","LFPulse","Lag","LagUD","LPF","HPF","RLPF","BPF","LeakDC","Select","Clip","WhiteNoise","PinkNoise","LFNoise0","LFNoise1","LFNoise2","RandSeed","Saw","Pulse","DelayN","DelayL","DelayC","CombN","CombL","CombC","AllpassN","AllpassL","AllpassC","Rand","ExpRand","In","SampleRate","SampleDur","ControlRate","ControlDur","BlockSize","RadiansPerSample","Delay1","Delay2","OnePole","OneZero","LPZ1","HPZ1","Latch","Gate","TRand","TExpRand","Dust","Dust2","Impulse","Decay","Decay2","FreeVerb","FreeVerb2","MiVerb","Fold","Wrap","BrownNoise","ClipNoise","Trig","Trig1","PulseDivider","PulseCount","ToggleFF","SetResetFF","Stepper","XFade2","LinXFade2","Balance2","LinExp","Slew","Lag2","Lag3","MiMu","RHPF","BRF","VarSaw","SyncSaw","LFCub","LFPar","LFDNoise0","LFDNoise1","LFDNoise3","Amplitude","BPeakEQ","BLowShelf","BHiShelf","Gendy1","Gendy2","Gendy3","Formant","Formlet","MaxLocalBufs","LocalBuf","SetBuf","DegreeToKey"};
 const char *fm_type_name(unsigned type) { return type < FM_TYPES ? types[type] : "unknown"; }
 typedef struct { const uint8_t *p; size_t left; int failed; } reader;
 static uint32_t rd(reader *r, unsigned n) {
@@ -81,6 +81,34 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
     for(j=0;j<u->inputs;j++) {fm_ref *ref=&g->ref[u->input+j];if(ref->node>=0 && g->node[ref->node].rate!=0) BAD("LagControl times must be initial rate");}
    } else if(u->inputs || (u->type==FM_TrigControl && u->rate!=1)) BAD("Invalid control inputs/rate");
    if(!u->outputs || u->rate>1 || u->special<0 || u->special+u->outputs>g->controls) BAD("Invalid Control layout/rate");
+  } else if(u->type==FM_MaxLocalBufs) {
+   if(u->rate || u->inputs!=1 || u->outputs!=1 || !literal(g,u,0,&v) || v<1 || v>FM_SCALE_TABLES || v!=floorf(v)) BAD("MaxLocalBufs requires a literal count from 1 to 16");
+   for(j=0;j<i;j++)if(g->node[j].type==FM_MaxLocalBufs)BAD("Duplicate MaxLocalBufs declaration");
+  } else if(u->type==FM_LocalBuf) {
+   if(u->rate || u->inputs!=3 || u->outputs!=1 || !literal(g,u,0,&v) || v!=1)BAD("LocalBuf supports mono constant pitch tables only");
+   if(!literal(g,u,1,&v) || v<1 || v>FM_SCALE_ENTRIES || v!=floorf(v))BAD("LocalBuf table length must be a literal integer from 1 to 128");
+   u->partials=(uint16_t)v;u->partial=UINT16_MAX;
+   fm_ref *ref=&g->ref[u->input+2];
+   if(ref->node<0 || g->node[ref->node].type!=FM_MaxLocalBufs)BAD("LocalBuf requires MaxLocalBufs dependency");
+   float maximum;literal(g,&g->node[ref->node],0,&maximum);unsigned tables=1;
+   for(j=0;j<i;j++)if(g->node[j].type==FM_LocalBuf)tables++;
+   if(tables>(unsigned)maximum)BAD("LocalBuf count exceeds MaxLocalBufs");
+  } else if(u->type==FM_SetBuf) {
+   if(u->rate || u->inputs<4 || u->outputs!=1)BAD("SetBuf requires one initial-rate constant table initializer");
+   fm_ref *ref=&g->ref[u->input];
+   if(ref->node<0 || g->node[ref->node].type!=FM_LocalBuf)BAD("SetBuf requires a direct LocalBuf reference");
+   fm_node *table=&g->node[ref->node];
+   if(table->partial!=UINT16_MAX)BAD("A constant LocalBuf table may only be initialized once");
+   if(!literal(g,u,1,&v) || v!=0 || !literal(g,u,2,&v) || v!=table->partials || u->inputs!=3+table->partials)BAD("SetBuf must initialize the entire table at offset zero");
+   for(j=3;j<u->inputs;j++)if(!literal(g,u,j,&v))BAD("SetBuf pitch values must be literal constants");
+   table->partial=u->input+3;
+  } else if(u->type==FM_DegreeToKey) {
+   if(!u->rate || u->inputs!=3 || u->outputs!=1)BAD("DegreeToKey requires three inputs at audio/control rate");
+   fm_ref *ref=&g->ref[u->input];
+   if(ref->node<0 || g->node[ref->node].type!=FM_LocalBuf || g->node[ref->node].partial==UINT16_MAX)BAD("DegreeToKey requires an initialized constant LocalBuf table");
+   u->partial=g->node[ref->node].partial;u->partials=g->node[ref->node].partials;
+   ref=&g->ref[u->input+1];if(ref->node>=0 && g->node[ref->node].rate>u->rate)BAD("DegreeToKey input rate exceeds calculation rate");
+   if(!literal(g,u,2,&v) || fabsf(v)>16777216.0f)BAD("DegreeToKey octave must be a bounded literal constant");
   } else if(u->type==FM_In) {
    if(u->rate!=2 || u->inputs!=1 || u->outputs<1 || u->outputs>2) BAD("In requires one or two audio channels");
    if(literal(g,u,0,&v)){if(v!=0) BAD("Only input bus 0 is supported");}
@@ -178,8 +206,8 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
     if(!literal(g,u,1,&v) || v<0) BAD("Delay maxdelaytime must be a nonnegative literal");
     if(u->inputs==4) {fm_ref *ref=&g->ref[u->input+3];if(ref->node>=0 && g->node[ref->node].rate==2) BAD("Delay decaytime requires initial/control rate");}
    }
-   if(u->type==FM_BinaryOpUGen && !(u->special==0 || u->special==1 || u->special==2 || u->special==4 || u->special==5 || (u->special>=19 && u->special<=21) || u->special==42 || u->special==44 || u->special==45 || (u->special>=6 && u->special<=13))) BAD("Unsupported binary operator selector");
-   if(u->type==FM_UnaryOpUGen && !(u->special==0 || u->special==5 || (u->special>=8 && u->special<=22) || (u->special>=25 && u->special<=31) || u->special==42 || u->special==43)) BAD("Unsupported unary operator selector");
+   if(u->type==FM_BinaryOpUGen && !((u->special>=0 && u->special<=13) || (u->special>=17 && u->special<=25) || (u->special>=30 && u->special<=46))) BAD("Unsupported binary operator selector");
+   if(u->type==FM_UnaryOpUGen && !(u->special==0 || u->special==5 || (u->special>=8 && u->special<=36) || u->special==42 || u->special==43)) BAD("Unsupported unary operator selector");
    if(u->type==FM_EnvGen) {
     for(j=1;j<u->inputs;j++) {fm_ref *ref=&g->ref[u->input+j];if(ref->node>=0 && g->node[ref->node].rate==2) BAD("Only the EnvGen gate may be audio rate in this profile");}
     if(!u->rate || !literal(g,u,6,&v) || v<1 || v>FM_SEGMENTS || v!=(int)v || u->inputs!=9+4*(int)v) BAD("EnvGen needs 1..32 literal segments");
@@ -232,6 +260,12 @@ int fm_load(fm_graph *g,const void *bytes,size_t size,char *error,size_t cap) {
    }
   }
  }
+ /* LocalBuf values are private table references, not general server buffer IDs. */
+ for(i=0;i<g->nodes;i++)for(j=0;j<g->node[i].inputs;j++){
+  const fm_node *consumer=&g->node[i];const fm_ref *ref=&g->ref[consumer->input+j];
+  if(ref->node>=0 && g->node[ref->node].type==FM_LocalBuf && !(j==0 && (consumer->type==FM_SetBuf || consumer->type==FM_DegreeToKey)))BAD("LocalBuf references may only feed SetBuf or DegreeToKey");
+ }
+ for(i=0;i<g->nodes;i++)if(g->node[i].type==FM_LocalBuf && g->node[i].partial==UINT16_MAX)BAD("LocalBuf requires a complete constant SetBuf initializer");
  if(rd(&r,2)!=0) BAD("SynthDef variants are not supported yet");
  if(r.failed || r.left) BAD("Truncated file or trailing bytes");
  g->valid=FM_VALID; return 1;

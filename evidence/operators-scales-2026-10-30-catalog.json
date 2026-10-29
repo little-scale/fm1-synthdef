@@ -1,0 +1,1009 @@
+{
+  "presets": 143,
+  "scales": 108,
+  "tunings": 35,
+  "lookup_checks": 6514,
+  "results": [
+    {
+      "name": "Scale_aeolian",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_ahirbhairav",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_ajam",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_atharKurd",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_augmented",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_augmented2",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_bartok",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_bastanikar",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_bayati",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_bhairav",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_chinese",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_chromatic",
+      "kind": "Scale",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_chromatic24",
+      "kind": "Scale",
+      "entries": 24,
+      "checks": 102,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_diminished",
+      "kind": "Scale",
+      "entries": 8,
+      "checks": 38,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_diminished2",
+      "kind": "Scale",
+      "entries": 8,
+      "checks": 38,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_dorian",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_egyptian",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_enigmatic",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_farahfaza",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_gong",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_harmonicMajor",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_harmonicMinor",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_hexAeolian",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_hexDorian",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_hexMajor6",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_hexMajor7",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_hexPhrygian",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_hexSus",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_hijaz",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_hijazDesc",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_hijazKar",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_hindu",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_hirajoshi",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_hungarianMinor",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_husseini",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_huzam",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_indian",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_ionian",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_iraq",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_iwato",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_jiao",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_jiharkah",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_karjighar",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_kijazKarKurd",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_kumoi",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_kurd",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_leadingWhole",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_locrian",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_locrianMajor",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_lydian",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_lydianMinor",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_mahur",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_major",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_majorPentatonic",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_marva",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_melodicMajor",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_melodicMinor",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_melodicMinorDesc",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_minor",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_minorPentatonic",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_mixolydian",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_murassah",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_mustar",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_nahawand",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_nahawandDesc",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_nairuz",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_nawaAthar",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_neapolitanMajor",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_neapolitanMinor",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_nikriz",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_partch_o1",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_partch_o2",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_partch_o3",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_partch_o4",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_partch_o5",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_partch_o6",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_partch_u1",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_partch_u2",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_partch_u3",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_partch_u4",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_partch_u5",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_partch_u6",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_pelog",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_phrygian",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_prometheus",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_purvi",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_rast",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_rastDesc",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_ritusen",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_romanianMinor",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_saba",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_scriabin",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_shang",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_shawqAfza",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_sikah",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_sikahDesc",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_spanish",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_superLocrian",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_suznak",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_todi",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_ushaqMashri",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_whole",
+      "kind": "Scale",
+      "entries": 6,
+      "checks": 30,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_yakah",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_yakahDesc",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_yu",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_zamzam",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_zanjaran",
+      "kind": "Scale",
+      "entries": 7,
+      "checks": 34,
+      "peak_error": 0
+    },
+    {
+      "name": "Scale_zhi",
+      "kind": "Scale",
+      "entries": 5,
+      "checks": 26,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_bp",
+      "kind": "Tuning",
+      "entries": 13,
+      "checks": 58,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_catler",
+      "kind": "Tuning",
+      "entries": 24,
+      "checks": 102,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_chalmers",
+      "kind": "Tuning",
+      "entries": 19,
+      "checks": 82,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_et12",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_et19",
+      "kind": "Tuning",
+      "entries": 19,
+      "checks": 82,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_et22",
+      "kind": "Tuning",
+      "entries": 22,
+      "checks": 94,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_et24",
+      "kind": "Tuning",
+      "entries": 24,
+      "checks": 102,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_et31",
+      "kind": "Tuning",
+      "entries": 31,
+      "checks": 130,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_et41",
+      "kind": "Tuning",
+      "entries": 41,
+      "checks": 170,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_et53",
+      "kind": "Tuning",
+      "entries": 53,
+      "checks": 218,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_harmonic",
+      "kind": "Tuning",
+      "entries": 24,
+      "checks": 102,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_harrison",
+      "kind": "Tuning",
+      "entries": 16,
+      "checks": 70,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_johnston",
+      "kind": "Tuning",
+      "entries": 25,
+      "checks": 106,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_just",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_kirnberger",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_lu",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_mean4",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_mean5",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_mean6",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_michael_harrison",
+      "kind": "Tuning",
+      "entries": 34,
+      "checks": 142,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_partch",
+      "kind": "Tuning",
+      "entries": 43,
+      "checks": 178,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_perret",
+      "kind": "Tuning",
+      "entries": 19,
+      "checks": 82,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_pythagorean",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_reinhard",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_sept1",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_sept2",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_sruti",
+      "kind": "Tuning",
+      "entries": 22,
+      "checks": 94,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_vallotti",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_wcAlpha",
+      "kind": "Tuning",
+      "entries": 15,
+      "checks": 66,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_wcBeta",
+      "kind": "Tuning",
+      "entries": 19,
+      "checks": 82,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_wcGamma",
+      "kind": "Tuning",
+      "entries": 34,
+      "checks": 142,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_wcHarm",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_wcSJ",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_werckmeister",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    },
+    {
+      "name": "Tuning_young",
+      "kind": "Tuning",
+      "entries": 12,
+      "checks": 54,
+      "peak_error": 0
+    }
+  ]
+}

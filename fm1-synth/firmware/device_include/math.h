@@ -62,3 +62,27 @@ static inline float asinf(float x){
  p=0.0303819444f;p=p*z*z+0.0446428571f;p=p*z*z+0.075f;p=p*z*z+0.166666667f;
  r=z+z*z*z*p;if(a>0.5f)r=1.57079632679f-2*r;return x<0?-r:r;
 }
+/* Reduced-domain odd series; no double arithmetic or libm dependency. */
+static inline float atanf(float x){
+ float a=fabsf(x),offset=0.0f;int inverse=a>1.0f;
+ if(inverse)a=1.0f/a;
+ if(a>0.414213562373095f){a=(a-1.0f)/(a+1.0f);offset=0.7853981633974483f;}
+ float q=a*a,p=1.0f/17.0f;
+ p=-1.0f/15.0f+q*p;p=1.0f/13.0f+q*p;p=-1.0f/11.0f+q*p;
+ p=1.0f/9.0f+q*p;p=-1.0f/7.0f+q*p;p=1.0f/5.0f+q*p;p=-1.0f/3.0f+q*p;
+ float y=offset+a*(1.0f+q*p);if(inverse)y=1.5707963267948966f-y;
+ return x<0.0f?-y:y;
+}
+static inline float atan2f(float y,float x){
+ union{float f;uint32_t u;} sy={y},sx={x};
+ if(x!=x||y!=y)return NAN;
+ if(y==0.0f)return sx.u>>31?(sy.u>>31?-3.1415926535897932f:3.1415926535897932f):y;
+ if(x==0.0f)return y<0.0f?-1.5707963267948966f:1.5707963267948966f;
+ float a=atanf(fabsf(y/x));if(x<0.0f)a=3.1415926535897932f-a;
+ return y<0.0f?-a:a;
+}
+static inline float acosf(float x){if(fabsf(x)>1.0f||x!=x)return NAN;return atan2f(sqrtf((1.0f-x)*(1.0f+x)),x);}
+static inline float sinhf(float x){float a=expm1f(fabsf(x));float y=0.5f*(a+a/(a+1.0f));return x<0.0f?-y:y;}
+static inline float coshf(float x){float a=expf(fabsf(x));return 0.5f*(a+1.0f/a);}
+static inline float tanhf(float x){float a=fabsf(x);if(a>10.0f)return x<0.0f?-1.0f:1.0f;float e=expm1f(-2.0f*a),y=-e/(2.0f+e);return x<0.0f?-y:y;}
+static inline float hypotf(float x,float y){float a=fmaxf(fabsf(x),fabsf(y)),b=fminf(fabsf(x),fabsf(y));if(a==0.0f)return 0.0f;float q=b/a;return a*sqrtf(1.0f+q*q);}

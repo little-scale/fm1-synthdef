@@ -4,7 +4,7 @@
 
 FM1 SynthDef is an experimental embedded SynthDef runtime and programmable instrument. Write a patch in the local browser editor, compile it with SuperCollider on your Mac, send it over USB, and play it on the FM-1.
 
-The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and executes that graph using a bounded set of 114 supported UGen types in the development source. This is not the full SuperCollider language, scsynth server or plugin ecosystem.
+The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and executes that graph using a bounded set of 118 supported UGen types in the development source. This is not the full SuperCollider language, scsynth server or plugin ecosystem.
 
 ## What it does
 
@@ -18,9 +18,9 @@ The Mac compiles SuperCollider source into a UGen graph. The FM-1 loads and exec
 
 ## Supported UGens
 
-The latest expansion adds 32 types, including **MiMu.ar**. [MiMu drive](fm1-synth/examples/mimu-drive.scd) and [modulation lab](fm1-synth/examples/modulation-lab.scd) are ready to compile and preview. Full **MiRings is not supported**: its upstream host probe works, but its roughly 176 KiB instance exceeds our 128 KiB shared DSP arena. See the [roadmap](docs/UGEN-ROADMAP.md).
+The development source includes **Formant, Formlet, Gendy1/2/3**, **MiMu.ar**, live Scale/Tuning pitch tables and 28 additional maths operators. [MiMu drive](fm1-synth/examples/mimu-drive.scd) and [modulation lab](fm1-synth/examples/modulation-lab.scd) are ready to compile and preview. Full **MiRings is not supported**: its upstream host probe works, but its roughly 176 KiB instance exceeds our 128 KiB shared DSP arena. See the [roadmap](docs/UGEN-ROADMAP.md).
 
-The development source supports these **114 compiled UGen types**, verified in emulation. The published **v0.1.0-preview firmware contains 53 types**; the additions below require a development build; the previous 77-type build has passed selected hardware tests. The latest 37 additions are awaiting hardware checks. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
+The development source supports these **118 compiled UGen types**, verified in emulation. The published **v0.1.0-preview firmware contains 53 types**; the additions below require a development build; the previous 77-type build has passed selected hardware tests. The latest 41 additions are awaiting hardware checks. Support is bounded by the calculation rates, input rules and operator selectors in the [engine compatibility profile](synthdef-engine/README.md#supported-profile); listing a type does not imply every SuperCollider usage is supported.
 
 | Category | UGen types |
 | --- | --- |
@@ -39,10 +39,12 @@ The development source supports these **114 compiled UGen types**, verified in e
 | Constants, rate conversion and bounds | `DC`, `K2A`, `A2K`, `Clip`, `Fold`, `Wrap`, `LinExp` |
 | Timing information (initial rate) | `SampleRate`, `SampleDur`, `ControlRate`, `ControlDur`, `BlockSize`, `RadiansPerSample` |
 | Triggers and counters | `Trig`, `Trig1`, `PulseDivider`, `PulseCount`, `ToggleFF`, `SetResetFF`, `Stepper` |
+| Scale/tuning lookup | `DegreeToKey`, with bounded immutable `MaxLocalBufs`, `LocalBuf`, `SetBuf` tables |
 | Arithmetic | `UnaryOpUGen`, `BinaryOpUGen`, `MulAdd`, `Sum3`, `Sum4` |
 
 - `In.ar(0, 1/2)` is available only in the permanent effect slot. `Out.ar` writes stereo bus 0.
-- `UnaryOpUGen` and `BinaryOpUGen` accept only the [documented selectors](synthdef-engine/README.md#supported-profile). Pitch/gain conversions `.cpsmidi`, `.midiratio`, `.ratiomidi`, `.dbamp` and `.ampdb` are now supported. Rounding, modulo, `clip2`, `fold2` and `wrap2` selectors are supported; general `pow` remains unsupported.
+- `UnaryOpUGen` and `BinaryOpUGen` accept only the [documented selectors](synthdef-engine/README.md#supported-profile). This includes `.abs`, `.squared`, `.cubed`, signed `.pow` / `**`, `.tanh`, octave/pitch/gain conversions, ring modulation, rounding and bounds. The complete selector list and remaining omissions are documented there.
+- `Scale` and `Tuning` presets/custom objects run at compilation. `Scale.as(LocalBuf)` plus `DegreeToKey.ar/kr` supports a changing degree during playback, including microtonal pitch values. Tables are read-only and limited to 128 entries; this does not add general sample buffers or automatic Event-scale behaviour.
 - `Env.perc`, `Env.adsr`, `Env.asr` and other Env constructors are source-language helpers compiled into `EnvGen` data. All nine EnvGen curve types are implemented, with done actions 0/2 and the documented segment limits.
 - `Mix.ar`, `Mix`, `Splay.ar`, `LinLin` and `PMOsc` can compile into existing supported nodes; they are not additional runtime types. Mix/Splay now have 15 compiled comparisons against explicit sums, stereo panners and rate converters. `DynKlang`/`DynKlank` likewise expand into supported oscillator/resonator graphs within the documented limits. This does not guarantee every argument/rate combination or CPU load.
 
@@ -63,6 +65,8 @@ Three additional [Gendy examples](fm1-synth/examples/gendy3.scd) use knobs 1–4
 
 [Formant](fm1-synth/examples/formant.scd) and [Formlet](fm1-synth/examples/formlet.scd) examples are also supplied with four live knob controls, compiled graphs and importable `.fmslot` files.
 
+Try the [just-intonation Formant patch](fm1-synth/examples/just-intonation.scd): each keyboard semitone advances one scale degree. Knobs control scale transposition, formant, attack and release. Its compiled graph and importable `.fmslot` are supplied alongside the source.
+
 ## Example bank
 
 | Slot | Patch | Knobs |
@@ -82,7 +86,7 @@ SELECT scrolls the focused code, OCT± transposes subsequent keyboard notes, and
 
 ## Status
 
-The development engine passes 981 reference cases on three rendering backends: 953 waveform checks and 28 stochastic-summary checks, with separate identical-state Gendy oracles. It also passes 50 API test groups and 740,000 sanitizer mutation/truncation cases. The instrument simulator covers the Gendy, Formant and Formlet examples with two voices and master echo. Gendy2’s chaotic feedback and Gendy3’s quantized interpolation can produce different long waveforms across floating-point implementations; these are algorithm-compatible ports, not bit-identical desktop output. The earlier 77-type build passed 189 hardware checks of the three reverbs with four lighter two-voice synths; two Addy voices through FreeVerb exceed the processing budget. The earlier 53-type preview was tested on one FM-1 and an Apple silicon Mac; its recorded hardware checks cover two voices, stealing, release, live knobs, persistent effects and code browsing. See [verification and limitations](docs/VERIFICATION.md).
+The development engine passes 1,248 reference cases on three rendering backends: 1,220 waveform/timing checks and 28 stochastic-summary checks, with separate identical-state Gendy oracles. It also passes 60 API test groups and 800,000 sanitizer mutation/truncation cases. All 108 stock Scale and 35 Tuning presets pass live lookup checks. Each maths backend also passes 1,835,103 direct operator comparisons. The instrument simulator covers the tuned-scale, Gendy, Formant and Formlet examples with two voices and master echo. Gendy2’s chaotic feedback and Gendy3’s quantized interpolation can produce different long waveforms across floating-point implementations; these are algorithm-compatible ports, not bit-identical desktop output. The earlier 77-type build passed 189 hardware checks of the three reverbs with four lighter two-voice synths; two Addy voices through FreeVerb exceed the processing budget. The earlier 53-type preview was tested on one FM-1 and an Apple silicon Mac; its recorded hardware checks cover two voices, stealing, release, live knobs, persistent effects and code browsing. See [verification and limitations](docs/VERIFICATION.md).
 
 Passing the graph and memory checks does **not** guarantee that an arbitrary patch fits the audio processing budget. The overload guard stops notes and disables effects when the device is over budget. Final-release power-cycle persistence and recovery are not yet part of the acceptance record. This is an independent project, not an official M-VAVE or SuperCollider product.
 

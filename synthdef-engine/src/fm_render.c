@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
- * Envelope and resonator equations adapted from SuperCollider 3.14.1,
+ * Envelope, resonator, operator and pitch-lookup equations adapted from SuperCollider 3.14.1,
  * Copyright (c) 2002 James McCartney (GPL-2.0-or-later). See reference/README.md.
  * Bounded single-precision implementation; no allocation or I/O in rendering.
  */
@@ -30,17 +30,40 @@ static float unary(int op,float a) {
  case 18:return log2f(a/440.0f)*12.0f+69.0f;
  case 19:return powf(2.0f,a/12.0f); case 20:return 12.0f*log2f(a);
  case 21:return powf(10.0f,a*0.05f); case 22:return log10f(a)*20.0f;
+ case 23:return 440.0f*exp2f(a-4.75f); case 24:return log2f(a/440.0f)+4.75f;
  case 25:return logf(fabsf(a)); case 26:return log2f(fabsf(a)); case 27:return log10f(fabsf(a));
  case 28:return sinf(a); case 29:return cosf(a); case 30:return tanf(a); case 31:return asinf(a);
+ case 32:return acosf(a); case 33:return atanf(a);
+ case 34:return sinhf(a); case 35:return coshf(a); case 36:return tanhf(a);
  case 42:return a/(1.0f+fabsf(a)); case 43:return fabsf(a)<=0.5f?a:(fabsf(a)-0.25f)/a;
  default:return 0;
  }
 }
 static float bounded_wrap(float x,float lo,float hi);
 static float bounded_fold(float x,float lo,float hi);
+/* Integer operators deliberately stay within float's exact-integer range.
+ * Bounded Euclid avoids soft int64 arithmetic on the pi32v2 audio thread. */
+static float integer_gcd(float a,float b,int lcm) {
+ if(!isfinite(a)||!isfinite(b)||fabsf(a)>16777216.0f||fabsf(b)>16777216.0f)return NAN;
+ int32_t ia=(int32_t)a,ib=(int32_t)b,x=ia<0?-ia:ia,y=ib<0?-ib:ib;
+ if(!x||!y)return lcm?0.0f:(float)(ia?ia:ib);
+ for(unsigned i=0;i<48 && y;i++){int32_t r=x%y;x=y;y=r;}
+ if(y)return NAN;
+ int32_t d=ia<0 && ib<0?-x:x;
+ return lcm?(float)(ia/d)*(float)ib:(float)d;
+}
 static float binary(int op,float a,float b) {
  switch(op) {
+ case 3:return floorf(a/b);
  case 5:return b==0?0:a-b*floorf(a/b);
+ case 17:return integer_gcd(a,b,1); case 18:return integer_gcd(a,b,0);
+ case 22:return atan2f(a,b); case 23:return hypotf(a,b);
+ case 24:return fabsf(a)+fabsf(b)-(1.4142135623730951f-1.0f)*fminf(fabsf(a),fabsf(b));
+ case 25:return a>=0?powf(a,b):-powf(-a,b);
+ case 30:return a*b+a; case 31:return a*b+a+b; case 32:return a*a*b; case 33:return a*a*b-a*b*b;
+ case 34:return a*a-b*b; case 35:return a*a+b*b; case 36:return (a+b)*(a+b); case 37:return (a-b)*(a-b);
+ case 38:return fabsf(a-b); case 39:return a<b?0:a; case 40:return a*0.5f*(b+fabsf(b));
+ case 41:return a>=0?a:a*b; case 43:return a-fminf(b,fmaxf(-b,a)); case 46:return a;
  case 19:return b==0?a:floorf(a/b+.5f)*b;
  case 20:return b==0?a:ceilf(a/b)*b;
  case 21:return b==0?a:floorf(a/b)*b;
@@ -347,6 +370,18 @@ static void render_graph(const fm_graph *g,fm_voice *v,fm_scratch *b,float *ster
     }break;
    case FM_DC:out=s->initialized?s->last:a;s->last=out;break;
    case FM_BinaryOpUGen:out=binary(n->special,math_in[0],math_in[1]);break;
+   /* Tables live in validated graph constants: no mutable buffer or audio allocation. */
+   case FM_MaxLocalBufs: case FM_LocalBuf: case FM_SetBuf:out=0.0f;break;
+   case FM_DegreeToKey:{
+    float degree=IN(1);
+    if(!isfinite(degree)||fabsf(degree)>16777216.0f){v->fault=1;out=0.0f;break;}
+    int32_t index=(int32_t)floorf(degree),size=n->partials,oct=index/size,key=index%size;
+    /* Euclidean wrap also handles exact negative octaves without an out-of-bounds read. */
+    if(key<0){key+=size;oct--;}
+    int32_t octave=(int32_t)IN(2);
+    out=g->constant[g->ref[n->partial+(unsigned)key].output]+(float)octave*(float)oct;
+    break;
+   }
    case FM_UnaryOpUGen:out=unary(n->special,a);break;
    case FM_MulAdd:out=math_in[0]*math_in[1]+math_in[2];break;
    case FM_Sum3:out=math_in[0]+math_in[1]+math_in[2];break;

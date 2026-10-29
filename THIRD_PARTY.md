@@ -6,6 +6,7 @@ FM1 SynthDef combines the following components. Original source headers and lice
 | --- | --- | --- |
 | New SynthDef engine, instrument, manager and release tooling | This project | GPL-3.0-or-later; root `LICENSE` and `synthdef-engine/LICENSE` |
 | Adapted DSP algorithms and reference material | SuperCollider 3.14.1; source credits include James McCartney and other named contributors | GPL-2.0-or-later sources, adaptations distributed under GPL-3.0-or-later; `synthdef-engine/reference/README.md`, original headers and source hash manifest |
+| Operators / DegreeToKey | SuperCollider 3.14.1, James McCartney and contributors; pinned BinaryOpUGens.cpp, UnaryOpUGens.cpp, SC inline headers and OscUGens.cpp | GPL-2.0-or-later originals; GPL-3.0-or-later C adaptation |
 | Formant / Formlet | SuperCollider 3.14.1, James McCartney, pinned OscUGens.cpp / FilterUGens.cpp | GPL-2.0-or-later original, GPL-3.0-or-later C adaptation |
 | Gendy1 / Gendy2 / Gendy3 | SuperCollider 3.14.1, Nick Collins; stochastic synthesis by Iannis Xenakis / Marie-Helene Serra | GPL-2.0-or-later original `GendynUGens.cpp`, GPL-3.0-or-later C adaptation; pinned hash in reference manifest |
 | FreeVerb / FreeVerb2 kernels | SuperCollider 3.14.1, blackrain | GPL-2.0-or-later original, GPL-3.0-or-later adaptation; pinned ReverbUGens.cpp and generated-kernel notice |
