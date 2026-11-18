@@ -18,13 +18,22 @@ Node.js is needed only for browser-code tests. Docker and the JieLi toolchain ar
 
 ## 2. Install the firmware
 
-The complete release archive contains `firmware/FM1-SynthDef-0.1.0-preview.fwsc`. A source checkout must build it first or obtain that file from the matching release. Check the archive against its published SHA-256 before use.
+The [v0.2.0-preview release](https://github.com/little-scale/fm1-synthdef/releases/tag/v0.2.0-preview) provides a ready-to-install `.fwsc` file and a complete ZIP containing `firmware/FM1-SynthDef-0.2.0-preview.fwsc`. Check your download against the published `SHA256SUMS`.
+
+To install firmware only, Python 3.11 or later and the USB-MIDI dependencies are sufficient. From the extracted complete ZIP, run the following before the installer commands below (SuperCollider, Docker and firmware compilation are not required):
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -r setup/requirements-midi-lock.txt
+```
+
+The full setup in section 1 is needed to build the local editor and compile new patches.
 
 Installing custom firmware replaces the current instrument. Export any work you need from the current firmware first; this project does not migrate stock presets or samples. Keep power and USB connected during installation. Begin with MASTER low.
 
 ```sh
 .venv/bin/python fm1-base/tools/fm1_install.py --info
-.venv/bin/python fm1-base/tools/fm1_install.py firmware/FM1-SynthDef-0.1.0-preview.fwsc
+.venv/bin/python fm1-base/tools/fm1_install.py firmware/FM1-SynthDef-0.2.0-preview.fwsc
 .venv/bin/python fm1-base/tools/fm1_install.py --info
 ```
 

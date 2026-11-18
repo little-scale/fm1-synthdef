@@ -107,7 +107,7 @@ Bitwise/shift selectors, random arithmetic selectors such as `.rand` / `.rrand`,
 
 ## Start here
 
-Download the complete **0.1.0-preview** archive from the repository's Releases page. It contains source, pinned platform sources, the firmware, example patches, licences and checksums. A Git clone also contains everything except the generated release firmware and SDK/compiler downloads.
+Download **v0.2.0-preview** from [GitHub Releases](https://github.com/little-scale/fm1-synthdef/releases/tag/v0.2.0-preview). The `.fwsc` asset is ready to install: no firmware compilation is required. The complete ZIP includes the same firmware, USB installer, source, pinned platform sources, example patches, licences and checksums. A Git clone contains everything except the generated firmware and SDK/compiler downloads.
 
 1. Follow [Mac setup and installation](docs/QUICKSTART.md).
 2. Try the [included patches and controls](docs/PATCHES.md).
